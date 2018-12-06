@@ -1,0 +1,100 @@
+---
+serverProtocol: http
+serverName: localhost
+
+server:
+  contextPath: /omar-ui
+
+grails:
+  serverURL: http://${serverName}/omar-ui
+
+endpoints:
+  enabled: true
+  health:
+    enabled: true
+  actuator:
+    sensitive: false
+  beans:
+    sensitive: false
+  metrics:
+    sensitive: false
+  configprops:
+    sensitive: false
+  trace:
+    sensitive: false
+  mappings:
+    sensitive: false
+  env:
+    sensitive: false
+---
+omar:
+  app:
+    footprints:
+      params:
+        styles: byFileType
+#        styles: bySensorType
+
+    sites:
+      -
+        info:
+          # Short name for the omar site
+          name: OMAR-DEV
+
+          # Long name/description of the site.  This is displayed in the dropdown in the UI
+          description: OMAR Development Server (Unclassified)
+        url:
+          # Base URL for the federated site
+          base: http://localhost
+
+      -
+        info:
+          # Short name for the omar site
+          name: OMAR-DEV (Remote)
+
+          # Long name/description of the site.  This is displayed in the dropdown in the UI
+          description: OMAR Development Server (Unclassified) (Remote)
+        url:
+          # Base URL for the federated site
+          base: https://omar-dev.ossim.io
+
+  openlayers:
+    baseMaps:
+      -
+        layerType: "tilewms"
+        title: "OSM Basic"
+        url: "https://omar-dev.ossim.io/omar-mapproxy/service"
+        params:
+          layers: "o2-basemap-basic"
+          format: "image/jpeg"
+        options:
+          visible: true
+      # -
+      #   layerType: "tilewms"
+      #   title: "NASA BMNG"
+      #   url: "http://localhost/cgi-bin/mapserv?map=/data/omar/bmng.map&"
+      #   params:
+      #     layers: "Reference"
+      #     format: "image/jpeg"
+      #   options:
+      #     visible: true
+    # Uncomment the example below, and modify to add
+    # a custom overlay layer
+    overlayLayers:
+#     -
+#        layerType: "tilewms"
+#        title: "Auto Mosaic"
+#        url: "http://localhost/omar-wms/mosaic"
+#        params:
+#          filter: ""
+#          version: "1.3.0"
+#          layers: ""
+#          styles: ""
+#          format: "image/png"
+#        options:
+#          visible: false
+---
+spring:
+  cloud:
+    service-registry:
+      auto-registration:
+        enabled: ${spring.cloud.discovery.enabled}

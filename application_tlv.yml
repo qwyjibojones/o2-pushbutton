@@ -1,0 +1,46 @@
+---
+server:
+  port: 8090
+  contextPath: /tlv
+---
+#baseUrl: http://localhost
+baseUrl: http://localhost
+
+# serverProtocol: https
+# serverName: omar-dev.ossim.io
+serverProtocol: http
+serverName: localhost
+
+baseLayers:
+    osmBasic:
+        layers: o2-basemap-basic
+        name: OSM Basic
+        styles:
+        type: wms
+        url: ${baseUrl}/omar-mapproxy/service
+#        url: https://omar-dev.ossim.io/omar-mapproxy/service
+        visible: false
+    osmBright:
+        layers: o2-basemap-bright
+        name: OSM Bright
+        styles:
+        type: wms
+        visible: true
+        url: ${baseUrl}/omar-mapproxy/service
+#        url: https://omar-dev.ossim.io/omar-mapproxy/service
+
+libraries:
+    o2-local:
+        imageSpaceUrl: ${baseUrl}/omar-ui/omar/#/mapImage
+        kmlUrl: ${baseUrl}/omar-superoverlay/superOverlay/createKml
+        label: O2-LOCAL
+        layerType: wms
+        mensaUrl: ${baseUrl}/omar-mensa/mensa
+        omsUrl: ${baseUrl}/omar-oms/imageSpace
+        stagerUrl: ${baseUrl}/omar-stager
+        wfsUrl: ${baseUrl}/omar-wfs/wfs
+        wmsUrl: ${baseUrl}/omar-wms/wms
+
+geocoderUrl: ${baseUrl}/twoFishesProxy
+imageIdFilters: '[ "(_2CMV_[A-Z])" ]'
+terrainProvider: //assets.agi.com/stk-terrain/world
