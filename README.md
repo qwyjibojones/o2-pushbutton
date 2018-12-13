@@ -2,7 +2,8 @@ This contains a docker-compose file and application.yml files to support a singl
 
 ## Requirements
 
-This does not contain all necessary files, such as the expected elevation data and imagery.
+This repo does not contain all necessary files, such as the expected elevation data and imagery.
+These can either be put in place manually, or by running the ./initialize.sh script.
 
 ### Elevation Data
 
@@ -27,4 +28,4 @@ To run O2 in the background, run `docker-compose up -d`
 
 ## Using the Deployment
 
-The deployment can be reached at https://localhost/omar-ui
+The deployment can be reached at http://localhost/omar-ui
