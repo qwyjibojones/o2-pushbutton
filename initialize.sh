@@ -26,7 +26,7 @@ fi
 echo "elevation done"
 
 # Create empty database directories
-for i in pg_commit_ts/ pg_dynshmem/ pg_replslot/ pg_serial/ pg_snapshots/ pg_stat/ pg_tblspc/ pg_twophase/ pgdata/pg_logical/snapshots/ pgdata/pg_logical/mappings/; do
+for i in pg_commit_ts/ pg_dynshmem/ pg_replslot/ pg_serial/ pg_snapshots/ pg_stat/ pg_tblspc/ pg_twophase/ pg_logical/snapshots/ pg_logical/mappings/; do
     if [[ ! -d ./pgdata/$i ]]; then
         mkdir ./pgdata/$i
     fi
