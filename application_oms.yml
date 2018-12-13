@@ -1,6 +1,6 @@
 ---
 
-serverName: localhost
+serverName: localhost:80
 grails:
   serverURL: http://${serverName}/omar-oms
 

@@ -3,8 +3,7 @@ server:
   port: 8090
   contextPath: /tlv
 ---
-#baseUrl: http://localhost
-baseUrl: http://localhost
+baseUrl: http://localhost:80
 
 # serverProtocol: https
 # serverName: omar-dev.ossim.io
@@ -17,8 +16,8 @@ baseLayers:
         name: OSM Basic
         styles:
         type: wms
-        url: ${baseUrl}/omar-mapproxy/service
-#        url: https://omar-dev.ossim.io/omar-mapproxy/service
+#        url: ${baseUrl}/omar-mapproxy/service
+        url: https://omar-dev.ossim.io/omar-mapproxy/service
         visible: false
     osmBright:
         layers: o2-basemap-bright
@@ -26,8 +25,8 @@ baseLayers:
         styles:
         type: wms
         visible: true
-        url: ${baseUrl}/omar-mapproxy/service
-#        url: https://omar-dev.ossim.io/omar-mapproxy/service
+#        url: ${baseUrl}/omar-mapproxy/service
+        url: https://omar-dev.ossim.io/omar-mapproxy/service
 
 libraries:
     o2-local:

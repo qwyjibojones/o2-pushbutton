@@ -1,6 +1,6 @@
 ---
 serverProtocol: http
-serverName: localhost
+serverName: localhost:80
 
 server:
   contextPath: /omar-ui
@@ -44,7 +44,7 @@ omar:
           description: OMAR Development Server (Unclassified)
         url:
           # Base URL for the federated site
-          base: http://localhost
+          base: ${serverProtocol}://${serverName}
 
       -
         info:

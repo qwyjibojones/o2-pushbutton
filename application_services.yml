@@ -1,6 +1,6 @@
 ---
 serverProtocol: http  
-serverName: localhost
+serverName: localhost:80
 
 server:
   port: 8081
