@@ -44,7 +44,7 @@ omar:
           description: OMAR Development Server (Unclassified)
         url:
           # Base URL for the federated site
-          base: ${serverProtocol}://${serverName}
+          base: http://localhost
 
       -
         info:
