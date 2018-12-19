@@ -13,8 +13,6 @@ services:
       - SPRING_CLOUD_DISCOVERY_ENABLED=false
     depends_on:
       - database
-    ports:
-      - 9090:9090
 
   tlv:
     image: quay.io/radiantsolutions/tlv-app:latest
