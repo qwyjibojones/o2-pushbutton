@@ -53,11 +53,20 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data/pgdata
 
-  apache:
-    image: httpd:latest
+#  apache:
+#    image: httpd:latest
+#    restart: always
+#    ports:
+#      - 80:80
+#    volumes:
+#      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf
+#      - ./o2-proxy.conf:/usr/local/apache2/conf/o2-proxy.conf
+
+  nginx:
+    image: nginx:latest
     restart: always
     ports:
       - 80:80
     volumes:
-      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf
-      - ./o2-proxy.conf:/usr/local/apache2/conf/o2-proxy.conf
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+
