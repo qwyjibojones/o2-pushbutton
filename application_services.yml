@@ -1,6 +1,7 @@
 ---
 serverProtocol: http  
 serverName: localhost:80
+internalServerName: localhost:8081
 
 server:
   port: 8081
@@ -291,7 +292,7 @@ spring:
 omar:
   download:
     maxFiles: 10
-    getRasterFilesUrl: ${serverProtocol}://${serverName}/omar-stager/dataManager/getRasterFiles
+    getRasterFilesUrl: ${serverProtocol}://${internalServerName}/omar-services/dataManager/getRasterFiles
   oms:
     getRasterFilesUrl: ${serverProtocol}://${serverName}/omar-services/dataManager/getRasterFiles
   wms:
