@@ -291,7 +291,7 @@ spring:
 omar:
   download:
     maxFiles: 10
-    getRasterFilesUrl: ${serverProtocol}://${serverName}/omar-stager/dataManager/getRasterFiles
+    getRasterFilesUrl: ${serverProtocol}://${serverName}/omar-services/dataManager/getRasterFiles
   oms:
     getRasterFilesUrl: ${serverProtocol}://${serverName}/omar-services/dataManager/getRasterFiles
   wms:
