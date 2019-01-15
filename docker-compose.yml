@@ -10,6 +10,8 @@ services:
       - ./application_services.yml:/home/omar/application.yml
     environment:
       - OSSIM_DATA=/data
+      - OSSIM_PREFS_FILE=/usr/share/ossim/ossim-site-preferences
+      - OSSIM_INSTALL_PREFIX=/usr
       - SPRING_CLOUD_DISCOVERY_ENABLED=false
     depends_on:
       - database
