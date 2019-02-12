@@ -10,15 +10,14 @@ banner:
    textColor: white
 
 serverProtocol: http
-serverName: localhost:80
-internalServerName: localhost:8081
+serverName: localhost
 
 omarDb:
-  host: database
+  host: omar-postgres
   username: postgres
   password: postgres
   port: 5432
-  name: o2_omar_db
+  name: omar-db
   driver: org.postgresql.Driver
   dialect: 'org.hibernate.spatial.dialect.postgis.PostgisDialect'
   url: jdbc:postgresql://${omarDb.host}:${omarDb.port}/${omarDb.name}
@@ -125,3 +124,8 @@ securityClassification:
   backgroundColor: green
   classification: UNCLASSIFIED
   textColor: white
+
+spring:
+  cloud:
+    discovery:
+      enabled: false

@@ -1,7 +1,7 @@
-version: '3'
+version: '3.5'
 services:
   omar-config-server:
-    image: quay.io/radiantsolutions/omar-config-server:latest
+    image: quay.io/radiantsolutions/omar-config-server:2.6.2
     env_file:
       - envs/omar-config-server.env
     volumes:
@@ -11,64 +11,208 @@ services:
       - omarnet
 
   omar-eureka-server:
-    image: quay.io/radiantsolutions/omar-eureka-server:latest
+    image: quay.io/radiantsolutions/omar-eureka-server:2.6.2
     env_file:
       - envs/omar-eureka-server.env
     networks:
       - proxynet
       - omarnet
 
-  services:
-    image: quay.io/radiantsolutions/omar-services-app:latest
+  nifi:
+    image: quay.io/radiantsolutions/nifi:2.6.2
     env_file:
-      - envs/omar-.env
-    volumes:
-      - ./sanfrancisco:/data/sanfrancisco
-      - ./elevation:/data/elevation
-      - ./application_services.yml:/home/omar/application.yml
+      - envs/nifi.env
     networks:
       - proxynet
       - omarnet
-    depends_on:
-      - database
 
-  tlv:
-    image: quay.io/radiantsolutions/tlv-app:latest
+  omar-admin-server:
+    image: quay.io/radiantsolutions/omar-admin-server:2.6.2
     env_file:
-      - envs/tlv.env
-    volumes:
-      - ./application_tlv.yml:/home/omar/application.yml
+      - envs/omar-admin-server.env
     networks:
       - proxynet
       - omarnet
-    depends_on:
-      - services
-      - twofishes
 
-  twofishes:
-    image: quay.io/radiantsolutions/omar-twofishes:latest
+  omar-avro-metadata:
+    image: quay.io/radiantsolutions/omar-avro-metadata:2.6.2
+    env_file:
+      - envs/omar-avro-metadata.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-disk-cleanup-app:
+    image: quay.io/radiantsolutions/omar-disk-cleanup-app:2.6.2
+    env_file:
+      - envs/omar-disk-cleanup-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-download-app:
+    image: quay.io/radiantsolutions/omar-download-app:2.6.2
+    env_file:
+      - envs/omar-download-app.env
+    volumes:
+      - ./image-data:/data
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-geoscript-app:
+    image: quay.io/radiantsolutions/omar-geoscript-app:2.6.2
+    env_file:
+      - envs/omar-geoscript-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-mensa-app:
+    image: quay.io/radiantsolutions/omar-mensa-app:2.6.2
+    env_file:
+      - envs/omar-mensa-app.env
+    volumes:
+      - ./image-data:/data
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-mensa-app:
+    image: quay.io/radiantsolutions/omar-mensa-app:2.6.2
+    env_file:
+      - envs/omar-mensa-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-ml:
+    image: quay.io/radiantsolutions/omar-ml:2.6.2
+    env_file:
+      - envs/omar-ml.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-oms-app:
+    image: quay.io/radiantsolutions/omar-oms-app:2.6.2
+    env_file:
+      - envs/omar-oms-app.env
+    volumes:
+      - ./image-data:/data
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-services-monitor-app:
+    image: quay.io/radiantsolutions/omar-services-monitor-app:2.6.2
+    env_file:
+      - envs/omar-services-monitor-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-stager-app:
+    image: quay.io/radiantsolutions/omar-stager-app:2.6.2
+    env_file:
+      - envs/omar-stager-app.env
+    volumes:
+      - ./image-data:/data
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-streetview-app:
+    image: quay.io/radiantsolutions/omar-streetview-app:2.6.2
+    env_file:
+      - envs/omar-streetview-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-superoverlay-app:
+    image: quay.io/radiantsolutions/omar-superoverlay-app:2.6.2
+    env_file:
+      - envs/omar-superoverlay-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-twofishes:
+    image: quay.io/radiantsolutions/omar-twofishes:2.6.2
     env_file:
       - envs/omar-twofishes.env
     networks:
       - proxynet
       - omarnet
-    depends_on:
-      - services
-      - database
 
-  ui:
-    image: quay.io/radiantsolutions/omar-ui-app:latest
+  omar-upload-app:
+    image: quay.io/radiantsolutions/omar-upload-app:2.6.2
     env_file:
-      - envs/omar-ui.env
+      - envs/omar-upload-app.env
     volumes:
-      - ./application_ui.yml:/home/omar/application.yml
+      - ./image-data:/data
     networks:
       - proxynet
       - omarnet
-    depends_on:
-      - services
 
-  database:
+  omar-wcs-app:
+    image: quay.io/radiantsolutions/omar-wcs-app:2.6.2
+    env_file:
+      - envs/omar-wcs-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-wfs-app:
+    image: quay.io/radiantsolutions/omar-wfs-app:2.6.2
+    env_file:
+      - envs/omar-wfs-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-wms-app:
+    image: quay.io/radiantsolutions/omar-wms-app:2.6.2
+    env_file:
+      - envs/omar-wms-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-wmts-app:
+    image: quay.io/radiantsolutions/omar-wmts-app:2.6.2
+    env_file:
+      - envs/omar-wmts-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  rabbitmq:
+    image: quay.io/radiantsolutions/rabbitmq:2.6.2
+    env_file:
+      - envs/rabbitmq.env
+    networks:
+      - proxynet
+      - omarnet
+
+  tlv-app:
+    image: quay.io/radiantsolutions/tlv-app:2.6.2
+    env_file:
+      - envs/tlv-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-ui-app:
+    image: quay.io/radiantsolutions/omar-ui-app:2.6.2
+    env_file:
+      - envs/omar-ui-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-postgres:
     image: quay.io/radiantsolutions/postgres-postgis-trgm:latest
     env_file:
       - envs/omar-postgres.env
@@ -77,30 +221,6 @@ services:
     networks:
       - proxynet
       - omarnet
-
-#  apache:
-#    image: httpd:latest
-#    networks:
-#      - proxynet
-#      - omarnet
-#    restart: always
-#    ports:
-#      - 80:80
-#    volumes:
-#      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf
-#      - ./o2-proxy.conf:/usr/local/apache2/conf/o2-proxy.conf
-
-#  nginx:
-#    image: nginx:latest
-#    networks:
-#      - proxynet
-#    restart: always
-#    ports:
-#      - 80:80
-#    volumes:
-#      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-#    depends_on:
-#      - ui
 
 networks:
   proxynet:
