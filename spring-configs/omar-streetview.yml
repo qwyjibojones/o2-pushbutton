@@ -1,0 +1,11 @@
+---
+
+streetview:
+  database:
+    name: ${omarDb.name}
+    user: ${omarDb.username}
+    password: ${omarDb.password}
+    host: ${omarDb.host}
+  shapeFile:
+    baseDir: /data/beijing-streetview
+    layerName: road_streetview_subset

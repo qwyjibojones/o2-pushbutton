@@ -1,0 +1,15 @@
+---
+server:
+  contextPath: /omar-wms
+
+---
+omar:
+  wms:
+    geoscript:
+      url: http://omar-geoscript-app:8080/omar-geoscript/geoscriptApi
+    mosaic:
+      limit: 50
+    oms:
+      chipper:
+        url: http://omar-oms-app:8080/omar-oms/chipper
+        histOp: auto-minmax

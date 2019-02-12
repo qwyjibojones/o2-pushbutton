@@ -1,0 +1,127 @@
+---
+releaseName: Juno
+releaseNumber: 2.6.2
+
+banner:
+   backgroundColor: darkgray
+   description: This application is subject to change without notice.
+   enabled: true
+   text: BETA
+   textColor: white
+
+serverProtocol: http
+serverName: localhost:80
+internalServerName: localhost:8081
+
+omarDb:
+  host: database
+  username: postgres
+  password: postgres
+  port: 5432
+  name: o2_omar_db
+  driver: org.postgresql.Driver
+  dialect: 'org.hibernate.spatial.dialect.postgis.PostgisDialect'
+  url: jdbc:postgresql://${omarDb.host}:${omarDb.port}/${omarDb.name}
+
+grails:
+  serverURL: ${serverProtocol}://${serverName}${server.contextPath}
+
+spring:
+  zipkin:
+    enabled: false
+    baseUrl: http://omar-zipkin-server:9411
+  sleuth:
+    enabled: false
+    sampler:
+      percentage: 0.5
+  boot:
+    admin:
+      url: http://omar-admin-server:8080/omar-admin-server/
+      auto-deregistration: true
+      client:
+        prefer-ip: true
+      username: pushbutton-app #Client app username for Spring Boot Admin
+      password: PushButt()n123 #Client app password for Spring Boot Admin
+
+security:
+  user:
+    name: pushbutton #user name to authenticate for Spring Boot Admin
+    password: PushButt()n123 #Password to authenticate for Spring Boot Admin
+
+hystrix:
+  fallback:
+    enabled: false
+  execution:
+    timeout:
+      enabled: false
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://omar-eureka-server:8761/omar-eureka-server/eureka/
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+    preferIpAddress: true
+    statusPageUrlPath: ${server.contextPath}/info
+    homePageUrlPath: ${server.contextPath}
+    healthCheckUrlPath: ${server.contextPath}/health
+
+endpoints:
+  enabled: true
+  health:
+    enabled: true
+  actuator:
+    sensitive: false
+  beans:
+    sensitive: false
+  metrics:
+    sensitive: false
+  configprops:
+    sensitive: false
+  trace:
+    sensitive: false
+  mappings:
+    sensitive: false
+  env:
+    sensitive: false
+  loggers:
+    sensitive: false
+
+loggingLevel: DEBUG
+
+logging:
+  level:
+    avro.app: ${loggingLevel}
+    sqs.app: ${loggingLevel}
+    stager.app: ${loggingLevel}
+    omar.avro: ${loggingLevel}
+    omar.eureka: ${loggingLevel}
+    omar.geoscript: ${loggingLevel}
+    omar.oms: ${loggingLevel}
+    omar.raster: ${loggingLevel}
+    omar.stager: ${loggingLevel}
+    omar.sqs: ${loggingLevel}
+    omar.wcs: ${loggingLevel}
+    omar.wfs: ${loggingLevel}
+    omar.wms: ${loggingLevel}
+    omar.wmts: ${loggingLevel}
+
+---
+swagger:
+  validatorUrl: null
+  info:
+    title: ${info.app.name} API
+    version: ${info.app.version}
+    contact:
+      name: "Radiant Solutions"
+      url: http://overview.${serverDomain}
+      email: "kurt.feldbush@radiantsolutions.com"
+    license:
+      name: "Licensed under MIT"
+      url: "https://opensource.org/licenses/MIT"
+
+securityClassification:
+  backgroundColor: green
+  classification: UNCLASSIFIED
+  textColor: white

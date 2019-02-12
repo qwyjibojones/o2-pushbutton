@@ -1,0 +1,28 @@
+---
+server:
+  contextPath: /omar-superoverlay
+
+environments:
+  production:
+    dataSource:
+      pooled: true
+      jmxExport: true
+      driverClassName: ${omarDb.driver}
+      dialect:  ${omarDb.dialect}
+      url:      ${omarDb.url}
+      username: ${omarDb.username}
+      password: ${omarDb.password}
+
+omar:
+  o2:
+    baseUrl: ${serverProtocol}://${serverName}
+  superOverlay:
+    wmsUrl: ${serverProtocol}://${serverName}/omar-wms/wms/getMap
+  tlv:
+    baseUrl: ${serverProtocol}://${serverName}/tlv
+  wfs:
+    baseUrl: ${serverProtocol}://${serverName}/omar-wfs
+  wms:
+    baseUrl: ${serverProtocol}://${serverName}/omar-wms
+
+configMsg: "Served by omar-config-server for omar-superoverlay-app"

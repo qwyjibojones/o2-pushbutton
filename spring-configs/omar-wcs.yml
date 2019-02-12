@@ -1,0 +1,14 @@
+---
+server:
+  contextPath: /omar-wcs
+
+environments:
+  production:
+    dataSource:
+      pooled: true
+      jmxExport: true
+      driverClassName: ${omarDb.driver}
+      dialect:  ${omarDb.dialect}
+      url:      ${omarDb.url}
+      username: ${omarDb.username}
+      password: ${omarDb.password}  

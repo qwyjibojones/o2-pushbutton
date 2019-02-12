@@ -1,0 +1,70 @@
+---
+about:
+  release: ${releaseName}
+  releaseNumber: ${releaseNumber}
+
+server:
+  contextPath: /tlv
+
+banner:
+    backgroundColor: darkgray
+    textColor: white
+    description: This application is subject to change without notice.
+    text: BETA
+
+libraries:
+    o2-dev:
+        imageSpaceUrl: ${baseUrl}/omar-ui/omar/#/mapImage
+        kmlUrl: ${baseUrl}/omar-superoverlay/superOverlay/createKml
+        label: O2-DEV
+        layerType: wms
+        mensaUrl: ${baseUrl}/omar-mensa/mensa
+        omsUrl: ${baseUrl}/omar-oms/imageSpace
+        stagerUrl: ${baseUrl}/omar-stager
+        wfsUrl: ${baseUrl}/omar-wfs/wfs
+        wmsUrl: ${baseUrl}/omar-wms/wms
+    # o2-release:
+    #     imageSpaceUrl: ${serverProtocol}://omar.${serverDomain}/omar-ui/omar/#/mapImage
+    #     kmlUrl: ${serverProtocol}://omar.${serverDomain}/omar-superoverlay/superOverlay/createKml
+    #     label: O2-RELEASE
+    #     layerType: wms
+    #     mensaUrl: ${serverProtocol}://omar.${serverDomain}/omar-mensa/mensa
+    #     omsUrl: ${serverProtocol}://omar.${serverDomain}/omar-oms/imageSpace
+    #     stagerUrl: ${serverProtocol}://omar.${serverDomain}/omar-stager
+    #     wfsUrl: ${serverProtocol}://omar.${serverDomain}/omar-wfs/wfs
+    #     wmsUrl: ${serverProtocol}://omar.${serverDomain}/omar-wms/wms
+
+baseLayers:
+    osmBasic:
+        layers: o2-basemap-basic
+        name: OSM Basic
+        styles:
+        type: wms
+        url: ${serverProtocol}://${serverName}/omar-mapproxy/service
+        visible: false
+    osmBright:
+        layers: o2-basemap-bright
+        name: OSM Bright
+        styles:
+        type: wms
+        visible: true
+        url: ${serverProtocol}://${serverName}/omar-mapproxy/service
+
+baseUrl: ${serverProtocol}://${serverName}
+
+beLookup:
+    columnName: be_number
+    typeName: omar:facility
+    #url: ${baseUrl}/omar-wfs/wfs
+
+defaultLocation: 48.8584, 2.2945
+
+docsUrl: ${baseUrl}/omar-docs/tlv/docs/user-guide/tlv/
+
+geocoderUrl: ${baseUrl}/omar-ui/twoFishesProxy
+
+imageIdFilters: '[ "(_2CMV_[A-Z])" ]'
+
+userInfo:
+    requestHeaderUserName: username
+    requestHeaderUserNameDefault: Anonymous
