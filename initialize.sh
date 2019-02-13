@@ -2,14 +2,14 @@
 # This is an initialization script to make the docker-compose useable.
 
 # Get the sanfrancisco data if necessary
-if [[ ! -d ./sanfrancisco || -z "$(ls -A ./sanfrancisco)" ]]; then
+if [[ ! -d ./image-data/sanfrancisco || -z "$(ls -A ./image-data/sanfrancisco)" ]]; then
     echo "The imagery directory is missing or empty, so we'll fill it"
     if [[ ! -e ./sanfrancisco.tgz ]]; then
         echo "The sanfrancisco.tgz file is missing, pulling..."
         wget "https://s3.amazonaws.com/o2-test-data/sanfrancisco.tgz"
     fi
     echo "Extracting sanfrancisco.tgz..."
-    tar -xzf ./sanfrancisco.tgz
+    tar -xzf ./sanfrancisco.tgz -C image-data
 fi
 echo "sanfrancisco done"
 
