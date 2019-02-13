@@ -34,14 +34,6 @@ services:
       - proxynet
       - omarnet
 
-  omar-avro-metadata:
-    image: quay.io/radiantsolutions/omar-avro-metadata:${OMAR_AVRO_METADATA_VERSION}
-    env_file:
-      - envs/omar-avro-metadata.env
-    networks:
-      - proxynet
-      - omarnet
-
   omar-disk-cleanup-app:
     image: quay.io/radiantsolutions/omar-disk-cleanup-app:${OMAR_DISK_CLEANUP_VERSION}
     env_file:
