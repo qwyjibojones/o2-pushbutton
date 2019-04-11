@@ -1,0 +1,16 @@
+---
+server:
+  contextPath: /omar-services-monitor
+
+omar:
+  app:
+    deployments:
+      -
+        url: ${serverUrl}
+
+    # Sets the amount of time (in milliseconds) to pole the Eureka endpoint for the deployments
+    deploymentPoleTime: 90000
+    # Sets the amount of time (in milliseconds) to pole the Eureka endpoint for the applications
+    appsPoleTime: 60000
+    # Sets the amount of time (in milliseconds) to pole the Eureka endpoint for the services (pod instances)
+    servicesPoleTime: 30000

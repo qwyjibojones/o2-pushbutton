@@ -1,0 +1,8 @@
+---
+server:
+  contextPath: /omar-upload
+
+omar:
+  upload:
+    maxFiles: 10
+    destinationPath: /data/user-uploads/unprocessed

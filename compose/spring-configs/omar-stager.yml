@@ -1,0 +1,21 @@
+---
+server:
+  contextPath: /omar-stager
+  port: 8080
+
+environments:
+  production:
+    dataSource:
+      pooled: true
+      jmxExport: true
+      driverClassName: ${omarDb.driver}
+      dialect:  ${omarDb.dialect}
+      url:      ${omarDb.url}
+      username: ${omarDb.username}
+      password: ${omarDb.password}
+
+quartz:
+  jdbcStore: false
+  threadPool:
+    threadCount: 2
+

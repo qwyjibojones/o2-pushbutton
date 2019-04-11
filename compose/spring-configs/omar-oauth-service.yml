@@ -1,0 +1,16 @@
+---
+#server:
+#  contextPath: /omar-spring-oauth
+---
+security:
+  oauth2:
+    client:
+      clientId: 85208461b55189ae32f1 # My Spring Security App ID for Github
+      clientSecret: bc3520cefe709536e2bfcd98f0c532bd6da337d0 # My Spring Security App Secret for Github
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      tokenName: oauth_token
+      authenticationScheme: query
+      clientAuthenticationScheme: form
+    resource:
+      userInfoUri: https://api.github.com/user

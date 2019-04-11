@@ -1,0 +1,19 @@
+deleteStaleEntries: false
+
+deleteStaleFiles: false
+
+diskVolume: /data/s3
+
+environments:
+    production:
+        dataSource:
+            driverClassName: ${omarDb.driver}
+            url: ${omarDb.url}
+            username: ${omarDb.username}
+            password: ${omarDb.password}
+
+maxDiskLimit: 0.95
+
+minDiskLimit: 0.94
+
+stagerUrl: http://omar-stager-app:8080/omar-stager

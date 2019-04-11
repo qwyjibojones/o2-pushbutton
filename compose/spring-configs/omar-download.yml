@@ -1,0 +1,8 @@
+---
+server:
+  contextPath: /omar-download
+
+omar:
+  download:
+    maxFiles: 10
+    getRasterFilesUrl: http://omar-stager-app:8080/omar-stager/dataManager/getRasterFiles
