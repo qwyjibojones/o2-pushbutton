@@ -1,0 +1,95 @@
+# This is an example of an OpenShift-Ansible host inventory that provides the
+# minimum recommended configuration for production use. This includes 3 masters,
+# two infra nodes, two compute nodes, 
+
+[masters]
+# if you have multiple masters you can use a shorthand if you name your nodes properly.  
+# Use private DNS entries
+openshift-test-master-node-[1:3].private.ossim.io
+
+[etcd]
+openshift-test-master-node-[1:2].private.ossim.io
+
+[nodes]
+# openshift_node_group_name must be provided for each node
+# See 'Node Group Definition and Mapping' in the project README for more details
+openshift-test-master-node-[1:3].private.ossim.io openshift_node_group_name="node-config-master"
+openshift-test-infra-node-[1:2].private.ossim.io openshift_node_group_name="node-config-infra"
+openshift-test-compute-node-[1:2].private.ossim.io openshift_node_group_name="node-config-compute"
+
+# GLUSTER NODES
+#openshift-test-gluster-node-[1:3].private.ossim.io openshift_node_group_name="node-config-compute"
+
+[lb]
+#
+# Configure and specify an HA proxy only if you have defined more than one master.  
+# Will configure the node as a High Availability proxy for the master nodes.
+#
+openshift-test-lb-node.private.ossim.io
+
+# Create an OSEv3 group that contains the masters and nodes groups
+[OSEv3:children]
+masters
+nodes
+etcd
+lb
+#nfs
+#glusterfs
+
+[glusterfs]
+
+#openshift-test-gluster-node-[1:3].private.ossim.io glusterfs_devices='[ "/dev/nvme1n1" ]'
+
+[OSEv3:vars]
+ansible_user=centos
+ansible_become=yes
+openshift_deployment_type=origin
+openshift_release="3.11"
+openshift_master_cluster_public_hostname=<loadbalancer-server-name>.ossim.io
+
+# Debug level for all OpenShift components (Defaults to 2)
+debug_level=2
+
+openshift_image_tag=v3.11.0
+openshift_pkg_version=-3.11.0
+
+#
+# Hawkular metrics for horizontal pod scaling
+# Your host is typically a load balancer pointing to the infra nodes.
+# The hostname should be a DNS resolving to either a single infra or 
+# some load balancer if multiple infra nodes are defined
+#
+openshift_metrics_install_metrics=true
+openshift_metrics_hawkular_hostname=hawkular-metrics-test.ossim.io
+openshift_metrics_hawkular_ca="/home/centos/ossim-io-ca.pem"
+openshift_metrics_hawkular_cert="/home/centos/ossim-io.pem"
+openshift_metrics_hawkular_key="/home/centos/ossim-io.key"
+
+#
+# Certs
+#
+openshift_hosted_router_certificate={"certfile": "/home/centos/ossim-io.pem", "keyfile": "/home/centos/ossim-io.key", "cafile": "/home/centos/ossim-io-ca.pem"}
+openshift_master_overwrite_named_certificates=true
+openshift_master_named_certificates=[{"certfile": "/home/centos/ossim-io.pem", "keyfile": "/home/centos/ossim-io.key", "cafile": "/home/centos/ossim-io-ca.pem"}]
+
+
+#
+# GLUSTER
+#
+#openshift_storage_glusterfs_is_native=False
+#openshift_hosted_registry_storage_kind=glusterfs
+#openshift_master_dynamic_provisioning_enabled=true
+#openshift_storage_glusterfs_heketi_is_native=True
+
+#openshift_storage_glusterfs_namespace=openshift-storage
+#openshift_storage_glusterfs_storageclass=true
+#openshift_storage_glusterfs_storageclass_default=false
+#openshift_storage_glusterfs_block_deploy=true
+#openshift_storage_glusterfs_block_host_vol_size=50
+#openshift_storage_glusterfs_block_storageclass=true
+#openshift_storage_glusterfs_block_storageclass_default=false
+
+#openshift_storage_glusterfs_heketi_ssh_user=centos
+#openshift_storage_glusterfs_heketi_executor=ssh
+#openshift_storage_glusterfs_heketi_ssh_keyfile=/home/centos/ec2_dev.pem
+#openshift_storage_glusterfs_heketi_ssh_sudo=True
