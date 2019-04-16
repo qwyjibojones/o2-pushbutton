@@ -31,6 +31,7 @@
                 "name": "${JENKINS_SERVICE_NAME}"
             },
             "spec": {
+                "host": "${JENKINS_SERVICE_NAME}.ossim.io",
                 "tls": {
                     "insecureEdgeTerminationPolicy": "Redirect",
                     "termination": "edge"

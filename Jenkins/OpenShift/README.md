@@ -26,6 +26,8 @@ to automate the process.
 
 1. Add the views, which can be found in the config.xml file, between the <views> and </views> tags
 
-1. Set up the AWS EC2 nodes
+1. Set up the AWS EC2 nodes, as found in the config.xml block. This should match the resulting config section in Jenkins's config.xml file
 
 1. Run the ossim-ci pipeline to generate build artifacts
+
+1. Verify that dynamic EC2 instances are being created as expected
