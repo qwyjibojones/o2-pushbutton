@@ -10,6 +10,8 @@ For this example installation process we will use one node for master and infra 
 
 Please rename accordingly for your installation.  For a production install you probably would want at least 2 or 3 masters and 2 infra nodes that route service traffic within the cluster.  The number of compute nodes will depend on how many pods you will be deploying.
 
+Please have a wildcard NPE Certificate that we will use for the Master and then router certificates.  We will aslo use the same CERT for the Hawkular metrics installation.
+
 ## Ansible
 
 We will need a machine running ansible that will be used to configure and setup the OpenShift cluster.  The ansible machine does not need to be  very powerful, for it is only used for cluster configuration.  The machine uses ansible to configure your OpenShift cluster using the openshift-ansible playbooks.  If you are limited on resources, you can use the node that will be dedicated to the OpenShift master as your ansible machine.  It is best to have a separate ansible machine dedicated to the configuration of the cluster, so if you need to destroy the cluster and re-install you still have your configuration machine in tact.
@@ -79,13 +81,20 @@ for x in {1..8}; do ssh openshift-test-compute-node-$x.private.ossim.io "sudo yu
 
 ### Configure the Nodes in the Cluster
 
-We now assume that you have a ~/.ssh/config file that describes how to reach each node in the cluster.  We will now place those nodes into the proper sections described in the annotated sample inventory file found in the directory **openshift/openshift-inventory-sample**.  Use this file to create an inventory file for your cluster in the ansible home ~/openshift-inventory.  Edit this file and put your node names into each section the nodes corresponds to.  SSH to each node in the config.  This will verify that the ansible machine can reach all nodes and are part of the known_hosts.
+We now assume that you have a ~/.ssh/config file that describes how to reach each node in the cluster.  We will now place those nodes into the proper sections described in the annotated sample inventory file found in the directory **openshift/openshift-inventory-sample**.  Use this file to create an inventory file for your cluster in the ansible home ~/openshift-inventory.  The file has annotation explaining each section and must be taylored for your environment and resource limits.   If you only have a couple of machines to use for an OpenShift cluster then you can merge the definionts so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  Please see the inventory example for further definitions.  
 
-If all the nodes are reachable and ready to be configured then run:
+Copy  and edit the inventory file
 
 ```bash
 cp openshift/openshift-inventory-sample ~/openshift-inventory
 vi ~/openshift-inventory
+```
+
+Put your node name into each section the node corresponds to.  SSH to each node in the config.  This will verify that the ansible machine can reach all nodes and are part of the known_hosts.
+
+If all the nodes are reachable and ready to be configured then run:
+
+```bash
 cd ~/openshift-ansible
 ansible-playbook -i ~/openshift-inventory playbooks/prerequisites.yml
 ansible-playbook -i ~/openshift-inventory playbooks/deploy_cluster.yml

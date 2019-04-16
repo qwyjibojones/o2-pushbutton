@@ -1,6 +1,10 @@
 # This is an example of an OpenShift-Ansible host inventory that provides the
 # minimum recommended configuration for production use. This includes 3 masters,
-# two infra nodes, two compute nodes, 
+# two infra nodes, two compute nodes.  More compute nodes can be defined.
+#
+# If you are resource limited then you can put the infra definitions and the master nodes definitions on one.
+#
+
 
 [masters]
 # if you have multiple masters you can use a shorthand if you name your nodes properly.  
@@ -8,14 +12,26 @@
 openshift-test-master-node-[1:3].private.ossim.io
 
 [etcd]
-openshift-test-master-node-[1:2].private.ossim.io
+# We have placed the etcd on all the masters
+# If you want a different machine please change to a different location.  We assume a 3 node master
+# If you only have one master then modify accordingly.  he example here is to show how to do a shorthand for
+# multiple nodes.n  If each node does not share a similar DNS prefix then you can list them individually.
+openshift-test-master-node-[1:3].private.ossim.io
 
 [nodes]
 # openshift_node_group_name must be provided for each node
-# See 'Node Group Definition and Mapping' in the project README for more details
+# The online OpenShift docs under the title "Defining Node Groups and Host Mappings"
+# will explain more on the different group names.   The group names will create the proper labels
+# for you so you do not have to.
 openshift-test-master-node-[1:3].private.ossim.io openshift_node_group_name="node-config-master"
 openshift-test-infra-node-[1:2].private.ossim.io openshift_node_group_name="node-config-infra"
 openshift-test-compute-node-[1:2].private.ossim.io openshift_node_group_name="node-config-compute"
+
+# If you want the infra to be on the same master and you do not have a separate infra node you can uncomment
+# this definition and comment out the master and infra above.   We will use the group name "node-config-master-infra"
+# 
+# openshift-test-master-node-[1:3].private.ossim.io openshift_node_group_name="node-config-master-infra"
+#
 
 # GLUSTER NODES
 #openshift-test-gluster-node-[1:3].private.ossim.io openshift_node_group_name="node-config-compute"
@@ -45,6 +61,9 @@ ansible_user=centos
 ansible_become=yes
 openshift_deployment_type=origin
 openshift_release="3.11"
+
+# This is a public DNS resolving to either your master node if you have only one master
+# or the Load Balancer as defined in your [lb] section
 openshift_master_cluster_public_hostname=<loadbalancer-server-name>.ossim.io
 
 # Debug level for all OpenShift components (Defaults to 2)
@@ -54,10 +73,15 @@ openshift_image_tag=v3.11.0
 openshift_pkg_version=-3.11.0
 
 #
-# Hawkular metrics for horizontal pod scaling
-# Your host is typically a load balancer pointing to the infra nodes.
-# The hostname should be a DNS resolving to either a single infra or 
-# some load balancer if multiple infra nodes are defined
+# Hawkular metrics used for horizontal pod scaling
+# the hawkular_hostname will point to your infra node.  If you have more than one 
+# infra node it is best to have a load balancer to front the infra nodes.  
+# in any case, this is a public DNS entry that will resolve either to your load balancer if you have
+# multiple infra nodes or to the actual infra node if you have only one installed and configured.
+#
+# Please have a valid NPE ( Non Person Entity or server certs) cert and sepecify them during configuration.  
+# If you have a wildcard cert then the same wildcard
+# cert can be used throughout this file for public https entry points.
 #
 openshift_metrics_install_metrics=true
 openshift_metrics_hawkular_hostname=hawkular-metrics-test.ossim.io
@@ -66,7 +90,11 @@ openshift_metrics_hawkular_cert="/home/centos/ossim-io.pem"
 openshift_metrics_hawkular_key="/home/centos/ossim-io.key"
 
 #
-# Certs
+# Certs.  Supply our wildcard NPE cert to the master and the internal router
+# note,  these can be changed by running the ansible playbook:
+#
+# For Master Certs: ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/redeploy-certificates.yml
+# For router Certs: ansible-playbook playbooks/openshift-hosted/redeploy-router-certificates.yml
 #
 openshift_hosted_router_certificate={"certfile": "/home/centos/ossim-io.pem", "keyfile": "/home/centos/ossim-io.key", "cafile": "/home/centos/ossim-io-ca.pem"}
 openshift_master_overwrite_named_certificates=true
