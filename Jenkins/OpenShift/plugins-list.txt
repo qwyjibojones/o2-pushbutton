@@ -1,0 +1,21 @@
+S3 publisher
+Amazon EC2
+Amazon Web Services SDK
+Copy Artifact
+CloudBees AWS Credentials
+Dashboard View
+Ansible
+AnsiColor
+Build Monitor View
+Build Pipeline
+Build Timeout
+Cucumber Reports
+Cucumber json test reporting
+Dependency Graph Viewer
+DocLinks
+Embeddable Build Status
+Gradle
+Performance
+Sidebar Link
+Timestamper
+View Job Filters

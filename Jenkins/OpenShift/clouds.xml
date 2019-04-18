@@ -1,0 +1,607 @@
+<clouds>
+    <org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud plugin="kubernetes@1.12.8">
+      <name>openshift</name>
+      <defaultsProviderTemplate></defaultsProviderTemplate>
+      <templates>
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
+          <name>maven</name>
+          <namespace></namespace>
+          <privileged>false</privileged>
+          <capOnlyOnAlivePods>false</capOnlyOnAlivePods>
+          <alwaysPullImage>false</alwaysPullImage>
+          <instanceCap>2147483647</instanceCap>
+          <slaveConnectTimeout>100</slaveConnectTimeout>
+          <idleMinutes>0</idleMinutes>
+          <activeDeadlineSeconds>0</activeDeadlineSeconds>
+          <label>maven</label>
+          <serviceAccount>jenkins</serviceAccount>
+          <nodeSelector></nodeSelector>
+          <nodeUsageMode>NORMAL</nodeUsageMode>
+          <customWorkspaceVolumeEnabled>false</customWorkspaceVolumeEnabled>
+          <workspaceVolume class="org.csanchez.jenkins.plugins.kubernetes.volumes.workspace.EmptyDirWorkspaceVolume">
+            <memory>false</memory>
+          </workspaceVolume>
+          <volumes/>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>docker.io/openshift/jenkins-agent-maven-35-centos7:v3.11</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>true</alwaysPullImage>
+              <workingDir>/tmp</workingDir>
+              <command></command>
+              <args>${computer.jnlpmac} ${computer.name}</args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+              <ports/>
+              <livenessProbe>
+                <execArgs></execArgs>
+                <timeoutSeconds>0</timeoutSeconds>
+                <initialDelaySeconds>0</initialDelaySeconds>
+                <failureThreshold>0</failureThreshold>
+                <periodSeconds>0</periodSeconds>
+                <successThreshold>0</successThreshold>
+              </livenessProbe>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <envVars/>
+          <annotations/>
+          <imagePullSecrets/>
+          <nodeProperties/>
+          <yaml></yaml>
+          <podRetention class="org.csanchez.jenkins.plugins.kubernetes.pod.retention.Default"/>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+        <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+          <inheritFrom></inheritFrom>
+          <name>nodejs</name>
+          <namespace></namespace>
+          <privileged>false</privileged>
+          <capOnlyOnAlivePods>false</capOnlyOnAlivePods>
+          <alwaysPullImage>false</alwaysPullImage>
+          <instanceCap>2147483647</instanceCap>
+          <slaveConnectTimeout>100</slaveConnectTimeout>
+          <idleMinutes>0</idleMinutes>
+          <activeDeadlineSeconds>0</activeDeadlineSeconds>
+          <label>nodejs</label>
+          <serviceAccount>jenkins</serviceAccount>
+          <nodeSelector></nodeSelector>
+          <nodeUsageMode>NORMAL</nodeUsageMode>
+          <customWorkspaceVolumeEnabled>false</customWorkspaceVolumeEnabled>
+          <workspaceVolume class="org.csanchez.jenkins.plugins.kubernetes.volumes.workspace.EmptyDirWorkspaceVolume">
+            <memory>false</memory>
+          </workspaceVolume>
+          <volumes/>
+          <containers>
+            <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+              <name>jnlp</name>
+              <image>docker.io/openshift/jenkins-agent-nodejs-8-centos7:v3.11</image>
+              <privileged>false</privileged>
+              <alwaysPullImage>true</alwaysPullImage>
+              <workingDir>/tmp</workingDir>
+              <command></command>
+              <args>${computer.jnlpmac} ${computer.name}</args>
+              <ttyEnabled>false</ttyEnabled>
+              <resourceRequestCpu></resourceRequestCpu>
+              <resourceRequestMemory></resourceRequestMemory>
+              <resourceLimitCpu></resourceLimitCpu>
+              <resourceLimitMemory></resourceLimitMemory>
+              <envVars/>
+              <ports/>
+              <livenessProbe>
+                <execArgs></execArgs>
+                <timeoutSeconds>0</timeoutSeconds>
+                <initialDelaySeconds>0</initialDelaySeconds>
+                <failureThreshold>0</failureThreshold>
+                <periodSeconds>0</periodSeconds>
+                <successThreshold>0</successThreshold>
+              </livenessProbe>
+            </org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
+          </containers>
+          <envVars/>
+          <annotations/>
+          <imagePullSecrets/>
+          <nodeProperties/>
+          <yaml></yaml>
+          <podRetention class="org.csanchez.jenkins.plugins.kubernetes.pod.retention.Default"/>
+        </org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
+      </templates>
+      <serverUrl>https://172.30.0.1:443</serverUrl>
+      <serverCertificate>-----BEGIN CERTIFICATE-----
+MIIC6jCCAdKgAwIBAgIBATANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBtvcGVu
+c2hpZnQtc2lnbmVyQDE1NTQxMjU1NjUwHhcNMTkwNDAxMTMzMjQ0WhcNMjQwMzMw
+MTMzMjQ1WjAmMSQwIgYDVQQDDBtvcGVuc2hpZnQtc2lnbmVyQDE1NTQxMjU1NjUw
+ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC94w5IpukwcRyEOEfumMl9
+shaKvH4PEbTUxIIWtf4Y2JXtvuOBb3ASkmJn+hm3mBjZdQ7rfJAvhuGCv52x+8eY
+fBRexy4jhfdfabAu6jzGikqjXgOGFCuLFDnX0ah2JY6ylisP1Rk+FACG7UQpfGMy
+WjhA9fLeQ0Fsu+PB6o+k7gpU+iY9uDQgXYLSp8wTMOKBt02B4MAHbA2N4Wchadgt
+zcoCWVMuciKrq+XvN8qVm+n4qC/apb98Woa8MFhul6aBpHhl0GqORUzGMgGG1NTs
+9MTsmbYI/A+jsceVY2Y37mzwjvZ4p8Lt6ELAuC/wXMR8/5Hus1NzXp1GURIu8sVF
+AgMBAAGjIzAhMA4GA1UdDwEB/wQEAwICpDAPBgNVHRMBAf8EBTADAQH/MA0GCSqG
+SIb3DQEBCwUAA4IBAQCBZSDtqBqqUqFcTV7jsq0/dhIHcm7PIyGE5tfcvoCZ6G0c
+UoUqdzbw9jxQs5H+bRqb4S2HNwGD1s9UJzbvYMnMkDjPSZ2Z8K336C9lmevpypYg
+wLmVm9M92A2MPYVpC4sL12MlesBYuSgXC8LvCd5K9vb1a1qmH9YPRYvfh6sz7wgO
+6hytvt7wD/b15pAG97CpsWoOCTS/dMoBGdM6Lwu1yvVLoqxXFcEdRHsNWP0NZma0
+qxm3eeSmeWypZbhqbPKZEnWVsfCl85ANNcywy6woMmqISunKQ/5cq1BgOADX5wxo
+98fhY/jSvYzrf3QVtZagCtN0LGbYtrM7XiZ0/lB7
+-----END CERTIFICATE-----</serverCertificate>
+      <skipTlsVerify>false</skipTlsVerify>
+      <addMasterProxyEnvVars>true</addMasterProxyEnvVars>
+      <capOnlyOnAlivePods>false</capOnlyOnAlivePods>
+      <namespace>devops</namespace>
+      <jenkinsUrl>http://172.30.80.63:80</jenkinsUrl>
+      <jenkinsTunnel>172.30.23.203:50000</jenkinsTunnel>
+      <credentialsId>1a12dfa4-7fc5-47a7-aa17-cc56572a41c7</credentialsId>
+      <containerCap>100</containerCap>
+      <retentionTimeout>5</retentionTimeout>
+      <connectTimeout>0</connectTimeout>
+      <readTimeout>0</readTimeout>
+      <usageRestricted>false</usageRestricted>
+      <maxRequestsPerHost>32</maxRequestsPerHost>
+      <podRetention class="org.csanchez.jenkins.plugins.kubernetes.pod.retention.Never"/>
+    </org.csanchez.jenkins.plugins.kubernetes.KubernetesCloud>
+    <hudson.plugins.ec2.EC2Cloud plugin="ec2@1.42">
+      <name>ec2-jenkins-centos-user</name>
+      <useInstanceProfileForCredentials>true</useInstanceProfileForCredentials>
+      <roleArn></roleArn>
+      <roleSessionName></roleSessionName>
+      <credentialsId></credentialsId>
+      <privateKey>
+        <privateKey>{AQAAABAAAAaQDMwT+LnejNz1usspF5xPvvV6qPvsxEaw2qRChMTvbO+MUuyKDoD9fdJyheJR2k9ehpTTuDr+hqDxr7zy9BP+0r+sWx9Z+Ra/CJ+gTus0+lpTFAJUuhNAEtRDV02xkMtt3IXbhUjAepl/NdUV6lnfGtudNaRpoRwNzrUPyJWRxZoWC81pGLbPHL0v68Ma5GPZoxWLCk1U/ZYuufXTYkP/mRhJDPoRBt2MsmXRLw1Zty+HQZ0RLFwk4yLHBztRWYS1k5+lkXUpPs0OtXmy24+01sh8Yaf5+YOovKXDcmcqkP076ZwR9ayEOOSGXjNWNVHWuub3wUon/MrQmAHtUSvQ6GLyo42fNYJ9zHOl1VIUKcdZ2YldV59p+C2bcZOsWEtIc89yzIuWArTiDCxhEiyAjdohHzPNpSpBmprO/wgXxPWn0/jodVSfF4zLOs+oUszLaal80gLrgyap/cYZ9f9b2YOabFIOKL0NXUla/oWalOQ4B87QUsRbYppNa1ClPBgf6crNLWc1HirsqaRXk9CBlxg5WM5I6Dgx5u40BWgiEE5R6FfZnx+Fb4Y1PzpcyNdoctCB1botigOV6xjH+Xz02clSuJsKlN7pLrU52ullQwP6n7TqIq9nvHJlHlIFa5RfZyQaSaL2FCKy57m29a9skmwgDwF+wA6/E4aq6qY8PvVbdPen14pZe/dW8hVSt+HzECPRCd3GwMpkm2fsBMd2WbREaF6ZoP0NNqsRd6fjDwW2YOI/7lipPiSEQ1EaSo+RW68HG8CRDue6f5rJnAoeD0XpStNlqCOIoe/Qs6WqX7sD2BsiQsAJ+7IxWy7WvuTqlLMFNs76xX8cxcODXSFUqnPfoDlfUsJo2AoI97LJ0joJPq7cXpkmbDogfk5KKLUpbGksy2xNMFx/NAZX24Fcv0v54wGolFNPY8fjof+PGFLjoy4KHEgjj0k55tLUdnqnTsdSRuawatKMPZOgkKezacxheENKpn5qGI0cLR6eqIJjZfWV80Hh8NmBU+xEBu4wUK8aRZQYOGSiUkglHtgGVslaTBBo2AK8Na8Q+wLjep9LOVd3JhN65hA8N3kXJgVjiKuh+s6tF2qFqBhkWWU0Cvsxc1bObiHRbHhMFxFhjHZoqpjOfJ1Atjzbo41vwWrj4zKKc3PQg+oD7Bu8VaPmxGsF1pbwM6TNbPJjSbyUlKQ/XyUYkKvMDOFaw6Zq4Rm9dF4UlItHrASQ4BPXgeS42tzeEjy1dbd5lX8Wk+Wnvj7ZGssqIaHZ/X8wBRRo6M4fRw+HuMqyfdOelHnIX7tKglCrzwVa4bIvT40gexLSSM5KJIVJ2jyU9EvIOcsZ32POW0LCZ2xowGb6BZGE8cgoEgb9R/VmBu4BweM+ifqVWeAFzGANEYckKc49Jhg4g4XVz84cfq0BhWGNj7/jOTSoU8YKSpgTz4vZqhQGCZAPy7PCuNVOycrbq+I7mJCEydCuppTJFhNIdL3PVBO135D+l6Y8Kvg8+4wBaBWFUr07Cp19meGQ4jri1t8c67a9IL3w+RCa03bVZPEumFu4QFQEpSK4taPEN0qV9kiQizJt/kR4p0C9Qmm9LNajUxbOF0zWlR3VZ3FVN4Bd1VZhE0SUcshGl2MvHoV52sGrDeB5/JS9mhi5mSeKp4O0kqf5WPGU0UStkrI5ApryldwW3C/Ep2BhevEzEVvfVme1/+xoDUBLpvNae50upVXl7k8bmiNQaNX4fwnYMikiwzNJ46leJ0uY/Ly9MoCsPh0cDP7Ntanoy6PI3x7SgQJUOJl9wSB28I42M5gf/BGFl5XPizX8SaB1Dndd/BGwNXzZUf6BbK/ehKvUwFpbHn8lDMS+RjNa7gjdqpIqaLYKqI1qk/z77ElHhyZIDoaaNl9qmLRhb2lCry0+WUqAZ00SmT9HkSRzUuRowzRUaGkviOXJdvVWcteC0J5PKTL99oVG6j8xK/svrncTjwsKmMOFRI0PsvWbqn0oUbC6S08lHOTkXCNvmRAbJkE25EWjM0jg7JqW+5GyaoekC4DLY7CBH2i6xeJscsC9r50GkwVP8eXd31DKGQflJ0IRZMNNSW6/ynww+1OsS9bprQcOihPJZcLqdH3tCcHhJ+hThG2wZcD/ZtRrXkLGNS7dWzeJhnQldTeueJAT1wgeloAmioYksMoiNaGtwqzr3+7ABX9pgY+UOxDR9BBRThxcmI7nie6e8AtjRS7g28oyb2O6OyO/LKWWRv4o5pnRVwAvKChh4iAxxoYcqA==}</privateKey>
+      </privateKey>
+      <instanceCap>2147483647</instanceCap>
+      <templates>
+        <hudson.plugins.ec2.SlaveTemplate>
+          <ami>ami-004017c43fdde65e9</ami>
+          <description>dynamic-jenkins-ossim-node</description>
+          <zone>us-east-1a</zone>
+          <securityGroups>default</securityGroups>
+          <remoteFS>/media/ephemeral0/jenkins</remoteFS>
+          <type>M4Xlarge</type>
+          <ebsOptimized>false</ebsOptimized>
+          <monitoring>false</monitoring>
+          <t2Unlimited>false</t2Unlimited>
+          <labels>ossim-build</labels>
+          <mode>EXCLUSIVE</mode>
+          <initScript>#!/bin/bash
+
+echo &quot;Pulling init script from s3&quot;
+aws s3 cp s3://o2-cicd/jenkins/dynamic-node-init.sh dynamic-node-init.sh
+chmod 775 dynamic-node-init.sh
+./dynamic-node-init.sh dynamic-jenkins-ossim-node    # Found in o2-paas/helper-scripts
+
+
+echo &quot;*******************************&quot;
+echo &quot;Completed init script &quot; date
+echo &quot;*******************************&quot;
+echo &quot;&quot;
+echo &quot;&quot;
+echo &quot;&quot;</initScript>
+          <tmpDir></tmpDir>
+          <userData></userData>
+          <numExecutors>4</numExecutors>
+          <remoteAdmin>centos</remoteAdmin>
+          <jvmopts></jvmopts>
+          <subnetId>subnet-29435b71</subnetId>
+          <idleTerminationMinutes>5</idleTerminationMinutes>
+          <iamInstanceProfile>arn:aws:iam::320588532383:instance-profile/Core_AWS_FullAccess</iamInstanceProfile>
+          <deleteRootOnTermination>false</deleteRootOnTermination>
+          <useEphemeralDevices>false</useEphemeralDevices>
+          <customDeviceMapping></customDeviceMapping>
+          <instanceCap>10</instanceCap>
+          <stopOnTerminate>false</stopOnTerminate>
+          <tags>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Name</name>
+              <value>dynamic-jenkins-ossim-node</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Application</name>
+              <value>Jenkins</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Project</name>
+              <value>ossim</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>exclude_opsworks</name>
+              <value>true</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>WBS</name>
+              <value>1019700.001</value>
+            </hudson.plugins.ec2.EC2Tag>
+          </tags>
+          <usePrivateDnsName>false</usePrivateDnsName>
+          <associatePublicIp>false</associatePublicIp>
+          <useDedicatedTenancy>false</useDedicatedTenancy>
+          <amiType class="hudson.plugins.ec2.UnixData">
+            <rootCommandPrefix></rootCommandPrefix>
+            <slaveCommandPrefix></slaveCommandPrefix>
+            <slaveCommandSuffix></slaveCommandSuffix>
+            <sshPort>22</sshPort>
+          </amiType>
+          <launchTimeout>600</launchTimeout>
+          <connectBySSHProcess>false</connectBySSHProcess>
+          <connectUsingPublicIp>false</connectUsingPublicIp>
+          <nextSubnet>0</nextSubnet>
+        </hudson.plugins.ec2.SlaveTemplate>
+        <hudson.plugins.ec2.SlaveTemplate>
+          <ami>ami-04aa4086e14950662</ami>
+          <description>dynamic-jenkins-ossim-test-node</description>
+          <zone>us-east-1a</zone>
+          <securityGroups>default</securityGroups>
+          <remoteFS>/media/ephemeral0/jenkins</remoteFS>
+          <type>M4Xlarge</type>
+          <ebsOptimized>false</ebsOptimized>
+          <monitoring>false</monitoring>
+          <t2Unlimited>false</t2Unlimited>
+          <labels>ossim-test-build</labels>
+          <mode>EXCLUSIVE</mode>
+          <initScript>#!/bin/bash
+
+echo &quot;Pulling init script from s3&quot;
+aws s3 cp s3://o2-cicd/jenkins/dynamic-node-init.sh dynamic-node-init.sh
+chmod 775 dynamic-node-init.sh
+./dynamic-node-init.sh dynamic-jenkins-ossim-test-node     # Found in o2-paas/helper-scripts
+
+echo &quot;*******************************&quot;
+echo &quot;Completed init script &quot; date
+echo &quot;*******************************&quot;
+echo &quot;&quot;
+echo &quot;&quot;
+echo &quot;&quot;</initScript>
+          <tmpDir></tmpDir>
+          <userData></userData>
+          <numExecutors>5</numExecutors>
+          <remoteAdmin>centos</remoteAdmin>
+          <jvmopts></jvmopts>
+          <subnetId>subnet-29435b71</subnetId>
+          <idleTerminationMinutes>30</idleTerminationMinutes>
+          <iamInstanceProfile>arn:aws:iam::320588532383:instance-profile/Core_AWS_FullAccess</iamInstanceProfile>
+          <deleteRootOnTermination>false</deleteRootOnTermination>
+          <useEphemeralDevices>false</useEphemeralDevices>
+          <customDeviceMapping></customDeviceMapping>
+          <instanceCap>10</instanceCap>
+          <stopOnTerminate>false</stopOnTerminate>
+          <tags>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Name</name>
+              <value>dynamic-jenkins-ossim-test-node</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Application</name>
+              <value>Jenkins</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Project</name>
+              <value>ossim</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>exclude_opsworks</name>
+              <value>true</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>WBS</name>
+              <value>1019700.001</value>
+            </hudson.plugins.ec2.EC2Tag>
+          </tags>
+          <usePrivateDnsName>false</usePrivateDnsName>
+          <associatePublicIp>false</associatePublicIp>
+          <useDedicatedTenancy>false</useDedicatedTenancy>
+          <amiType class="hudson.plugins.ec2.UnixData">
+            <rootCommandPrefix></rootCommandPrefix>
+            <slaveCommandPrefix></slaveCommandPrefix>
+            <slaveCommandSuffix></slaveCommandSuffix>
+            <sshPort>22</sshPort>
+          </amiType>
+          <launchTimeout>600</launchTimeout>
+          <connectBySSHProcess>false</connectBySSHProcess>
+          <connectUsingPublicIp>false</connectUsingPublicIp>
+          <nextSubnet>0</nextSubnet>
+        </hudson.plugins.ec2.SlaveTemplate>
+        <hudson.plugins.ec2.SlaveTemplate>
+          <ami>ami-0ffaad1a222bec07d</ami>
+          <description>dynamic-jenkins-omar-node</description>
+          <zone>us-east-1a</zone>
+          <securityGroups>default</securityGroups>
+          <remoteFS>/media/ephemeral0/jenkins</remoteFS>
+          <type>M4Xlarge</type>
+          <ebsOptimized>false</ebsOptimized>
+          <monitoring>false</monitoring>
+          <t2Unlimited>false</t2Unlimited>
+          <labels>omar-build</labels>
+          <mode>EXCLUSIVE</mode>
+          <initScript>#!/bin/bash
+
+echo &quot;Pulling init script from s3&quot;
+aws s3 cp s3://o2-cicd/jenkins/dynamic-node-init.sh dynamic-node-init.sh
+chmod 775 dynamic-node-init.sh
+. dynamic-node-init.sh dynamic-jenkins-omar-node     # Found in o2-paas/helper-scripts
+
+echo &quot;*******************************&quot;
+echo &quot;Completed init script &quot; date
+echo &quot;*******************************&quot;
+echo &quot;&quot;
+echo &quot;&quot;
+echo &quot;&quot;</initScript>
+          <tmpDir></tmpDir>
+          <userData></userData>
+          <numExecutors>5</numExecutors>
+          <remoteAdmin>centos</remoteAdmin>
+          <jvmopts></jvmopts>
+          <subnetId>subnet-29435b71</subnetId>
+          <idleTerminationMinutes>10</idleTerminationMinutes>
+          <iamInstanceProfile>arn:aws:iam::320588532383:instance-profile/Core_AWS_FullAccess</iamInstanceProfile>
+          <deleteRootOnTermination>false</deleteRootOnTermination>
+          <useEphemeralDevices>false</useEphemeralDevices>
+          <customDeviceMapping></customDeviceMapping>
+          <instanceCap>10</instanceCap>
+          <stopOnTerminate>false</stopOnTerminate>
+          <tags>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Name</name>
+              <value>dynamic-jenkins-omar-node</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Application</name>
+              <value>Jenkins</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Project</name>
+              <value>omar</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>exclude_opsworks</name>
+              <value>true</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>WBS</name>
+              <value>1019700.001</value>
+            </hudson.plugins.ec2.EC2Tag>
+          </tags>
+          <usePrivateDnsName>false</usePrivateDnsName>
+          <associatePublicIp>false</associatePublicIp>
+          <useDedicatedTenancy>false</useDedicatedTenancy>
+          <amiType class="hudson.plugins.ec2.UnixData">
+            <rootCommandPrefix></rootCommandPrefix>
+            <slaveCommandPrefix></slaveCommandPrefix>
+            <slaveCommandSuffix></slaveCommandSuffix>
+            <sshPort>22</sshPort>
+          </amiType>
+          <launchTimeout>600</launchTimeout>
+          <connectBySSHProcess>false</connectBySSHProcess>
+          <connectUsingPublicIp>false</connectUsingPublicIp>
+          <nextSubnet>0</nextSubnet>
+        </hudson.plugins.ec2.SlaveTemplate>
+        <hudson.plugins.ec2.SlaveTemplate>
+          <ami>ami-0ffaad1a222bec07d</ami>
+          <description>dynamic-jenkins-devops-node</description>
+          <zone>us-east-1a</zone>
+          <securityGroups>o2-elastic-stack</securityGroups>
+          <remoteFS>/media/ephemeral0/jenkins</remoteFS>
+          <type>T2Micro</type>
+          <ebsOptimized>false</ebsOptimized>
+          <monitoring>false</monitoring>
+          <t2Unlimited>false</t2Unlimited>
+          <labels>devops</labels>
+          <mode>NORMAL</mode>
+          <initScript>#!/bin/bash
+
+echo &quot;Pulling init script from s3&quot;
+aws s3 cp s3://o2-cicd/jenkins/dynamic-node-init.sh dynamic-node-init.sh
+chmod 775 dynamic-node-init.sh
+./dynamic-node-init.sh dynamic-jenkins-devops-node    # Found in o2-paas/helper-scripts
+
+echo &quot;*******************************&quot;
+echo &quot;Completed init script &quot; date
+echo &quot;*******************************&quot;
+echo &quot;&quot;
+echo &quot;&quot;
+echo &quot;&quot;</initScript>
+          <tmpDir></tmpDir>
+          <userData></userData>
+          <numExecutors>2</numExecutors>
+          <remoteAdmin>centos</remoteAdmin>
+          <jvmopts></jvmopts>
+          <subnetId>subnet-29435b71</subnetId>
+          <idleTerminationMinutes>10</idleTerminationMinutes>
+          <iamInstanceProfile>arn:aws:iam::320588532383:instance-profile/Core_AWS_FullAccess</iamInstanceProfile>
+          <deleteRootOnTermination>false</deleteRootOnTermination>
+          <useEphemeralDevices>false</useEphemeralDevices>
+          <customDeviceMapping></customDeviceMapping>
+          <instanceCap>3</instanceCap>
+          <stopOnTerminate>false</stopOnTerminate>
+          <tags>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Name</name>
+              <value>dynamic-jenkins-devops-node</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Application</name>
+              <value>Jenkins</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Project</name>
+              <value>Devops</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>exclude_opsworks</name>
+              <value>true</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>WBS</name>
+              <value>1019700.001</value>
+            </hudson.plugins.ec2.EC2Tag>
+          </tags>
+          <usePrivateDnsName>false</usePrivateDnsName>
+          <associatePublicIp>false</associatePublicIp>
+          <useDedicatedTenancy>false</useDedicatedTenancy>
+          <amiType class="hudson.plugins.ec2.UnixData">
+            <rootCommandPrefix></rootCommandPrefix>
+            <slaveCommandPrefix></slaveCommandPrefix>
+            <slaveCommandSuffix></slaveCommandSuffix>
+            <sshPort>22</sshPort>
+          </amiType>
+          <launchTimeout>600</launchTimeout>
+          <connectBySSHProcess>false</connectBySSHProcess>
+          <connectUsingPublicIp>false</connectUsingPublicIp>
+          <nextSubnet>0</nextSubnet>
+        </hudson.plugins.ec2.SlaveTemplate>
+        <hudson.plugins.ec2.SlaveTemplate>
+          <ami>ami-0ffaad1a222bec07d</ami>
+          <description>dynamic-mydg-build-node</description>
+          <zone>us-east-1a</zone>
+          <securityGroups>default</securityGroups>
+          <remoteFS>/media/ephemeral0/jenkins</remoteFS>
+          <type>M3Medium</type>
+          <ebsOptimized>false</ebsOptimized>
+          <monitoring>false</monitoring>
+          <t2Unlimited>false</t2Unlimited>
+          <labels>mydg-build</labels>
+          <mode>EXCLUSIVE</mode>
+          <initScript>#!/bin/bash
+
+echo &quot;Pulling init script from s3&quot;
+aws s3 cp s3://o2-cicd/jenkins/dynamic-node-init.sh dynamic-node-init.sh
+chmod 775 dynamic-node-init.sh
+./dynamic-node-init.sh dynamic-mydg-build-node    # Found in o2-paas/helper-scripts
+
+echo &quot;*******************************&quot;
+echo &quot;Completed init script &quot; date
+echo &quot;*******************************&quot;
+echo &quot;&quot;
+echo &quot;&quot;
+echo &quot;&quot;</initScript>
+          <tmpDir></tmpDir>
+          <userData></userData>
+          <numExecutors>2</numExecutors>
+          <remoteAdmin>centos</remoteAdmin>
+          <jvmopts></jvmopts>
+          <subnetId>subnet-29435b71</subnetId>
+          <idleTerminationMinutes>10</idleTerminationMinutes>
+          <iamInstanceProfile>arn:aws:iam::320588532383:instance-profile/Core_AWS_FullAccess</iamInstanceProfile>
+          <deleteRootOnTermination>false</deleteRootOnTermination>
+          <useEphemeralDevices>false</useEphemeralDevices>
+          <customDeviceMapping></customDeviceMapping>
+          <instanceCap>2</instanceCap>
+          <stopOnTerminate>false</stopOnTerminate>
+          <tags>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Name</name>
+              <value>dynamic-mydg-build-node</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Application</name>
+              <value>Jenkins</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Project</name>
+              <value>EVWHS</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>exclude_opsworks</name>
+              <value>true</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>WBS</name>
+              <value>101D041.014</value>
+            </hudson.plugins.ec2.EC2Tag>
+          </tags>
+          <usePrivateDnsName>false</usePrivateDnsName>
+          <associatePublicIp>false</associatePublicIp>
+          <useDedicatedTenancy>false</useDedicatedTenancy>
+          <amiType class="hudson.plugins.ec2.UnixData">
+            <rootCommandPrefix></rootCommandPrefix>
+            <slaveCommandPrefix></slaveCommandPrefix>
+            <slaveCommandSuffix></slaveCommandSuffix>
+            <sshPort>22</sshPort>
+          </amiType>
+          <launchTimeout>600</launchTimeout>
+          <connectBySSHProcess>false</connectBySSHProcess>
+          <connectUsingPublicIp>false</connectUsingPublicIp>
+          <nextSubnet>0</nextSubnet>
+        </hudson.plugins.ec2.SlaveTemplate>
+        <hudson.plugins.ec2.SlaveTemplate>
+          <ami>ami-0ffaad1a222bec07d</ami>
+          <description>dynamic-ossim-hpf-scan-node</description>
+          <zone>us-east-1a</zone>
+          <securityGroups>default</securityGroups>
+          <remoteFS>/media/ephemeral0/jenkins</remoteFS>
+          <type>M4Xlarge</type>
+          <ebsOptimized>false</ebsOptimized>
+          <monitoring>false</monitoring>
+          <t2Unlimited>false</t2Unlimited>
+          <labels>hpf-build</labels>
+          <mode>EXCLUSIVE</mode>
+          <initScript>#!/bin/bash
+
+echo &quot;Pulling init script from s3&quot;
+aws s3 cp s3://o2-cicd/jenkins/dynamic-node-init.sh dynamic-node-init.sh
+chmod 775 dynamic-node-init.sh
+./dynamic-node-init.sh dynamic-ossim-hpf-scan-node    # Found in o2-paas/helper-scripts
+
+echo &quot;*******************************&quot;
+echo &quot;Completed init script &quot; date
+echo &quot;*******************************&quot;
+echo &quot;&quot;
+echo &quot;&quot;
+echo &quot;&quot;</initScript>
+          <tmpDir></tmpDir>
+          <userData></userData>
+          <numExecutors>1</numExecutors>
+          <remoteAdmin>centos</remoteAdmin>
+          <jvmopts></jvmopts>
+          <subnetId>subnet-29435b71</subnetId>
+          <idleTerminationMinutes>10</idleTerminationMinutes>
+          <iamInstanceProfile>1019700.001</iamInstanceProfile>
+          <deleteRootOnTermination>false</deleteRootOnTermination>
+          <useEphemeralDevices>false</useEphemeralDevices>
+          <customDeviceMapping></customDeviceMapping>
+          <instanceCap>2</instanceCap>
+          <stopOnTerminate>true</stopOnTerminate>
+          <tags>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Name</name>
+              <value>dynamic-jenkins-ossim-csm-plugin-node</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Application</name>
+              <value>Jenkins</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>Project</name>
+              <value>ossim</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>exclude_opsworks</name>
+              <value>true</value>
+            </hudson.plugins.ec2.EC2Tag>
+            <hudson.plugins.ec2.EC2Tag>
+              <name>WBS</name>
+              <value>1019700.001</value>
+            </hudson.plugins.ec2.EC2Tag>
+          </tags>
+          <usePrivateDnsName>false</usePrivateDnsName>
+          <associatePublicIp>false</associatePublicIp>
+          <useDedicatedTenancy>false</useDedicatedTenancy>
+          <amiType class="hudson.plugins.ec2.UnixData">
+            <rootCommandPrefix></rootCommandPrefix>
+            <slaveCommandPrefix></slaveCommandPrefix>
+            <slaveCommandSuffix></slaveCommandSuffix>
+            <sshPort>22</sshPort>
+          </amiType>
+          <launchTimeout>600</launchTimeout>
+          <connectBySSHProcess>false</connectBySSHProcess>
+          <connectUsingPublicIp>false</connectUsingPublicIp>
+          <nextSubnet>0</nextSubnet>
+        </hudson.plugins.ec2.SlaveTemplate>
+      </templates>
+      <region>us-east-1</region>
+      <noDelayProvisioning>false</noDelayProvisioning>
+    </hudson.plugins.ec2.EC2Cloud>
+  </clouds>
