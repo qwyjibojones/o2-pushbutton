@@ -106,14 +106,6 @@ services:
       - proxynet
       - omarnet
 
-  omar-streetview-app:
-    image: quay.io/radiantsolutions/omar-streetview-app:${OMAR_STREETVIEW_APP_VERSION}
-    env_file:
-      - envs/omar-streetview-app.env
-    networks:
-      - proxynet
-      - omarnet
-
   omar-superoverlay-app:
     image: quay.io/radiantsolutions/omar-superoverlay-app:${OMAR_SUPEROVERLAY_APP_VERSION}
     env_file:
@@ -192,6 +184,18 @@ services:
     image: quay.io/radiantsolutions/omar-ui-app:${OMAR_UI_APP_VERSION}
     env_file:
       - envs/omar-ui-app.env
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-basemap:
+    image: quay.io/radiantsolutions/omar-basemap:${OMAR_BASEMAP_VERSION}
+    networks:
+      - proxynet
+      - omarnet
+
+  omar-mapproxy:
+    image: quay.io/radiantsolutions/omar-mapproxy:${OMAR_MAPPROXY_VERSION}
     networks:
       - proxynet
       - omarnet

@@ -5,6 +5,8 @@ server:
 ---
 omar:
   wms:
+    stager:
+      url: http://omar-stager-app:8080/omar-stager/dataManager
     geoscript:
       url: http://omar-geoscript-app:8080/omar-geoscript/geoscriptApi
     mosaic:
