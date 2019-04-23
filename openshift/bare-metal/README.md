@@ -195,8 +195,7 @@ metadata:
   resourceVersion: ""
   selfLink: ""
 ```
-
-You can then run a command:
+Note, if you cahnage the variable or add a varible called **openshift_storage_glusterfs_storageclass_volume_type** it will give you control over the volumetype allocated when provisioning new volumes.  If you want to support replicated and non replicated volumetypes then you can add multiple definiions but will have to be added after the installation is complete using this command:
 
 ```bash
 oc create -f glusterfs-dynamic-norep.yml
@@ -216,5 +215,5 @@ ansible-playbook -i ~/openshift-inventory playbooks/adhoc/uninstall.yml
 If you want to completely wipe the glustersfs clean after you run the uninstall.yml you might have to do a `wipefs -a` on all glusterfs nodes.  For example you can use this script as a template for a 6 node cluster:
 
 ```bash
-for x in {1..6}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo wipefs -a <device>"; 
+for x in {1..6}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo wipefs -a <device>";
 ```
