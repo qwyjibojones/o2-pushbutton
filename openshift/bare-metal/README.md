@@ -113,7 +113,7 @@ cp openshift/openshift-inventory-sample ~/openshift-inventory
 vi ~/openshift-inventory
 ```
 
-Put your node name into each section the node corresponds to.  SSH to each node in the config.  This will verify that the ansible machine can reach all nodes and are part of the known_hosts.
+Please make any modifications required to the openshift-inventory. Put your node name into each section the node corresponds to.  SSH to each node in the config.  This will verify that the ansible machine can reach all nodes and are part of the known_hosts.
 
 If all the nodes are reachable and ready to be configured then run:
 
@@ -123,7 +123,7 @@ ansible-playbook -i ~/openshift-inventory playbooks/prerequisites.yml
 ansible-playbook -i ~/openshift-inventory playbooks/deploy_cluster.yml
 ```
 
-Once the cluster has been deployed we must setup the Security Context for the cluster to allow us to run as any user.  The OMAR services run as user 1000 and the ElasticSearch Opendistro cluster runs as user 1001.  The easiest thing is the do:
+Once the cluster has been deployed we must setup the Security Context for the cluster to allow us to run as any user.  The OMAR services run as user 1000 and the ElasticSearch Opendistro cluster runs as user 1001.  The easiest thing is to do is:
 
 ```bash
 oc login -u system:admin

@@ -70,15 +70,31 @@ openshift-test-glusterfs-[1:6].private.ossim.io glusterfs_devices='["/dev/xvdb",
 #openshift-test-glusterfs-[1:6].private.ossim.io glusterfs_devices='["/dev/nvme1n1","/dev/nvme2n1"]'
 
 [OSEv3:vars]
+# we will disable failures on memory checks
 openshift_disable_check=memory_availability
+
+# if youy are not running as root and are ssh into the nodes as a different user (the preferred method) 
+# then you must specify the username and the ansible become which states elevation to sudo rights during 
+# install.  This states that the user must have a sudo rights.
 ansible_user=centos
 ansible_become=yes
+
+# We will deploy the open source version "origin" of OpenShift and will use the latest version at the time
+# of writing this document of 3.11
+#
 openshift_deployment_type=origin
 openshift_release="3.11"
-#openshift_master_default_subdomain=example.io
+
+# I am using the subdomain of our wildcard cert.
+openshift_master_default_subdomain=ossim.io
+
+# Public route to the master load balancer
 openshift_master_cluster_public_hostname=openshift-test.ossim.io
+
+# the insecure registries list if any.
 openshift_docker_insecure_registries=["docker-registry.default.svc.cluster.local:5000"]
 
+# In this example we use a simple external htpasswd file
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
 
 # pregenerated htpasswd file.  If you have an htpasswd file already generated and ready to go with all your users
@@ -88,14 +104,16 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 # this will generate one
 #
 # If you want to generate a htpasswd file it will put it under /etc/origin/master/htpasswd location.  It comes in 
-# pairs separated by commas.  <Username?:<htpasswd hash>
+# pairs separated by commas.  <Username>:<htpasswd hash>
 #
 # You can use the command:  
 #       htpasswd -n <username>
 # to generate a hash
+#
 openshift_master_htpasswd_users={"admin":"$apr1$/SVTdCha$88Z1FxrKwDBGPAwwNi7h21"}
 
 openshift_hosted_registry_routehost="openshift-test-registry.ossim.io"
+
 #reencrypt or passthrough
 openshift_hosted_registry_routetermination=reencrypt
 openshift_hosted_registry_routecertificates={'certfile': '/home/centos/ossim-io.pem', 'keyfile': '/home/centos/ossim-io.key', 'cafile': '/home/centos/ossim-io-ca.pem'}
@@ -119,8 +137,6 @@ openshift_pkg_version=-3.11.0
 openshift_storage_glusterfs_is_native=true
 openshift_storage_glusterfs_heketi_is_native=true
 openshift_storage_glusterfs_name="dynamic"
-#openshift_storage_glusterfs_heketi_url=openshift-test-master-node-1.private.ossim.io
-#openshift_storage_glusterfs_heketi_port=8080
 
 #
 # Certs
@@ -128,3 +144,12 @@ openshift_storage_glusterfs_name="dynamic"
 openshift_hosted_router_certificate={"certfile": "/home/centos/ossim-io.pem", "keyfile": "/home/centos/ossim-io.key", "cafile": "/home/centos/ossim-io-ca.pem"}
 openshift_master_overwrite_named_certificates=true
 openshift_master_named_certificates=[{"certfile": "/home/centos/ossim-io.pem", "keyfile": "/home/centos/ossim-io.key", "cafile": "/home/centos/ossim-io-ca.pem"}]
+
+
+#
+# Custom RPM repos
+#
+# This is a list of JSON objects that describe you REPO location for RPM's  If you have a custom REPO list you can use this to pass them to 
+# OpenShift ansible installation.
+#
+# openshift_additional_repos=[{'id': 'openshift-origin-ci', 'name': 'OpenShift Origin CI repostory (caution: not release)', 'baseurl': 'https://storage.googleapis.com/origin-ci-test/releases/openshift/origin/master/origin.repo', 'enabled': 1, 'gpgcheck': 0}]

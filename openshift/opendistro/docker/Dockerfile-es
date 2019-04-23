@@ -1,0 +1,4 @@
+FROM amazon/opendistro-for-elasticsearch:0.7.1
+USER 0
+RUN chown -R 1000:0  /usr/share/supervisor
+USER 1000

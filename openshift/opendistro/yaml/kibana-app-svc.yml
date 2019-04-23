@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  selector:
+    deploymentconfig: kibana
+  ports:
+    - port: 5601
+      name: rest-kibana
+    - port: 9200
+      name: rest-elasticsearch
