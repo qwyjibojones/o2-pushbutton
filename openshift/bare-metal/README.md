@@ -33,8 +33,9 @@ For disconnected environments, assume all dependency RPMs are in a common repo a
 sudu yum install -y ansible
 ```
 
+At the time of writing this document we are using ansible version **2.7.10**.  
 
-If you have internet connectivitiy you can checkout ansible from the openshift project on github.
+If you have internet connectivitiy you can checkout openshift-ansible playbooks from the openshift project on github.
 
 ```bash
 cd ~
@@ -43,13 +44,15 @@ cd ~/openshift-ansible
 git checkout remotes/origin/release-3.11
 ```
 
-If you do not have internet connectivity please use either copy the RPM to a disconnected repo or grab a  tarball that holds the openshift-ansible source and then extract to the home directory on the ansible machine. We will assume that the version is the same mentioned in this Documentation.
+If you do not have internet connectivity please either copy the RPM to a disconnected repo or grab a tarball that holds the openshift-ansible source and then extract to the home directory on the ansible machine. We will assume that the version is the same mentioned in this Documentation.
 
 `tar xvfz openshift-ansible.tgz`
 
+We have made no modifications to the installation playbooks and can be used as is.  Most of the playbooks have variables we can set in the inventory file to customize the installation process.
+
 ### Setup SSH Keys and Config
 
-SSH is used by ansible to configure nodes in the cluster.  Each node must be reachable from the ansible configuration node.  Setup an ssh key for a common user so one can configure all nodes in the inventory.  If you add a password to your ssh key you must use an ssh-agent on the ansible machine.  The ssh-agent will cache the password and encrypt it.  We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the ssh user must have sudo rights on each node for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
+SSH is used by ansible to configure nodes in the cluster.  Each node must be reachable from the ansible configuration node.  Setup an ssh key for a common user so one can configure all nodes in the inventory. If you add a password to your ssh key you must use an ssh-agent on the ansible machine.  The ssh-agent will cache the password and encrypt it.  We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
 
 ```bash
 mkdir ~/.ssh;chmod 700 ~/.ssh
@@ -141,6 +144,65 @@ runAsUser:
 ```
 
 then exit with the command sequence Escape key, then hit colin key ":" then "wq" key this will finally save the modifications.  We are now ready to install a sample ElasticCluster using our dynamic proviisioning.
+
+### Gluster Volume Types
+
+Once the installation process is complete the default volume type added for the storageclass provisioner in OpenShift will replicate blocks for redundancy.  It will look something like this.
+
+```yaml
+apiVersion: v1
+items:
+- apiVersion: storage.k8s.io/v1
+  kind: StorageClass
+  metadata:
+    name: glusterfs-dynamic
+    namespace: ""
+  parameters:
+    resturl: http://heketi-dynamic.glusterfs.svc:8080
+    restuser: admin
+    secretName: heketi-dynamic-admin-secret
+    secretNamespace: glusterfs
+  provisioner: kubernetes.io/glusterfs
+  reclaimPolicy: Delete
+  volumeBindingMode: Immediate
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
+```
+
+We have provided a file called glusterfs-dynamic-norep.yml that is a no replication volumetype so it just distributes the blocks allocated.
+
+```yaml
+apiVersion: v1
+items:
+- apiVersion: storage.k8s.io/v1
+  kind: StorageClass
+  metadata:
+    name: glusterfs-dynamic-norep
+    namespace: ""
+  parameters:
+    resturl: http://heketi-dynamic.glusterfs.svc:8080
+    restuser: admin
+    secretName: heketi-dynamic-admin-secret
+    secretNamespace: glusterfs
+    volumetype: "none"
+  provisioner: kubernetes.io/glusterfs
+  reclaimPolicy: Delete
+  volumeBindingMode: Immediate
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
+```
+
+You can then run a command:
+
+```bash
+oc create -f glusterfs-dynamic-norep.yml
+```
+
+To use this provisioner type you will need to use the name **glusterfs-dynamic-norep** instead of **glusterfs-dynamic** if you do not want to worry about replication.
 
 ### Uninstalling
 
