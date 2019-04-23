@@ -139,6 +139,15 @@ openshift_storage_glusterfs_heketi_is_native=true
 openshift_storage_glusterfs_name="dynamic"
 
 #
+# Options can be of the form
+# none which means no replication
+# replicate:3 where its a replicating volume and the count is 3
+#
+# The default is a replicate volume.
+# Unciomment if you want to modify the volume_type
+# openshift_storage_glusterfs_storageclass_volume_type="none"
+
+#
 # Certs
 #
 openshift_hosted_router_certificate={"certfile": "/home/centos/ossim-io.pem", "keyfile": "/home/centos/ossim-io.key", "cafile": "/home/centos/ossim-io-ca.pem"}

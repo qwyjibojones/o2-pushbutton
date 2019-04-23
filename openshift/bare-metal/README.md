@@ -60,7 +60,7 @@ ssh-keygen -f ~/.ssh/os-config-key-rsa -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/os-config-key-rsa user@host
 ```
 
-If the **keys are password protected** then make sure the ssh-agent is running and then add the key.
+If the **keys are password protected** then make sure the ssh-agent is running on the ansible machine and then add the key.
 
 ```bash
 ssh-agent
