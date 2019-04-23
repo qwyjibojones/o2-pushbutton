@@ -3,7 +3,6 @@
 #
 # Global variables
 #
-
 export REGISTRY=docker-registry.ossim.io
 export REGISTRY_URL=http://$REGISTRY
 export INTERNAL_REGISTRY="docker-registry.default.svc:5000"
@@ -11,6 +10,7 @@ ES_CLUSTER_MEM_SIZE="512m"
 ES_CLUSTER_MIN_MASTER_NODES=4
 ES_CLUSTER_STORAGE_SIZE="10Gi"
 ES_CLUSTER_REPLICAS=6
+STORAGE_CLASS_NAME="gp2"
 KIBANA_REPLICAS=2
 KIBANA_IMAGE="$INTERNAL_REGISTRY/es-stack/kibana-app"
 ES_IMAGE="$INTERNAL_REGISTRY/es-stack/es-app"

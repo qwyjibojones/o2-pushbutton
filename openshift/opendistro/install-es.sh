@@ -18,6 +18,14 @@ function usage {
   echo "                example: docker-registry.default.svc:5000/es-stack/es-app:latest"
   echo "     --storage-size Formated in Openshift form of Storage sizes"
   echo "                10Gi is ten gigs or 1Ti is one terrabyte"
+  echo "     --storage-class-name Specify the class name to use for the dynamic provisioning"
+  echo "                          For aws you can specify gp2.   For glusterfs you can specify"
+  echo "                          glusterfs-dynamic and if you installed the norep for 'No Replicatioun'"
+  echo "                          you can use the value glusterfs-dynamic-norep"
+  echo ""
+  echo ""
+  echo "Example:"
+  echo "     $0 --replicas 3 --storage-class-name glusterfs-dynamic-norep --storage-size 10Gi --mem-size 1g"
 }
 
 POSITIONAL=()
@@ -52,6 +60,11 @@ do
     ;;
     --storage-size)
     ES_CLUSTER_STORAGE_SIZE="$2"
+    shift
+    shift
+    ;;
+    --storage-class-name)
+    STORAGE_CLASS_NAME="$2"
     shift
     shift
     ;;
@@ -93,6 +106,7 @@ ES_YAML=${ES_YAML//MIN_MASTER_NODES/"$ES_CLUSTER_MIN_MASTER_NODES"}
 ES_YAML=${ES_YAML//ES_IMAGE/"$ES_IMAGE"}
 ES_YAML=${ES_YAML//ES_REPLICAS/"$ES_CLUSTER_REPLICAS"}
 ES_YAML=${ES_YAML//STORAGE_SIZE/"$ES_CLUSTER_STORAGE_SIZE"}
+ES_YAML=${ES_YAML//STORAGE_CLASS_NAME/"$STORAGE_CLASS_NAME"}
 
 echo "$ES_YAML" > $SCRIPT_DIR/yaml/es-app.yml
 

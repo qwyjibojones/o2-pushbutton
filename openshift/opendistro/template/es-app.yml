@@ -73,7 +73,7 @@ spec:
         app: elasticsearch
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: gp2
+      storageClassName: STORAGE_CLASS_NAME
       resources:
         requests:
           storage: STORAGE_SIZE
