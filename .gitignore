@@ -1,7 +1,7 @@
 .gradle
 .idea
+.vscode
 sanfrancisco
 elevation*
-sanfrancisco.tgz
-dted-elevation.tgz
+*.tgz
 pgdata
