@@ -147,7 +147,7 @@ then exit with the command sequence Escape key, then hit colin key ":" then "wq"
 
 ### Gluster Volume Types
 
-Once the installation process is complete the default volume type added for the storageclass provisioner in OpenShift will replicate blocks for redundancy.  It will look something like this.
+Once the installation process is complete the default volume type added for the storageclass provisioner in OpenShift will replicate for redundancy unless you specify otherwise with the variable **openshift_storage_glusterfs_storageclass_volume_type** in your inventory file.  Your default storage class created should look something like this:
 
 ```yaml
 apiVersion: v1
@@ -195,13 +195,35 @@ metadata:
   resourceVersion: ""
   selfLink: ""
 ```
-Note, if you cahnage the variable or add a varible called **openshift_storage_glusterfs_storageclass_volume_type** it will give you control over the volumetype allocated when provisioning new volumes.  If you want to support replicated and non replicated volumetypes then you can add multiple definiions but will have to be added after the installation is complete using this command:
+
+Note, if you change the variable or add a variable called **openshift_storage_glusterfs_storageclass_volume_type** to the inventory file it will give you control over the volumetype allocated when provisioning new volumes.  The values can be:
+
+* **none** specifies you want a storage class that does not enable replication on a volume
+* **replicate:3** specifies you want the storage class to have a replication of 3
+
+If you want to support replicated and non replicated volumetypes then you can add multiple storage classes but will have to be added after the installation is complete using this command:
 
 ```bash
 oc create -f glusterfs-dynamic-norep.yml
 ```
 
 To use this provisioner type you will need to use the name **glusterfs-dynamic-norep** instead of **glusterfs-dynamic** if you do not want to worry about replication.
+
+Testing your storage class:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: gluster1
+spec:
+ accessModes:
+  - ReadWriteMany
+ resources:
+   requests:
+        storage: 1Gi
+ storageClassName: glusterfs-dynamic
+```
 
 ### Uninstalling
 
@@ -212,8 +234,10 @@ cd ~/openshift-ansible
 ansible-playbook -i ~/openshift-inventory playbooks/adhoc/uninstall.yml
 ```
 
-If you want to completely wipe the glustersfs clean after you run the uninstall.yml you might have to do a `wipefs -a` on all glusterfs nodes.  For example you can use this script as a template for a 6 node cluster:
+If you want to completely wipe the glustersfs clean after you run the uninstall.yml you might have to do a `wipefs -a <device>` on all glusterfs nodes.  For example you can use this script as a template for a 6 node cluster:
 
 ```bash
 for x in {1..6}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo wipefs -a <device>";
 ```
+
+If you have multiple devices per node then the script would need to be ran for each device.

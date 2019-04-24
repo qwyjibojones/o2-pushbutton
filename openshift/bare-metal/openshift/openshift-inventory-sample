@@ -116,14 +116,14 @@ openshift_hosted_registry_routehost="openshift-test-registry.ossim.io"
 
 #reencrypt or passthrough
 openshift_hosted_registry_routetermination=reencrypt
-openshift_hosted_registry_routecertificates={'certfile': '/home/centos/ossim-io.pem', 'keyfile': '/home/centos/ossim-io.key', 'cafile': '/home/centos/ossim-io-ca.pem'}
+openshift_hosted_registry_routecertificates={'certfile': '/home/centos/o2.pem', 'keyfile': '/home/centos/o2.key', 'cafile': '/home/centos/o2-ca.pem'}
 
-# metircs install
+# metrics install
 openshift_metrics_install_metrics=true
 openshift_metrics_hawkular_hostname=hawkular-metrics-test.ossim.io
-openshift_metrics_hawkular_ca="/home/centos/ossim-io-ca.pem"
-openshift_metrics_hawkular_cert="/home/centos/ossim-io.pem"
-openshift_metrics_hawkular_key="/home/centos/ossim-io.key"
+openshift_metrics_hawkular_ca="/home/centos/o2-ca.pem"
+openshift_metrics_hawkular_cert="/home/centos/o2.pem"
+openshift_metrics_hawkular_key="/home/centos/o2.key"
 
 # Debug level for all OpenShift components (Defaults to 2)
 debug_level=2
@@ -150,9 +150,9 @@ openshift_storage_glusterfs_name="dynamic"
 #
 # Certs
 #
-openshift_hosted_router_certificate={"certfile": "/home/centos/ossim-io.pem", "keyfile": "/home/centos/ossim-io.key", "cafile": "/home/centos/ossim-io-ca.pem"}
+openshift_hosted_router_certificate={"certfile": "/home/centos/o2.pem", "keyfile": "/home/centos/o2.key", "cafile": "/home/centos/o2-ca.pem"}
 openshift_master_overwrite_named_certificates=true
-openshift_master_named_certificates=[{"certfile": "/home/centos/ossim-io.pem", "keyfile": "/home/centos/ossim-io.key", "cafile": "/home/centos/ossim-io-ca.pem"}]
+openshift_master_named_certificates=[{"certfile": "/home/centos/o2.pem", "keyfile": "/home/centos/o2.key", "cafile": "/home/centos/o2-ca.pem"}]
 
 
 #
