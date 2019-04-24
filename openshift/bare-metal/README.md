@@ -24,24 +24,24 @@ For connected environments:
 
 ```bash
 sudo yum install -y git centos-release-ansible26
-sudo yum install -y ansible
+sudo yum install -y ansible git pyOpenSSL
 ```
 
-For disconnected environments, assume all dependency RPMs are in a common repo and have a repo file under /etc/yum.repo.d/ directory pointing to your common yum repository.
+For disconnected environments, assume all dependency RPMs are in a common repo and have a repo file under /etc/yum.repo.d/ directory pointing to your common yum repository. 
 
 ```bash
-sudu yum install -y ansible
+sudo yum install -y ansible git pyOpenSSL
 ```
 
 At the time of writing this document we are using ansible version **2.7.10**.  
 
-If you have internet connectivitiy you can checkout openshift-ansible playbooks from the openshift project on github.
+If you have internet connectivity you can checkout openshift-ansible playbooks from the openshift project on github.
 
 ```bash
 cd ~
 git clone https://github.com/openshift/openshift-ansible.git
 cd ~/openshift-ansible
-git checkout remotes/origin/release-3.11
+git checkout release-3.11
 ```
 
 If you do not have internet connectivity please either copy the RPM to a disconnected repo or grab a tarball that holds the openshift-ansible source and then extract to the home directory on the ansible machine. We will assume that the version is the same mentioned in this Documentation.
@@ -79,6 +79,9 @@ Host openshift-test-infra-node-1.private.ossim.io
 Host openshift-test-compute-node-1.private.ossim.io
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
+Host openshift-test-lb-node.private.ossim.io
+  User centos
+  IdentityFile ~/.ssh/os-config-key-rsa
 ```
 
 change the permissions to be 600: `chmod 600 ~/.ssh/config`
@@ -91,9 +94,17 @@ for x in {1..1}; do ssh openshift-test-infra-node-$x.private.ossim.io "sudo yum 
 for x in {1..8}; do ssh openshift-test-compute-node-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
 ```
 
-### Dyanmic Provisioning with Gluster
+If you have a gluster cluster that would need to be configured for openshift dynamic provisioning support then we will assume similar private dns names and you can run the following script
 
-For the gluster ansible scripts to work, please make sure you have the latest CentOS7 and updates installed on your gluster nodes.  We will show the dynamic provbisioning version of gluster.  This is not a statically installed gluster where the volumes are predefined and laid out.  The dynamic provisioning is facilitate through heketi and will carve out volumes from the gluster cluster on demand.  At the time of writing this document the version of CentOS that we know worked with the configuration setup is **CentOS Linux release 7.6.1810 (Core)**
+```bash
+for x in {1..3}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
+```
+
+Note, the gluster cluster here should have un-allocated disks and OpenShift installs heketi to add a restful interface for dynamically provisioning space from the gluster cluster.
+
+### Dynamic Provisioning with Gluster
+
+For the gluster ansible scripts to work, please make sure you have the latest CentOS7 and updates installed on your gluster nodes.  We will show the dynamic provisioning version of gluster.  This is not a statically installed gluster where the volumes are predefined and laid out.  The dynamic provisioning is facilitate through heketi and will carve out volumes from the gluster cluster on demand.  At the time of writing this document the version of CentOS that we know worked with the configuration setup is **CentOS Linux release 7.6.1810 (Core)**
 
 The gluster interface allows one to dynamically provision volumes using heketi.  The current installation allows the gluster server to be installed as a daemonset into OpenShift.  This is indicated by the variables in the inventory file:
 
@@ -126,7 +137,7 @@ ansible-playbook -i ~/openshift-inventory playbooks/prerequisites.yml
 ansible-playbook -i ~/openshift-inventory playbooks/deploy_cluster.yml
 ```
 
-Once the cluster has been deployed we must setup the Security Context for the cluster to allow us to run as any user.  The OMAR services run as user 1000 and the ElasticSearch Opendistro cluster runs as user 1001.  The easiest thing is to do is:
+Once the cluster has been deployed we must setup the Security Context for the cluster to allow us to run as any user.  The OMAR services run as user 1000 and the ElasticSearch Opendistro cluster runs as user 1001.  The easiest thing to do is:
 
 ```bash
 oc login -u system:admin
@@ -143,7 +154,7 @@ runAsUser:
   type: RunAsAny
 ```
 
-then exit with the command sequence Escape key, then hit colin key ":" then "wq" key this will finally save the modifications.  We are now ready to install a sample ElasticCluster using our dynamic proviisioning.
+then exit with the command sequence Escape key, then hit colin key ":" then "wq" key this will finally save the modifications.  We are now ready to install a sample ElasticCluster using our dynamic provisioning.
 
 ### Gluster Volume Types
 
@@ -209,7 +220,7 @@ oc create -f glusterfs-dynamic-norep.yml
 
 To use this provisioner type you will need to use the name **glusterfs-dynamic-norep** instead of **glusterfs-dynamic** if you do not want to worry about replication.
 
-Testing your storage class:
+Once you have defined your storage class you can use this to test the allocation of a claim.  In this example please modify the **storageClassName** to the name you created in your storage class list.  Create a file called glusterfs-pvc.yml with contents:
 
 ```yaml
 apiVersion: v1
@@ -225,6 +236,21 @@ spec:
  storageClassName: glusterfs-dynamic
 ```
 
+We will use the default project to test dynamic provision and assume you created a file called glusterfs-pvc.yml.
+
+```bash
+oc login -u system:admin
+oc project default
+oc create -f glusterfs-pvc.yml
+oc get pvc
+```
+
+Should have output that shows your claim being bound glusterfs1.  Note it might take a second so if you run the oc get pvc right after the create you might not get the "Bound" state.
+
+```text
+gluster1   Bound     pvc-dbe9559b-6687-11e9-b140-0e3548ad372e   1Gi        RWX            glusterfs-dynamic   10s
+```
+
 ### Uninstalling
 
 If you want to uninstall a cluster because of failure or you just want to do a fresh new install you can run the uninstall playbook:
@@ -234,7 +260,7 @@ cd ~/openshift-ansible
 ansible-playbook -i ~/openshift-inventory playbooks/adhoc/uninstall.yml
 ```
 
-If you want to completely wipe the glustersfs clean after you run the uninstall.yml you might have to do a `wipefs -a <device>` on all glusterfs nodes.  For example you can use this script as a template for a 6 node cluster:
+If you want to completely wipe the glusterfs clean after you run the uninstall.yml you might have to do a `wipefs -a <device>` on all glusterfs nodes.  For example you can use this script as a template for a 6 node cluster:
 
 ```bash
 for x in {1..6}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo wipefs -a <device>";
