@@ -13,7 +13,7 @@ Please rename accordingly for your installation.  For a production install you p
 Before we begin.  Please have a wildcard NPE Certificate that we will use for the master and router certificates.  We will also use the same CERT for the Hawkular metrics installation.
 
 ## Ansible
-
+ 
 We will need a machine running ansible that will be used to configure and setup the OpenShift cluster.  The ansible machine does not need to be very powerful, for it is only used for cluster configuration.  The machine uses ansible to configure your OpenShift cluster using the openshift-ansible playbooks.  If you are limited on resources, you can use the node that will be dedicated to the OpenShift master as your ansible machine.  It is best to have a separate ansible machine dedicated to the configuration of the cluster, so if you need to destroy the cluster and re-install, you still have your configuration machine in tact.
 
 ### Install Ansible
@@ -24,7 +24,7 @@ For connected environments:
 
 ```bash
 sudo yum install -y git centos-release-ansible26
-sudo yum install -y ansible git pyOpenSSL
+sudo yum install -y ansible git pyOpenSSL httpd-tools java-1.8.0-openjdk-headless
 ```
 
 For disconnected environments, assume all dependency RPMs are in a common repo and have a repo file under /etc/yum.repo.d/ directory pointing to your common yum repository. 
@@ -262,8 +262,14 @@ ansible-playbook -i ~/openshift-inventory playbooks/adhoc/uninstall.yml
 
 If you want to completely wipe the glusterfs clean after you run the uninstall.yml you might have to do a `wipefs -a <device>` on all glusterfs nodes.  For example you can use this script as a template for a 6 node cluster:
 
+You might have volume groups created and wipefs will error out.   If you want to remove everything then you must wipe the volumes created on the gluster devices on each node or you will not be able to re-install gluster.
+
 ```bash
-for x in {1..6}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo wipefs -a <device>";
+for x in {1..6}; do echo $x;ssh openshift-test-glusterfs-$x.private.ossim.io "sudo vgremove -q -y \$(sudo vgdisplay|grep 'VG Name'|awk '{print \$3}');";done
 ```
 
-If you have multiple devices per node then the script would need to be ran for each device.
+Now wipe out each device.
+
+```bash
+for x in {1..6}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo wipefs -a <device>";done
+```
