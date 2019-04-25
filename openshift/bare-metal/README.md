@@ -24,7 +24,7 @@ For connected environments:
 
 ```bash
 sudo yum install -y git centos-release-ansible26
-sudo yum install -y ansible git pyOpenSSL httpd-tools java-1.8.0-openjdk-headless
+sudo yum install -y ansible python-passlib git pyOpenSSL httpd-tools java-1.8.0-openjdk-headless
 ```
 
 For disconnected environments, assume all dependency RPMs are in a common repo and have a repo file under /etc/yum.repo.d/ directory pointing to your common yum repository. 
@@ -154,6 +154,23 @@ runAsUser:
   type: RunAsAny
 ```
 
+Also edit the restricted scc:
+
+```bash
+oc login -u system:admin
+oc edit scc restricted
+```
+
+set the variables:
+
+```yaml
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: true
+
+runAsUser:
+  type: RunAsAny
+```
+
 then exit with the command sequence Escape key, then hit colin key ":" then "wq" key this will finally save the modifications.  We are now ready to install a sample ElasticCluster using our dynamic provisioning.
 
 ### Gluster Volume Types
@@ -220,7 +237,19 @@ oc create -f glusterfs-dynamic-norep.yml
 
 To use this provisioner type you will need to use the name **glusterfs-dynamic-norep** instead of **glusterfs-dynamic** if you do not want to worry about replication.
 
-Once you have defined your storage class you can use this to test the allocation of a claim.  In this example please modify the **storageClassName** to the name you created in your storage class list.  Create a file called glusterfs-pvc.yml with contents:
+Once you have defined your storage class you can use this to test the allocation of a claim.  In this example please modify the **storageClassName** to the name you created in your storage class list.  If you want to verify then:
+
+```bash
+oc get storageclass
+```
+
+Should print something of the form:
+
+```text
+NAME                PROVISIONER               AGE
+glusterfs-dynamic   kubernetes.io/glusterfs   18h
+```
+Create a file called glusterfs-pvc.yml with contents:
 
 ```yaml
 apiVersion: v1
@@ -236,11 +265,11 @@ spec:
  storageClassName: glusterfs-dynamic
 ```
 
-We will use the default project to test dynamic provision and assume you created a file called glusterfs-pvc.yml.
+We will use the glusterfs project to test dynamic provision and assume you created a file called glusterfs-pvc.yml.
 
 ```bash
 oc login -u system:admin
-oc project default
+oc project glusterfs
 oc create -f glusterfs-pvc.yml
 oc get pvc
 ```
@@ -249,6 +278,12 @@ Should have output that shows your claim being bound glusterfs1.  Note it might 
 
 ```text
 gluster1   Bound     pvc-dbe9559b-6687-11e9-b140-0e3548ad372e   1Gi        RWX            glusterfs-dynamic   10s
+```
+
+To remove the volume just do
+
+```bash
+oc delete pvc gluster1
 ```
 
 ### Uninstalling
