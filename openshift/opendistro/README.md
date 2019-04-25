@@ -23,7 +23,7 @@ oc new-project es-stack
 
 Now make sure you are in this directory where this README is located and execute the commands that follow to install the cluster
 
-Next build the elasticsearch image and Kibana image
+Next build the elasticsearch image and kibana image
 
 ``` bash
 ./build-push.sh
