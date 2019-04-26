@@ -10,10 +10,10 @@ For this example installation process we will use one node for master and infra 
 
 Please rename accordingly for your installation.  For a production install you probably would want at least 2 or 3 masters and 2 infra nodes that route service traffic within the cluster.  The compute or "worker nodes" typically handle all the main processing pods.  The number of compute nodes will allow one to horizontally scale compute power by increasing the pod count and if the pod count exceeds the resource you can add another compute node to the cluster and keep horizontally scaling.
 
-Before we begin.  Please have a wildcard NPE Certificate that we will use for the master and router certificates.  We will also use the same CERT for the Hawkular metrics installation.
+Before we begin, please have a wildcard NPE Certificate that we will use for the master and router certificates.  We will also use the same CERT for the Hawkular metrics installation.
 
 ## Ansible
- 
+
 We will need a machine running ansible that will be used to configure and setup the OpenShift cluster.  The ansible machine does not need to be very powerful, for it is only used for cluster configuration.  The machine uses ansible to configure your OpenShift cluster using the openshift-ansible playbooks.  If you are limited on resources, you can use the node that will be dedicated to the OpenShift master as your ansible machine.  It is best to have a separate ansible machine dedicated to the configuration of the cluster, so if you need to destroy the cluster and re-install, you still have your configuration machine in tact.
 
 ### Install Ansible
@@ -44,7 +44,7 @@ cd ~/openshift-ansible
 git checkout release-3.11
 ```
 
-If you do not have internet connectivity please either copy the RPM to a disconnected repo or grab a tarball that holds the openshift-ansible source and then extract to the home directory on the ansible machine. We will assume that the version is the same mentioned in this Documentation.
+If you are disconnected then the openshift-ansible repo will need to be tarballed up and then extract to the home directory on the ansible machine. We will assume that the version is the same mentioned in this Documentation, 3.11.
 
 `tar xvfz openshift-ansible.tgz`
 
@@ -52,7 +52,7 @@ We have made no modifications to the installation playbooks and can be used as i
 
 ### Setup SSH Keys and Config
 
-SSH is used by ansible to configure nodes in the cluster.  Each node must be reachable from the ansible configuration node.  Setup an ssh key for a common user so one can configure all nodes in the inventory. If you add a password to your ssh key you must use an ssh-agent on the ansible machine.  The ssh-agent will cache the password and encrypt it.  We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
+SSH is used by ansible to configure nodes in the cluster.  Each node must be reachable from the ansible configuration node.  Setup an ssh key for a common user so one can configure all nodes in the inventory. The prefered way is to create an ssh key without a password.  If you add a password to your ssh key you must use an ssh-agent on the ansible machine.  The ssh-agent will cache the password and encrypt it.  We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
 
 ```bash
 mkdir ~/.ssh;chmod 700 ~/.ssh
@@ -67,7 +67,7 @@ ssh-agent
 ssh-add ~/.ssh/os-config-key-rsa
 ```
 
-create ~/.ssh/config on your ansible machine with contents listing all nodes in your cluster
+`create ~/.ssh/config` on your ansible machine with contents listing all nodes in your cluster
 
 ```config
 Host openshift-test-master-node-1.private.ossim.io
@@ -104,7 +104,7 @@ Note, the gluster cluster here should have un-allocated disks and OpenShift inst
 
 ### Dynamic Provisioning with Gluster
 
-For the gluster ansible scripts to work, please make sure you have the latest CentOS7 and updates installed on your gluster nodes.  We will show the dynamic provisioning version of gluster.  This is not a statically installed gluster where the volumes are predefined and laid out.  The dynamic provisioning is facilitate through heketi and will carve out volumes from the gluster cluster on demand.  At the time of writing this document the version of CentOS that we know worked with the configuration setup is **CentOS Linux release 7.6.1810 (Core)**
+For the gluster ansible scripts to work, please make sure you have the latest CentOS7 and updates installed on your gluster nodes.  We will show the dynamic provisioning via heketi.  The dynamic provisioning is facilitated through heketi and will carve out volumes from the gluster cluster on demand.  At the time of writing this document the version of CentOS that we know worked with the configuration setup is **CentOS Linux release 7.6.1810 (Core)**.  Note, when the openshift installation gets to heketi and it load the topology it seems to take a while, so please be patient.
 
 The gluster interface allows one to dynamically provision volumes using heketi.  The current installation allows the gluster server to be installed as a daemonset into OpenShift.  This is indicated by the variables in the inventory file:
 
@@ -113,6 +113,8 @@ openshift_storage_glusterfs_is_native=true
 openshift_storage_glusterfs_heketi_is_native=true
 openshift_storage_glusterfs_name="dynamic"
 ```
+
+A gluster server is installed on every node listed in the **[glusterfs]** section.
 
 The storage class reference name used will be prefixed with glusterfs.  the keyword **openshift_storage_glusterfs_name** will indicate that a storage class reference **glusterfs-dynamic** can be used to reference the dynamic provisioner.
 
