@@ -9,6 +9,7 @@ function usage {
   echo " options:"
   echo "     --help Display this help"
   echo "     --registry-url Give the full url for the registry: http://myregistry.foo.io"
+  echo "     --project-namespace Give the namespace you wish to push the images to"
   echo ""
   echo ""
   echo "Example:"
@@ -29,6 +30,11 @@ do
     --registry-url)
     REGISTRY_URL=$2
     REGISTRY=${REGISTRY_URL##*/}
+    shift
+    shift
+    ;;
+    --project-namespace)
+    PROJECT_NAMESPACE=$2
     shift
     shift
     ;;
