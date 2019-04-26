@@ -118,7 +118,7 @@ A gluster server is installed on every node listed in the **[glusterfs]** sectio
 
 The storage class reference name used will be prefixed with glusterfs.  the keyword **openshift_storage_glusterfs_name** will indicate that a storage class reference **glusterfs-dynamic** can be used to reference the dynamic provisioner.
 
-So the gluster will not have any worker pods scheduled to it we will redefined the node_groups and add another group called **node-config-compute-storage**.  At the time of writing this document we have not found a way to append to the current list of node groups so we have to specify all the groups we will need in the current list plus any additional groups.  
+So the gluster will not have any worker pods scheduled to it, we will redefined the node_groups and add another group called **node-config-compute-storage**.  At the time of writing this document we have not found a way to append to the current list of node groups so we have to specify all the groups we will need in the current list plus any additional groups.  
 
 ```config
 openshift_node_groups=[{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true']}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true']}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true']}, {'name': 'node-config-compute-storage', 'labels': ['node-role.kubernetes.io/compute-storage=true']}]
