@@ -28,6 +28,9 @@ For completeness we will repeat from the Origin Documentation for 3.11 the Hardw
   - See the Hardware Recommendations section of the CoreOS etcd documentation for information how to properly size your etcd nodes.
   - Currently, OKD stores image, build, and deployment metadata in etcd. You must periodically prune old resources. If you are planning to leverage a large number of these resources, place etcd on machines with large amounts of memory and fast SSD drives.
 * **System Admin Knowledge** One will need to have some level of training in System Administration and bash scripting.
+* **Repos**
+  - openshift-ansible This will be a checkout or tar ball of release-3.11.
+  - o2-pushbutton
 
 If we do not have the luxury of being able to host or install OpenShift within a cloud environment and be able to use one of their cloud installation scripts we will need to configure and deploy OpenShift "manually".  When we say "manual" we have to configure each bare-metal machine with some initial settings before the openshift-ansible scripts can be ran to setup the cluster as an OpenShift environment.
 
