@@ -157,6 +157,7 @@ openshift_storage_glusterfs_name="dynamic"
 # Options can be of the form
 # none which means no replication
 # replicate:3 where its a replicating volume and the count is 3
+# disperse:4:2 where you distribute the blocks across 4 data bricks and have 2 replications
 #
 # The default is a replicate volume.
 # Uncomment if you want to modify the volume_type
