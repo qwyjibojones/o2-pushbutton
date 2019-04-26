@@ -124,12 +124,11 @@ So the gluster will not have any worker pods scheduled to it, we will redefined 
 openshift_node_groups=[{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true']}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true']}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true']}, {'name': 'node-config-compute-storage', 'labels': ['node-role.kubernetes.io/compute-storage=true']}]
 ```
 
-We can override the variable without editing the scripts but the original list can be found under the file **roles/openshift_facts/defaults/main.yml** relative form the the top level openshift-ansible directory.  Any node group can be copied out and added to the list
-
+We can override the variable without editing the scripts but the original list can be found under the file **roles/openshift_facts/defaults/main.yml** relative from the the top level openshift-ansible directory.  Any node group can be copied out and added to the list.
 
 ### Configure the Nodes in the Cluster
 
-We now assume that you have a ~/.ssh/config file that describes how to reach each node in the cluster.  We will now place those nodes into the proper sections described in the annotated sample inventory file found in the directory **openshift/openshift-inventory-sample**.  Use this file to create an inventory file for your cluster in the ansible home ~/openshift-inventory.  The file has annotations explaining each section and must be tailored for your environment and resource limits.  If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  Please see the inventory example for further definitions.  
+We now assume that you have a ~/.ssh/config file that describes how to reach each node in the cluster.  We will now place those nodes into the proper sections described in the annotated sample inventory file found in the directory **[openshift/openshift-inventory-sample](openshift/openshift-inventory-sample)**.  Use this file to create an inventory file for your cluster in the ansible home ~/openshift-inventory.  The file has annotations explaining each section and must be tailored for your environment and resource limits.  If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  Please see the inventory example for further definitions.  
 
 Copy  and edit the inventory file
 

@@ -1,18 +1,19 @@
 # This is an example of an OpenShift-Ansible host inventory that provides the
 # minimum recommended configuration for production use. This includes 3 masters,
 # two infra nodes, two compute nodes, and an haproxy load balancer to load
-# balance traffic to the API servers. For a truly production environment you
+# balance traffic to the API services. For a truly production environment you
 # should use an external load balancing solution that itself is highly available.
 
 [masters]
 #
-# This is an example 3 node master definition
+# This is an example 3 node master definition.  Modify based on the number
+# of masters you wish to have
 #
 openshift-test-master-node-[1:3].private.ossim.io
 
 [etcd]
 #
-# We will put the etcd on all 3 mater nodes.  You can use another node(s) for the etcd services.
+# We will put the etcd on all 3 master nodes.  You can use another node(s) for the etcd services.
 # I would at least use 2 nodes for etcd.
 #
 openshift-test-master-node-[1:3].private.ossim.io
@@ -42,6 +43,10 @@ openshift-test-compute-node-[1:6].private.ossim.io openshift_node_group_name="no
 #
 openshift-test-glusterfs-[1:6].private.ossim.io openshift_node_group_name="node-config-compute"
 
+#
+# Internally managed NFS ignored for now.  We will assume a NAS is accessible and will be
+# defined when deploying our services that require an NFS mount.
+#
 [nfs]
 
 [lb]
@@ -49,6 +54,10 @@ openshift-test-glusterfs-[1:6].private.ossim.io openshift_node_group_name="node-
 # This is a load balancer that loads balances the master nodes.  Right now this is only for the masters
 # and will setup an HAProxy on this node for managing load blancing to the master nodes.  At his time you 
 # will have to configure your own load balancer if you have mulitple infra nodes.
+#
+# If you have AWS and  or already have a manually defined load balancer where you can point
+# to your masters then you can ignore this section and leave it blank.  Just make sure your load balancer 
+# can ballance all master nodes.
 #
 openshift-test-lb-node.private.ossim.io
 
@@ -62,12 +71,11 @@ masters
 nodes
 etcd
 lb
-#nfs
+nfs
 glusterfs
 
 [glusterfs]
 openshift-test-glusterfs-[1:6].private.ossim.io glusterfs_devices='["/dev/xvdb","/dev/xvdc"]'
-#openshift-test-glusterfs-[1:6].private.ossim.io glusterfs_devices='["/dev/nvme1n1","/dev/nvme2n1"]'
 
 [OSEv3:vars]
 
@@ -121,7 +129,8 @@ openshift_hosted_registry_routehost="openshift-test-registry.ossim.io"
 openshift_hosted_registry_routetermination=reencrypt
 openshift_hosted_registry_routecertificates={'certfile': '/home/centos/o2.pem', 'keyfile': '/home/centos/o2.key', 'cafile': '/home/centos/o2-ca.pem'}
 
-# metrics install
+# metrics install.  Specify your global host name and the NPE cert.  We have
+# a wildcard cert so it will be the same cert throughout the file
 openshift_metrics_install_metrics=true
 openshift_metrics_hawkular_hostname=hawkular-metrics-test.ossim.io
 openshift_metrics_hawkular_ca="/home/centos/o2-ca.pem"
@@ -137,6 +146,9 @@ openshift_pkg_version=-3.11.0
 #
 # GLUSTER
 #
+# Enable native gluster support.  This will tell OpenShift to automatically configure the
+# gluster-server daemonset and install on all nodes listed in the [glusterfs] section.
+#
 openshift_storage_glusterfs_is_native=true
 openshift_storage_glusterfs_heketi_is_native=true
 openshift_storage_glusterfs_name="dynamic"
@@ -147,8 +159,8 @@ openshift_storage_glusterfs_name="dynamic"
 # replicate:3 where its a replicating volume and the count is 3
 #
 # The default is a replicate volume.
-# Unciomment if you want to modify the volume_type
-# openshift_storage_glusterfs_storageclass_volume_type="none"
+# Uncomment if you want to modify the volume_type
+openshift_storage_glusterfs_storageclass_volume_type="none"
 
 #
 # Certs

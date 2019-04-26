@@ -1,3 +1,8 @@
+#
+# This is a sample storage class that changes the paramters passed to the heketi service 
+# allowing one to create a none replicating volume.  This storage class type is 
+# referenced via the name glusterfs-dynamic-norep
+#
 apiVersion: v1
 items:
 - apiVersion: storage.k8s.io/v1
