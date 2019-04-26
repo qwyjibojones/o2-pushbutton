@@ -354,7 +354,7 @@ for x in {1..6}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo wipef
 
 ### Evacuate and drain Nodes
 
-If for some reason a node is needing to be removed or something has happened to the node and you want to safely remove it from the schedulable nodes then you can do the following:
+If for some reason a node is needing to be removed or something has happened to the node and you want to safely remove it or you just need to update and then reboot the nof then you will need to make the node not schedulable and drain any pods that are currently running on the node:
 
 ```bash
 oc adm manage-node <node> --schedulable=false
