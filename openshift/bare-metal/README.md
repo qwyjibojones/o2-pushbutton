@@ -13,7 +13,6 @@ For completeness we will repeat from the Origin Documentation for 3.11 the Hardw
   - Minimum 1 GB hard disk space for the file system containing /usr/local/bin/.
   - Minimum 1 GB hard disk space for the file system containing the system’s temporary directory.
   - Masters with a co-located etcd require a minimum of 4 cores. Two-core systems do not work.
-
 * **Node Hardware**
   - Physical or virtual system, or an instance running on a public or private IaaS.
   - Base OS: CentOS 7.6.  We were testing on at least **CentOS Linux release 7.6.1810 (Core)**
@@ -24,12 +23,11 @@ For completeness we will repeat from the Origin Documentation for 3.11 the Hardw
   - Minimum 1 GB hard disk space for the file system containing /usr/local/bin/.
   - Minimum 1 GB hard disk space for the file system containing the system’s temporary directory.
   - An additional minimum 15 GB unallocated space per system running containers for Docker’s storage back end.
-
 * **External Etcd**
   - Minimum 20 GB hard disk space for etcd data.
   - See the Hardware Recommendations section of the CoreOS etcd documentation for information how to properly size your etcd nodes.
   - Currently, OKD stores image, build, and deployment metadata in etcd. You must periodically prune old resources. If you are planning to leverage a large number of these resources, place etcd on machines with large amounts of memory and fast SSD drives.
-
+* **System Admin Knowledge** One will need to have some level of training in System Administration and bash scripting.
 
 If we do not have the luxury of being able to host or install OpenShift within a cloud environment and be able to use one of their cloud installation scripts we will need to configure and deploy OpenShift "manually".  When we say "manual" we have to configure each bare-metal machine with some initial settings before the openshift-ansible scripts can be ran to setup the cluster as an OpenShift environment.
 
