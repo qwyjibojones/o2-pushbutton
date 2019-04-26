@@ -17,6 +17,7 @@ function usage {
   echo "                example: docker-registry.default.svc:5000/es-stack/es-app:latest"
   echo "     --kibana-image Is the source kibana image stream to pull from "
   echo "                example: docker-registry.default.svc:5000/es-stack/kibana-app:latest"
+  echo "     --project-namespace Give the namespace you wish to push the images to"
 }
 
 POSITIONAL=()
@@ -48,6 +49,11 @@ do
     KIBANA_IMAGE=$2
     shift
     shift 
+    ;;
+    --project-namespace)
+    PROJECT_NAMESPACE=$2
+    shift
+    shift
     ;;
     *)
     echo "Unknown option $1"

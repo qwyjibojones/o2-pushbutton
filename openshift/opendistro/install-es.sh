@@ -22,6 +22,7 @@ function usage {
   echo "                          For aws you can specify gp2.   For glusterfs you can specify"
   echo "                          glusterfs-dynamic and if you installed the norep for 'No Replicatioun'"
   echo "                          you can use the value glusterfs-dynamic-norep"
+  echo "     --project-namespace Give the namespace you wish to push the images to"
   echo ""
   echo ""
   echo "Example:"
@@ -65,6 +66,11 @@ do
     ;;
     --storage-class-name)
     STORAGE_CLASS_NAME="$2"
+    shift
+    shift
+    ;;
+    --project-namespace)
+    PROJECT_NAMESPACE=$2
     shift
     shift
     ;;
