@@ -1,5 +1,36 @@
 # OpenShift-3.11 Bare Metal Installation and Configuration
 
+## Requirements
+
+For completeness we will repeat from the Origin Documentation for 3.11 the Hardware Requirements but tailored to our CentOS7 environment.
+
+* **Master Harderware**
+  - Physical or virtual system or an instance running on a public or private IaaS.
+  - Base OS: CentOS 7.6. We were testing on at least **CentOS Linux release 7.6.1810 (Core)**
+  - Minimum 4 vCPU (additional are strongly recommended).
+  - Minimum 16 GB RAM (additional memory is strongly recommended, especially if etcd is co-located on masters).
+  - Minimum 40 GB hard disk space for the file system containing /var/.
+  - Minimum 1 GB hard disk space for the file system containing /usr/local/bin/.
+  - Minimum 1 GB hard disk space for the file system containing the system’s temporary directory.
+  - Masters with a co-located etcd require a minimum of 4 cores. Two-core systems do not work.
+
+* **Node Hardware**
+  - Physical or virtual system, or an instance running on a public or private IaaS.
+  - Base OS: CentOS 7.6.  We were testing on at least **CentOS Linux release 7.6.1810 (Core)**
+  - NetworkManager 1.0 or later.
+  - 1 vCPU.
+  - Minimum 8 GB RAM.
+  - Minimum 15 GB hard disk space for the file system containing /var/.
+  - Minimum 1 GB hard disk space for the file system containing /usr/local/bin/.
+  - Minimum 1 GB hard disk space for the file system containing the system’s temporary directory.
+  - An additional minimum 15 GB unallocated space per system running containers for Docker’s storage back end.
+
+* **External Etcd**
+  - Minimum 20 GB hard disk space for etcd data.
+  - See the Hardware Recommendations section of the CoreOS etcd documentation for information how to properly size your etcd nodes.
+  - Currently, OKD stores image, build, and deployment metadata in etcd. You must periodically prune old resources. If you are planning to leverage a large number of these resources, place etcd on machines with large amounts of memory and fast SSD drives.
+
+
 If we do not have the luxury of being able to host or install OpenShift within a cloud environment and be able to use one of their cloud installation scripts we will need to configure and deploy OpenShift "manually".  When we say "manual" we have to configure each bare-metal machine with some initial settings before the openshift-ansible scripts can be ran to setup the cluster as an OpenShift environment.
 
 For this example installation process we will use one node for master and infra and compute and will have DNS names:
@@ -317,4 +348,21 @@ Now wipe out each device.
 
 ```bash
 for x in {1..6}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo wipefs -a <device>";done
+```
+
+## Tips
+
+### Evacuate and drain Nodes
+
+If for some reason a node is needing to be removed or something has happened to the node and you want to safely remove it from the schedulable nodes then you can do the following:
+
+```bash
+oc adm manage-node <node> --schedulable=false
+oc adm drain <node> --ignore-daemonsets
+```
+
+Now the node should no longer be scheduling and have any pods running on it.  We can now safely update or remove the node.  If we want to remove the node we can do:
+
+```bash
+oc delete node <node>
 ```
