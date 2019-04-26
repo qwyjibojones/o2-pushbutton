@@ -1,0 +1,180 @@
+# This is an example of an OpenShift-Ansible host inventory that provides the
+# minimum recommended configuration for production use. This includes 3 masters,
+# two infra nodes, two compute nodes, and an haproxy load balancer to load
+# balance traffic to the API services. For a truly production environment you
+# should use an external load balancing solution that itself is highly available.
+
+[masters]
+#
+# This is an example 3 node master definition.  Modify based on the number
+# of masters you wish to have
+#
+openshift-test-master-node-[1:3].private.ossim.io
+
+[etcd]
+#
+# We will put the etcd on all 3 master nodes.  You can use another node(s) for the etcd services.
+# I would at least use 2 nodes for etcd.
+#
+openshift-test-master-node-[1:3].private.ossim.io
+
+[nodes]
+# openshift_node_group_name must be provided for each node
+# See 'Node Group Definition and Mapping' in the project README for more details
+# the group names will automatically be mapped to the proper tag names for the nodes.
+#
+# In this example we configure the master node as both a master and infra.
+# You can easily specify another set of nodes for your infra.  The infra will hold the internal router 
+# and registry, ... etc.
+#
+openshift-test-master-node-[1:3].private.ossim.io openshift_node_group_name="node-config-master-infra"
+
+#
+# The ocmpute nodes are your main worker nodes where all of your pods will be distributed across.
+#
+openshift-test-compute-node-[1:6].private.ossim.io openshift_node_group_name="node-config-compute"
+
+# GLUSTER NODES
+#
+# This is an example 6 node cluster.  You can do a 3 node cluster if you like.  We will need some kind
+# of dynamic provisioning capability. The OpenShift installation scripts support gluster as an internally
+# managed storage. In other words,  the scripts create a daemonset for all the gluster servers for each node
+# in the gluster cluster.
+#
+openshift-test-glusterfs-[1:6].private.ossim.io openshift_node_group_name="node-config-compute"
+
+#
+# Internally managed NFS ignored for now.  We will assume a NAS is accessible and will be
+# defined when deploying our services that require an NFS mount.
+#
+[nfs]
+
+[lb]
+#
+# This is a load balancer that loads balances the master nodes.  Right now this is only for the masters
+# and will setup an HAProxy on this node for managing load blancing to the master nodes.  At his time you 
+# will have to configure your own load balancer if you have mulitple infra nodes.
+#
+# If you have AWS and  or already have a manually defined load balancer where you can point
+# to your masters then you can ignore this section and leave it blank.  Just make sure your load balancer 
+# can ballance all master nodes.
+#
+openshift-test-lb-node.private.ossim.io
+
+# Create an OSEv3 group that contains the masters and nodes groups
+#
+# This is all the sections you wish to have active.  We will have a masters, nodes, etcd, lb and glusterfs
+# section
+#
+[OSEv3:children]
+masters
+nodes
+etcd
+lb
+nfs
+glusterfs
+
+[glusterfs]
+openshift-test-glusterfs-[1:6].private.ossim.io glusterfs_devices='["/dev/xvdb","/dev/xvdc"]'
+
+[OSEv3:vars]
+
+openshift_node_groups=[{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true']}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true']}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true']}, {'name': 'node-config-compute-storage', 'labels': ['node-role.kubernetes.io/compute-storage=true']}]
+
+# we will disable failures on memory checks
+openshift_disable_check=memory_availability
+
+# if youy are not running as root and are ssh into the nodes as a different user (the preferred method) 
+# then you must specify the username and the ansible become which states elevation to sudo rights during 
+# install.  This states that the user must have a sudo rights.
+ansible_user=centos
+ansible_become=yes
+
+# We will deploy the open source version "origin" of OpenShift and will use the latest version at the time
+# of writing this document of 3.11
+#
+openshift_deployment_type=origin
+openshift_release="3.11"
+
+# I am using the subdomain of our wildcard cert.
+openshift_master_default_subdomain=ossim.io
+
+# Public route to the master load balancer
+openshift_master_cluster_public_hostname=openshift-test.ossim.io
+
+# the insecure registries list if any.
+openshift_docker_insecure_registries=["docker-registry.default.svc.cluster.local:5000"]
+
+# In this example we use a simple external htpasswd file
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+
+# pregenerated htpasswd file.  If you have an htpasswd file already generated and ready to go with all your users
+# then uncomment this and comment out the openshift_master_htpasswd_users
+#openshift_master_htpasswd_file=/etc/origin/htpasswd
+
+# this will generate one
+#
+# If you want to generate a htpasswd file it will put it under /etc/origin/master/htpasswd location.  It comes in 
+# pairs separated by commas.  <Username>:<htpasswd hash>
+#
+# You can use the command:  
+#       htpasswd -n <username>
+# to generate a hash
+#
+openshift_master_htpasswd_users={"admin":"$apr1$/SVTdCha$88Z1FxrKwDBGPAwwNi7h21"}
+
+openshift_hosted_registry_routehost="openshift-test-registry.ossim.io"
+
+#reencrypt or passthrough
+openshift_hosted_registry_routetermination=reencrypt
+openshift_hosted_registry_routecertificates={'certfile': '/home/centos/o2.pem', 'keyfile': '/home/centos/o2.key', 'cafile': '/home/centos/o2-ca.pem'}
+
+# metrics install.  Specify your global host name and the NPE cert.  We have
+# a wildcard cert so it will be the same cert throughout the file
+openshift_metrics_install_metrics=true
+openshift_metrics_hawkular_hostname=hawkular-metrics-test.ossim.io
+openshift_metrics_hawkular_ca="/home/centos/o2-ca.pem"
+openshift_metrics_hawkular_cert="/home/centos/o2.pem"
+openshift_metrics_hawkular_key="/home/centos/o2.key"
+
+# Debug level for all OpenShift components (Defaults to 2)
+debug_level=2
+
+openshift_image_tag=v3.11.0
+openshift_pkg_version=-3.11.0
+
+#
+# GLUSTER
+#
+# Enable native gluster support.  This will tell OpenShift to automatically configure the
+# gluster-server daemonset and install on all nodes listed in the [glusterfs] section.
+#
+openshift_storage_glusterfs_is_native=true
+openshift_storage_glusterfs_heketi_is_native=true
+openshift_storage_glusterfs_name="dynamic"
+
+#
+# Options can be of the form
+# none which means no replication
+# replicate:3 where its a replicating volume and the count is 3
+# disperse:4:2 where you distribute the blocks across 4 data bricks and have 2 replications
+#
+# The default is a replicate volume.
+# Uncomment if you want to modify the volume_type
+openshift_storage_glusterfs_storageclass_volume_type="none"
+
+#
+# Certs
+#
+openshift_hosted_router_certificate={"certfile": "/home/centos/o2.pem", "keyfile": "/home/centos/o2.key", "cafile": "/home/centos/o2-ca.pem"}
+openshift_master_overwrite_named_certificates=true
+openshift_master_named_certificates=[{"certfile": "/home/centos/o2.pem", "keyfile": "/home/centos/o2.key", "cafile": "/home/centos/o2-ca.pem"}]
+
+
+#
+# Custom RPM repos
+#
+# This is a list of JSON objects that describe you REPO location for RPM's  If you have a custom REPO list you can use this to pass them to 
+# OpenShift ansible installation.
+#
+# openshift_additional_repos=[{'id': 'openshift-origin-ci', 'name': 'OpenShift Origin CI repostory (caution: not release)', 'baseurl': 'https://storage.googleapis.com/origin-ci-test/releases/openshift/origin/master/origin.repo', 'enabled': 1, 'gpgcheck': 0}]
