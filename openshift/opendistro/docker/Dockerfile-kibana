@@ -1,1 +1,4 @@
+# We found we can use this verbatim.  It is only here for complteness
+# and if we need to modify on high side locations
+#
 FROM  amazon/opendistro-for-elasticsearch-kibana:0.8.0

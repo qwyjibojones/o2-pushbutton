@@ -1,3 +1,6 @@
+# There is a bad permission on this directory as of 0.7.0
+# I have not tested on newer runs to see if the directory
+# permissions have changed
 FROM amazon/opendistro-for-elasticsearch:0.8.0
 USER 0
 RUN chown -R 1000:0  /usr/share/supervisor
