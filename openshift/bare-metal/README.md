@@ -31,16 +31,17 @@ For completeness we will repeat from the Origin Documentation for 3.11 the Hardw
 * **Repos**
   - openshift-ansible This will be a checkout or tar ball of release-3.11.
   - o2-pushbutton
+* **wildcard NPE Certificate** We prefer that you have a valid wildcard NPE certificate that we can use.  If this is in the format of a .p12 we will need to convert into a passwordless pem and key and have the CA available.
 
 If we do not have the luxury of being able to host or install OpenShift within a cloud environment and be able to use one of their cloud installation scripts we will need to configure and deploy OpenShift "manually".  When we say "manual" we have to configure each bare-metal machine with some initial settings before the openshift-ansible scripts can be ran to setup the cluster as an OpenShift environment.
 
-For this example installation process we will use one node for master and infra and compute and will have DNS names:
+For this example installation process we will use one node for master, infra and compute and will have DNS names:
 
 * openshift-test-master-node-1.ossim.io
 * openshift-test-infra-node-1.ossim.io
 * openshift-test-compute-node-1.ossim.io
 
-Please rename accordingly for your installation.  For a production install you probably would want at least 2 or 3 masters and 2 infra nodes that route service traffic within the cluster.If you are limited on resources you can double up the infra and put the infra support on the master nodes.  The compute or "worker nodes" typically handle all the main processing pods.  The number of compute nodes will allow one to horizontally scale compute power by increasing the pod count and if the pod count exceeds the resource you can add another compute node to the cluster and keep horizontally scaling.
+Please rename accordingly for your installation.  For a production install you probably would want at least 2 or 3 masters and 2 infra nodes that route service traffic within the cluster.If you are limited on resources you can double up the infra and put the infra support on the master nodes.  The compute or "worker nodes" typically handle all the main processing pods.  The number of compute nodes will allow one to horizontally scale compute power by increasing the pod count and if the pod resources exceeds the resource of yor cluster then you can add another compute node to the cluster and keep horizontally scaling.
 
 Before we begin, please have a wildcard NPE Certificate that we will use for the master and router certificates.  We will also use the same CERT for the Hawkular metrics installation.
 
