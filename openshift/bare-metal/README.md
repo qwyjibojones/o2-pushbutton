@@ -161,12 +161,12 @@ We can override the variable without editing the scripts but the original list c
 
 ### Configure the Nodes in the Cluster
 
-We now assume that you have a ~/.ssh/config file that describes how to reach each node in the cluster.  We will now place those nodes into the proper sections described in the annotated sample inventory file found in the directory **[openshift/openshift-inventory-sample](openshift/openshift-inventory-sample)**.  Use this file to create an inventory file for your cluster in the ansible home ~/openshift-inventory.  The file has annotations explaining each section and must be tailored for your environment and resource limits.  If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  Please see the inventory example for further definitions.  
+We now assume that you have a ~/.ssh/config file that describes how to reach each node in the cluster.  We will now place those nodes into the proper sections described in the annotated sample inventory file found in the directory **[openshift-inventory-sample](./openshift-inventory-sample)**.  Use this file to create an inventory file for your cluster in the ansible home ~/openshift-inventory.  The file has annotations explaining each section and must be tailored for your environment and resource limits.  If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  Please see the inventory example for further definitions.
 
 Copy  and edit the inventory file
 
 ```bash
-cp openshift/openshift-inventory-sample ~/openshift-inventory
+cp ./openshift-inventory-sample ~/openshift-inventory
 vi ~/openshift-inventory
 ```
 
