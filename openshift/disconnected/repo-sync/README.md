@@ -1,6 +1,6 @@
 # Synchronize the RPM distribution OpenShift Origin Version 3.11
 
-We have a [Dockerfile](./Dockerfile) that we use to build a synchronization image so we can download and synchronize the RPM repo from the Origin 3.11 repo.
+We have a [Dockerfile](./Dockerfile) that we use to build a synchronization image so we can download and synchronize the RPM repo from the Origin 3.11 repo.  You have docker running and must be able to mount your destination directory that you choose to cache the RPMs to.
 
 ```bash
 ./build-sync.sh
