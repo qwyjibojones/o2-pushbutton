@@ -19,3 +19,4 @@ Performance
 Sidebar Link
 Timestamper
 View Job Filters
+SonarQube Scanner
