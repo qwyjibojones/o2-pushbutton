@@ -29,8 +29,8 @@ For completeness we will repeat from the Origin Documentation for 3.11 the Hardw
   - Currently, OKD stores image, build, and deployment metadata in etcd. You must periodically prune old resources. If you are planning to leverage a large number of these resources, place etcd on machines with large amounts of memory and fast SSD drives.
 * **System Admin Knowledge** One will need to have some level of training in System Administration and bash scripting.
 * **Repos**
-  - openshift-ansible This will be a checkout or tar ball of release-3.11.
-  - o2-pushbutton
+  - openshift-ansible This will be a checkout or tar ball of release-3.11.  Repo can be found here [https://github.com/openshift/openshift-ansible](https://github.com/openshift/openshift-ansible)
+  - o2-pushbutton repo can be found here [https://github.com/ossimlabs/o2-pushbutton](https://github.com/ossimlabs/o2-pushbutton)
   
 * **wildcard NPE Certificate** We prefer that you have a valid wildcard NPE certificate that we can use.  If this is in the format of a .p12 we will need to convert into a passwordless pem and key and have the CA available.
 
