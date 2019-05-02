@@ -31,6 +31,7 @@ For completeness we will repeat from the Origin Documentation for 3.11 the Hardw
 * **Repos**
   - openshift-ansible This will be a checkout or tar ball of release-3.11.
   - o2-pushbutton
+  
 * **wildcard NPE Certificate** We prefer that you have a valid wildcard NPE certificate that we can use.  If this is in the format of a .p12 we will need to convert into a passwordless pem and key and have the CA available.
 
 If we do not have the luxury of being able to host or install OpenShift within a cloud environment and be able to use one of their cloud installation scripts we will need to configure and deploy OpenShift "manually".  When we say "manual" we have to configure each bare-metal machine with some initial settings before the openshift-ansible scripts can be ran to setup the cluster as an OpenShift environment.
@@ -161,12 +162,12 @@ We can override the variable without editing the scripts but the original list c
 
 ### Configure the Nodes in the Cluster
 
-We now assume that you have a ~/.ssh/config file that describes how to reach each node in the cluster.  We will now place those nodes into the proper sections described in the annotated sample inventory file found in the directory **[openshift-inventory-sample](./openshift-inventory-sample)**.  Use this file to create an inventory file for your cluster in the ansible home ~/openshift-inventory.  The file has annotations explaining each section and must be tailored for your environment and resource limits.  If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  Please see the inventory example for further definitions.
+We now assume that you have a ~/.ssh/config file that describes how to reach each node in the cluster.  We will now place those nodes into the proper sections described in the annotated sample inventory file found in the directory **[openshift/openshift-inventory-sample](openshift/openshift-inventory-sample)**.  Use this file to create an inventory file for your cluster in the ansible home ~/openshift-inventory.  The file has annotations explaining each section and must be tailored for your environment and resource limits.  If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  Please see the inventory example for further definitions.  
 
 Copy  and edit the inventory file
 
 ```bash
-cp ./openshift-inventory-sample ~/openshift-inventory
+cp openshift/openshift-inventory-sample ~/openshift-inventory
 vi ~/openshift-inventory
 ```
 
@@ -271,6 +272,7 @@ Note, if you change the variable or add a variable called **openshift_storage_gl
 
 * **none** specifies you want a storage class that does not enable replication on a volume
 * **replicate:3** specifies you want the storage class to have a replication of 3
+* **disperse:4:2** specifies a 4 data bricks and 2 replicas. The "disperse 4" means that each disperse-set is made of 4 bricks. "redundancy 2" means that two of those bricks will be redundant (i.e. it will work fine with 2 bricks down). Disperse doesn't allow redundancies greater or equal to "number of bricks" / 2. With redundancy 2, the minimum number of bricks/servers should be 5. Which is in reference to this response [https://lists.gluster.org/pipermail/gluster-users/2016-June/027022.html](https://lists.gluster.org/pipermail/gluster-users/2016-June/027022.html). Regarding the disperse, the minimum number of servers you would need is 3. Disperse requires at least 3 bricks to create a configuration with redundancy 1 (this is equivalent to a replica 2 in terms of redundancy), but if you put 2 of those bricks in a single server and that server dies, you will lose 2 bricks from a volume that only tolerates 1 brick failure.  For more information on disperse please see the [Gluster Documentation](https://docs.gluster.org/en/latest/Administrator%20Guide/Managing%20Volumes/).  This volume type is typically a little slower than the **replicate** type but in general is less wasteful on disk space.
 
 If you want to support replicated and non replicated volumetypes then you can add multiple storage classes but will have to be added after the installation is complete using this command:
 
