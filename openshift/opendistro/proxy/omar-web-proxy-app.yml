@@ -1,0 +1,72 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  labels:
+    app: omar-web-proxy-app
+  name: omar-web-proxy-app
+spec:
+  replicas: 1
+  selector:
+    app: omar-web-proxy-app
+    deploymentconfig: omar-web-proxy-app
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftWebConsole
+      creationTimestamp: null
+      labels:
+        app: omar-web-proxy-app
+        deploymentconfig: omar-web-proxy-app
+    spec:
+      containers:
+      - image: quay.io/radiantsolutions/omar-web-proxy-app:latest
+        imagePullPolicy: Always
+        name: omar-web-proxy-app
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        - containerPort: 443
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/ssl/server-certs
+          name: volume-5pn74
+        - mountPath: /etc/httpd/conf.d
+          name: volume-gqbjf
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: web-proxy-certs
+        name: volume-5pn74
+      - configMap:
+          defaultMode: 420
+          name: web-proxy-conf
+        name: volume-gqbjf
+  test: false
+  triggers:
+  - imageChangeParams:
+      containerNames:
+      - omar-web-proxy-app
+      from:
+        kind: ImageStreamTag
+        name: omar-web-proxy-app:latest
+    type: ImageChange
