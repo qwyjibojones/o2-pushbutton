@@ -268,7 +268,7 @@ metadata:
   selfLink: ""
 ```
 
-Note, if you change the variable or add a variable called **openshift_storage_glusterfs_storageclass_volume_type** to the inventory file it will give you control over the volumetype allocated when provisioning new volumes.  The values can be:
+Note, if you change the variable or add a variable called **openshift_storage_glusterfs_storageclass_volume_type** to the inventory file it will give you control over the **volumetype** allocated when provisioning new volumes.  The values can be:
 
 * **none** specifies you want a storage class that does not enable replication on a volume
 * **replicate:3** specifies you want the storage class to have a replication of 3
