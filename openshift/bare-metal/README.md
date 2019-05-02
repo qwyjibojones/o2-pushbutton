@@ -38,11 +38,11 @@ If we do not have the luxury of being able to host or install OpenShift within a
 
 For this example installation process we will use one node for master, infra and compute and will have DNS names:
 
-* openshift-test-master-node-1.ossim.io
-* openshift-test-infra-node-1.ossim.io
-* openshift-test-compute-node-1.ossim.io
+* `openshift-test-master-node-1.ossim.io`
+* `openshift-test-infra-node-1.ossim.io`
+* `openshift-test-compute-node-1.ossim.io`
 
-Please rename accordingly for your installation.  For a production install you probably would want at least 2 or 3 masters and 2 infra nodes that route service traffic within the cluster.If you are limited on resources you can double up the infra and put the infra support on the master nodes.  The compute or "worker nodes" typically handle all the main processing pods.  The number of compute nodes will allow one to horizontally scale compute power by increasing the pod count and if the pod resources exceeds the resource of yor cluster then you can add another compute node to the cluster and keep horizontally scaling.
+Please rename accordingly for your installation.  For a production install you probably would want at least 2 or 3 masters and 2 infra nodes that route service traffic within the cluster. If you are limited on resources you can double up the infra and put the infra support on the master nodes.  The compute or "worker nodes" typically handle all the main processing pods.  The number of compute nodes will allow one to horizontally scale compute power by increasing the pod count and if the pod resources exceeds the resource of yor cluster then you can add another compute node to the cluster and keep horizontally scaling.
 
 Before we begin, please have a wildcard NPE Certificate that we will use for the master and router certificates.  We will also use the same CERT for the Hawkular metrics installation.
 
