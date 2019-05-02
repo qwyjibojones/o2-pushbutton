@@ -128,6 +128,8 @@ for x in {1..1}; do ssh openshift-test-infra-node-$x.private.ossim.io "sudo yum 
 for x in {1..8}; do ssh openshift-test-compute-node-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
 ```
 
+**Note**: when you start the installation and you see messages of the form  `RETRYING: Wait for the ServiceMonitor CRD to be created` you will need to make sure you enable ip forwarding on all nodes see [Ip Forwarding Must Be Enable](#ip-forwarding-must-be-enable) section on how to set the value.
+
 If you have a gluster cluster that would need to be configured for openshift dynamic provisioning support then we will assume similar private dns names and you can run the following script
 
 ```bash
@@ -370,3 +372,10 @@ Now the node should no longer be scheduling and have any pods running on it.  We
 ```bash
 oc delete node <node>
 ```
+
+### Ip Forwarding Must Be Enable
+
+For the OpenShift pod to write out the network settings the ip forwarding must be enabled on all the nodes.
+
+* check the file /etc/sysctl.d/99-sysctl.conf file for the variable net.ipv4.ip_forward and make sure it is enabled with the value of 1.
+* sudo systctl --load /etc/sysctl.d/99-sysctl.con
