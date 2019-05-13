@@ -14,6 +14,8 @@ openshift/origin-service-catalog:v3.11 \
 openshift/origin-web-console:v3.11 \
 openshift/origin-metrics-server:v3.11 \
 openshift/origin-metrics-heapster:v3.11 \
+openshift/origin-metrics-cassandra:v3.11 \
+openshift/origin-metrics-hawkular-metrics:v3.11 \
 openshift/origin-metrics-schema-installer:v3.11 \
 openshift/oauth-proxy:v1.1.0 \
 openshift/prometheus-alertmanager:v0.15.2 \
