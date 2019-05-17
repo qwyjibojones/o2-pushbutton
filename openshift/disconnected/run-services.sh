@@ -16,8 +16,8 @@ docker run -d -p 5000:5000 --restart=always \
 docker run -d -p 80:80 -p 443:443   --restart=always \
        --link registry:registry \
        --name httpd \
-       -v ${pwd}/server-certs:/etc/ssl/server-certs \
-       -v ${pwd}/rpms:/var/www/html/rpms \
-       -v ${pwd}/reverse-proxy.conf:/etc/httpd/conf.d/reverse-proxy.conf \
+       -v $(pwd)/server-certs:/etc/ssl/server-certs \
+       -v $(pwd)/rpms:/var/www/html/rpms \
+       -v $(pwd)/reverse-proxy.conf:/etc/httpd/conf.d/reverse-proxy.conf \
        httpd
 popd
