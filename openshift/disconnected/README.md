@@ -7,6 +7,11 @@ For disconnected installations of OpenShift 3.11 we need to synchronize RPM repo
 * Synchronize RPMs [README.md](./repo-sync/README.md)
 * Download all Containers [README.md](./containers/README.md).
 
+We also provided some self signed CERTS so we can proxy https.  Please copy the **/server-certs** directory to the working location.  Also, copy the reverse-proxy.conf to the location $WORKING_DIRECTORY/ giving you:
+
+* **$WORKING_DIRECTORY/server-certs**
+* **$WORKING_DIRECTORY/reverse-proxy.conf**
+
 The containers README specifies how to download the containers used to serve up the okd-311 installation as well as downloading the 3.11 installation
 
 ## Load Dependencies
@@ -23,13 +28,10 @@ docker load -i ansible.tgz
 
 Once we have loaded the docker images into our docker we can now execute the run-services.  It will take an argument that is the working directory that serves at the root directory for the container registry cache, rpms, ... etc.
 
-In this section we will now assume all dependencies will be extracted to a root working directory indicated by WORKING_DIRECTORY.  For example, let's assume we have extracted docker-registry-data.tgz, and rpms.tgz to the working directory giving us so far:
+In this section we will now assume all dependencies will be extracted to a root working directory indicated by WORKING_DIRECTORY.  For example, let's assume we have extracted bundled all dependencies under a tgz call disconnected.tgz into the working directory giving us so far:
 
 * **$WORKING_DIRECTORY/docker-registry-data**
 * **$WORKING_DIRECTORY/rpms**
-
-We also provided some slef signed CERTS so we can proxy https.  Please copy the **/server-certs** directory to the working location.  Also, copy the reverse-proxy.conf to the location $WORKING_DIRECTORY/ giving you:
-
 * **$WORKING_DIRECTORY/server-certs**
 * **$WORKING_DIRECTORY/reverse-proxy.conf**
 

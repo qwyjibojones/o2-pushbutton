@@ -15,7 +15,7 @@ Although the registry Dockerfile is no more than a pointer to the docker hub reg
 
 where:
 
-* **optional destination** is a output location for the bundled images for ansible, httpd, and registry.  Note the output must have a trailing slash. for example: `./bundle-images.sh /tmp/`.  If this is left off then it will output to the current directory
+* **optional destination** is a output location for the bundled images for ansible, httpd, and registry.  Note the output must have a trailing slash. for example: `./bundle-images.sh /data/disconnected/`.  If this is left off then it will output to the current directory
 
 We should now have the **ansible**, **httpd**, and the **registry** images in our local docker and we are ready to move on to the downloading of the dependencies for OpenShift
 
@@ -25,11 +25,11 @@ We are going to use a registry we just built and downloaded to store our OpenShi
 
 We will first create a directory for our cache.  This directory can be anywhere that you can mount to your local docker registry:
 
-`mkdir /data/docker-registry-data`
+`mkdir /data/disconnected/docker-registry-data`
 
 We will next run a local registry as a docker container:
 
-`docker run -d   -p 5000:5000   --restart=always   --name registry   -v /data/docker-registry-data:/var/lib/registry   registry`
+`docker run -d   -p 5000:5000   --restart=always   --name registry   -v /data/disconnected/docker-registry-data:/var/lib/registry   registry`
 
 This will mount the directory /data/docker-registry-data to the container /var/lib/registry.
 
