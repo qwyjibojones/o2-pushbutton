@@ -1,19 +1,78 @@
-# Syncronizing Repos for Disconnected Installation
+# Disconnected OpenShift 3.11 origin (Now OKD) Installation Dependencies
 
-For disconnected installations we need to synchronize RPM repos and download all images for the containers that will be running in the OpenShift environment.  We have created a directory that called repo-sync that will manage synchronizing the RPMs required for the OpenShift Origin 3.11 installation.
+## Syncronizing Repos for Disconnected Installation
+
+For disconnected installations of OpenShift 3.11 we need to synchronize RPM repos and download all images for the containers that will be running in the OpenShift environment.  We have created a directory that called repo-sync that will manage synchronizing the RPMs required for the OpenShift Origin 3.11 installation.
 
 * Synchronize RPMs [README.md](./repo-sync/README.md)
-* Download all Images required for OpenShift origin 3.11 [README.md](./containers/README.md).
+* Download all Containers [README.md](./containers/README.md).
 
-## Set up repo on Disconnected Host
+The containers README specifies how to download the containers used to serve up the okd-311 installation as well as downloading the 3.11 installation
 
-```bash
-cd /data/
-tar cvfz docker-registry-data.tgz docker-registry-data
-```
+## Load Dependencies
 
-The only caveat is that you must bring your docker registry container as a separate tgz and then make sure you have the docker client installed on your disconnected machine.  Go to any directory copy the registry image to a registry.tgz
+Once all dependencies are downloaded and brought to a disconnected location we need to run the proxy server which serves as a https proxy to the docker registry and also serves up the YUM repository that we just cached.
 
 ```bash
-docker save registry:2 > registry.tgz
+docker load -i registry.tgz
+docker load -i httpd.tgz
+docker load -i ansible.tgz
 ```
+
+### Serve out dependencies
+
+Once we have loaded the docker images into our docker we can now execute the run-services.  It will take an argument that is the working directory that serves at the root directory for the container registry cache, rpms, ... etc.
+
+In this section we will now assume all dependencies will be extracted to a root working directory indicated by WORKING_DIRECTORY.  For example, let's assume we have extracted docker-registry-data.tgz, and rpms.tgz to the working directory giving us so far:
+
+* **$WORKING_DIRECTORY/docker-registry-data**
+* **$WORKING_DIRECTORY/rpms**
+
+We also provided some slef signed CERTS so we can proxy https.  Please copy the **/server-certs** directory to the working location.  Also, copy the reverse-proxy.conf to the location $WORKING_DIRECTORY/ giving you:
+
+* **$WORKING_DIRECTORY/server-certs**
+* **$WORKING_DIRECTORY/reverse-proxy.conf**
+
+We can now serve these out via our local proxy **httpd** and our **registry** by running [run-services.sh](./run-services.sh).
+
+`./run-services.sh <working directory>`
+
+
+## NOTES TO INTEGRATE
+
+### File Context Type
+
+Changes context to allow directory and files to be accessed via a running container.  Needed for the registry
+
+`sudo chcon -Rt svirt_sandbox_file_t <data-dir-to-mount>`
+
+### Ports To Open
+
+Open ports for our registry server:
+
+```bash
+firewall-cmd --zone-public --permanent --add-port=5000/tcp
+firewall-cmd --zone=public --add-service=http
+firewall-cmd --zone=public --add-service=https
+firewall-cmd --reload
+```
+
+### SELINUX
+
+Enable selinus for web access
+
+`sudo setsebool -P httpd_can_network_connect on`
+
+### Enable IP Forwarding
+
+Add IP forward to all nodes
+
+`sudo vi /etc/sysctl.d/99-sysctl.conf`
+
+then add the line
+
+`net.ipv4.ip_forward = 1`
+
+Then reload:
+
+sudo systctl --load /etc/sysctl.d/99-sysctl.conf
