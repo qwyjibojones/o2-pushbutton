@@ -67,6 +67,41 @@
         },
         {
             "apiVersion": "v1",
+            "kind": "PersistentVolume",
+            "metadata": {
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp",
+                    "pv.kubernetes.io/bound-by-controller": "yes"
+                },
+                "creationTimestamp": null,
+                "finalizers": [
+                    "kubernetes.io/pv-protection"
+                ],
+                "labels": {
+                    "app": "persistent-volumes",
+                    "template": "persistent-volumes-template",
+                    "name": "${JENKINS_PV_NAME}"
+                },
+                "name": "${JENKINS_PV_NAME}",
+                "selfLink": "/api/v1/persistentvolumes/${JENKINS_PV_NAME}"
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteOnce"
+                ],
+                "capacity": {
+                    "storage": "${VOLUME_CAPACITY}"
+                },
+                "nfs": {
+                    "path": "${NFS_MOUNT_PATH}",
+                    "server": "${NFS_SERVER}"
+                },
+                "persistentVolumeReclaimPolicy": "Retain"
+            },
+            "status": {}
+        },
+        {
+            "apiVersion": "v1",
             "kind": "DeploymentConfig",
             "metadata": {
                 "annotations": {
@@ -315,6 +350,20 @@
             "name": "VOLUME_CAPACITY",
             "required": true,
             "value": "50Gi"
+        },
+        {
+            "description": "The mount point on the NFS",
+            "displayName": "NFS Mount Path",
+            "name": "NFS_MOUNT_PATH",
+            "required": true,
+            "value": "/mnt/jenkins-data"
+        },
+        {
+            "description": "The location of the NFS server (e.g. o2-nfs.private.ossim.io)",
+            "displayName": "NFS Server",
+            "name": "NFS_SERVER",
+            "required": true,
+            "value": "o2-nfs.private.ossim.io"
         },
         {
             "description": "The OpenShift Namespace where the Jenkins ImageStream resides.",
