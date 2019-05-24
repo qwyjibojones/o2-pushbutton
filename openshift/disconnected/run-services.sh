@@ -1,10 +1,11 @@
 #!/bin/bash
 WORKING_DIRECTORY=$1
 
-if [ "$WORKING_DIRECTORY" == "" ] ; then
+if [ "${WORKING_DIRECTORY}" == "" ] ; then
   echo "Please pass in the working directory where the yum cache is located"
   echo "Usage:"
   echo "    $0 <working directory>"
+  exit 1
 fi
 
 pushd $WORKING_DIRECTORY

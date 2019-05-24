@@ -4,7 +4,7 @@
 
 For completeness we will repeat from the Origin Documentation for 3.11 the Hardware Requirements but tailored to our CentOS7 environment.
 
-* **Master Harderware**
+* **Master Hardware**
   - Physical or virtual system or an instance running on a public or private IaaS.
   - Base OS: CentOS 7.6. We were testing on at least **CentOS Linux release 7.6.1810 (Core)**
   - Minimum 4 vCPU (additional are strongly recommended).
