@@ -61,7 +61,7 @@ firewall-cmd --reload
 
 ### SELINUX
 
-Enable selinus for web access
+Enable selinus for web access on the installer.
 
 `sudo setsebool -P httpd_can_network_connect on`
 
@@ -78,3 +78,16 @@ then add the line
 Then reload:
 
 sudo systctl --load /etc/sysctl.d/99-sysctl.conf
+
+
+# Testing docker registry:
+
+curl -X GET https://localhost/v2/_catalog
+
+list tags for a specific image listed in the catalog:
+
+curl -X GET https://localhost/v2/<image-path-and-name>/tags/list
+
+
+
+

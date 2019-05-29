@@ -32,27 +32,27 @@ For completeness we will repeat from the Origin Documentation for 3.11 the Hardw
   - openshift-ansible This will be a checkout or tar ball of release-3.11.  Repo can be found here [https://github.com/openshift/openshift-ansible](https://github.com/openshift/openshift-ansible)
   - o2-pushbutton repo can be found here [https://github.com/ossimlabs/o2-pushbutton](https://github.com/ossimlabs/o2-pushbutton)
   
-* **wildcard NPE Certificate** We prefer that you have a valid wildcard NPE certificate that we can use.  If this is in the format of a .p12 we will need to convert into a passwordless pem and key and have the CA available.
+* **NPE Certificate** We prefer that you have a valid wildcard NPE certificate that we can use.  If this is in the format of a .p12 we will need to convert into a pem and key without a password and have the CA available.  If you do not have the ability to use a wildcard NPE CERT that is fine. You will at the minimum need an NPE CERT for the okd hawkular metrics and OKD master web console endpoints.  Additional NPE CERTS will be needed for any web applications installed on the cluster that needs to serve via https.
 
-If we do not have the luxury of being able to host or install OpenShift within a cloud environment and be able to use one of their cloud installation scripts we will need to configure and deploy OpenShift "manually".  When we say "manual" we have to configure each bare-metal machine with some initial settings before the openshift-ansible scripts can be ran to setup the cluster as an OpenShift environment.
+If we do not have the luxury of being able to host or install OpenShift within a cloud environment and be able to use one of their cloud installation scripts we will need to configure and deploy OpenShift "manually".  When we say "manually" we have to configure each bare-metal machine with some initial settings before the openshift-ansible scripts can be ran to setup the cluster as an OpenShift environment.
 
 For this example installation process we will use one node for master, infra and compute and will have DNS names:
 
-* `openshift-test-master-node-1.ossim.io`
-* `openshift-test-infra-node-1.ossim.io`
-* `openshift-test-compute-node-1.ossim.io`
+* `openshift-test-master-node-1.foo.io`
+* `openshift-test-infra-node-1.foo.io`
+* `openshift-test-compute-node-1.foo.io`
 
-Please rename accordingly for your installation.  For a production install you probably would want at least 2 or 3 masters and 2 infra nodes that route service traffic within the cluster. If you are limited on resources you can double up the infra and put the infra support on the master nodes.  The compute or "worker nodes" typically handle all the main processing pods.  The number of compute nodes will allow one to horizontally scale compute power by increasing the pod count and if the pod resources exceeds the resource of yor cluster then you can add another compute node to the cluster and keep horizontally scaling.
+Please rename accordingly for your installation.  For a production install you probably would want at least 2 or 3 masters and 2 infra nodes that route service traffic within the cluster. If you are limited on resources you can double up the infra and put the infra support on the master nodes.  The compute or "worker nodes" typically handle all the main processing pods.  The number of compute nodes will allow one to horizontally scale compute power by increasing the pod count and if the pod resources exceeds the resources of your cluster then you can add another compute node to the cluster and keep horizontally scaling.
 
-Before we begin, please have a wildcard NPE Certificate that we will use for the master and router certificates.  We will also use the same CERT for the Hawkular metrics installation.
+Before we begin, please have your NPE Certificate(s) for each endpoint hosted via https which at a minimum will be hawkular, and the web console.
 
 ## Ansible
 
-We will need a machine running ansible that will be used to configure and setup the OpenShift cluster.  The ansible machine does not need to be very powerful, for it is only used for cluster configuration.  The machine uses ansible to configure your OpenShift cluster using the openshift-ansible playbooks.  If you are limited on resources, you can use the node that will be dedicated to the OpenShift master as your ansible machine.  It is best to have a separate ansible machine dedicated to the configuration of the cluster, so if you need to destroy the cluster and re-install, you still have your configuration machine in tact.
+We will need a machine running ansible that will be used to configure and setup the OpenShift cluster.  The ansible machine does not need to be very powerful, for it is only used for cluster configuration.  We will also use the ansible host as a disconnected machine that will serve up the OpenShift origin containers and the RPMS used during the installation process.  The machine uses ansible to configure your OpenShift cluster using the openshift-ansible playbooks.  If you are limited on resources, you can use the node that will be dedicated to the OpenShift master as your ansible machine.  It is best to have a separate ansible machine dedicated to the configuration of the cluster, so if you need to destroy the cluster and re-install, you still have your configuration machine in tact.
 
 ### Install Ansible
 
-For disconnected networks we will assume that the /etc/yum.repo.d/ directory has files that are pointing to your local yum repo that holds all the base RPMS for a CentOS distribution including any updates and extras.
+We have supplied a mechanism that uses docker to serve up openshift related RPM and container dependencies.  For disconnected networks we will assume that the /etc/yum.repo.d/ directory has files that are pointing to a yum repo that holds all the base RPMS for a CentOS distribution including any updates and extras.  If you do not have these then these could be added to our RPM tree as described in this [README](../disconnected/README.md)
 
 For connected environments:
 
@@ -61,7 +61,7 @@ sudo yum install -y git centos-release-ansible26
 sudo yum install -y ansible python-passlib git pyOpenSSL httpd-tools java-1.8.0-openjdk-headless
 ```
 
-For disconnected environments, assume all dependency RPMs are in a common repo and have a repo file under /etc/yum.repo.d/ directory pointing to your common yum repository. 
+For disconnected environments, assume all dependency RPMs are in a common repo and have a repo file under /etc/yum.repo.d/ directory pointing to your common yum repository.
 
 ```bash
 sudo yum install -y ansible python-passlib git pyOpenSSL httpd-tools java-1.8.0-openjdk-headless
@@ -76,9 +76,12 @@ cd ~
 git clone https://github.com/openshift/openshift-ansible.git
 cd ~/openshift-ansible
 git checkout release-3.11
+# for disconnected create a tarball
+cd ~
+tar cvfz openshift-ansible.tgz openshift-ansible
 ```
 
-If you are disconnected then the openshift-ansible repo will need to be tarballed up and then extract to the home directory on the ansible machine. We will assume that the version is the same mentioned in this Documentation, 3.11.
+If you are disconnected then the openshift-ansible repo will need to be tarballed up and then extracted to the home/working directory of an install user on the ansible machine. We will assume that the version is the same mentioned in this Documentation, release-3.11.
 
 `tar xvfz openshift-ansible.tgz`
 
@@ -86,7 +89,7 @@ We have made no modifications to the installation playbooks and can be used as i
 
 ### Setup SSH Keys and Config
 
-SSH is used by ansible to configure nodes in the cluster.  Each node must be reachable from the ansible configuration node.  Setup an ssh key for a common user so one can configure all nodes in the inventory. The prefered way is to create an ssh key without a password.  If you add a password to your ssh key you must use an ssh-agent on the ansible machine.  The ssh-agent will cache the password and encrypt it.  We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
+SSH is used by ansible to configure nodes in the cluster.  Each node must be reachable from the ansible configuration node.  Setup an ssh key for a common user so one can configure all nodes in the inventory. The preferred way is to create an ssh key without a password.  If you add a password to your ssh key you must use an ssh-agent on the ansible machine.  The ssh-agent will cache the password and encrypt it.  We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node, for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
 
 ```bash
 mkdir ~/.ssh;chmod 700 ~/.ssh
@@ -140,7 +143,7 @@ Note, the gluster cluster here should have un-allocated disks and OpenShift inst
 
 ### Dynamic Provisioning with Gluster
 
-For the gluster ansible scripts to work, please make sure you have the latest CentOS7 and updates installed on your gluster nodes.  We will show the dynamic provisioning via heketi.  The dynamic provisioning is facilitated through heketi and will carve out volumes from the gluster cluster on demand.  At the time of writing this document the version of CentOS that we know worked with the configuration setup is **CentOS Linux release 7.6.1810 (Core)**.  Note, when the openshift installation gets to heketi and it load the topology it seems to take a while, so please be patient.
+For the gluster ansible scripts to work, please make sure you have the latest CentOS7 and updates installed on your gluster nodes.  We will show the dynamic provisioning via heketi.  The dynamic provisioning is facilitated through heketi and will carve out volumes from the gluster cluster on demand.  At the time of writing this document the version of CentOS that we know worked with the configuration setup is **CentOS Linux release 7.6.1810 (Core)**.  Note, when the openshift installation gets to heketi and it loads the topology it seems to take a while, so please be patient.
 
 The gluster interface allows one to dynamically provision volumes using heketi.  The current installation allows the gluster server to be installed as a daemonset into OpenShift.  This is indicated by the variables in the inventory file:
 
@@ -154,7 +157,7 @@ A gluster server is installed on every node listed in the **[glusterfs]** sectio
 
 The storage class reference name used will be prefixed with glusterfs.  the keyword **openshift_storage_glusterfs_name** will indicate that a storage class reference **glusterfs-dynamic** can be used to reference the dynamic provisioner.
 
-So the gluster will not have any worker pods scheduled to it, we will redefined the node_groups and add another group called **node-config-compute-storage**.  At the time of writing this document we have not found a way to append to the current list of node groups so we have to specify all the groups we will need in the current list plus any additional groups.  
+So the gluster will not have any worker pods scheduled to it, we will redefined the node_groups and add another group called **node-config-compute-storage**.  At the time of writing this document we have not found a way to append to the current list of node groups so we have to specify all the groups we will need in the current list plus any additional groups.  We can make this much more readable by using an external variables file and cut and paste the values from the main.yml and put into our YAML inventory vars file.   In this example we show the format in the inventory file.  
 
 ```config
 openshift_node_groups=[{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true']}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true']}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true']}, {'name': 'node-config-compute-storage', 'labels': ['node-role.kubernetes.io/compute-storage=true']}]
@@ -217,7 +220,7 @@ runAsUser:
   type: RunAsAny
 ```
 
-then exit with the command sequence Escape key, then hit colin key ":" then "wq" key this will finally save the modifications.  We are now ready to install a sample ElasticCluster using our dynamic provisioning.
+then exit with the command sequence Escape key, then hit colin key ":" then "wq" key this will save the modifications.  We are now ready to install a sample ElasticCluster using our dynamic provisioning.
 
 ### Gluster Volume Types
 
@@ -245,7 +248,7 @@ metadata:
   selfLink: ""
 ```
 
-We have provided a file called glusterfs-dynamic-norep.yml that is a no replication volumetype so it just distributes the blocks allocated.
+We have provided a file called glusterfs-dynamic-norep.yml that is a no replication volume type so it just distributes the blocks allocated indicated by the **volumetype: none**.
 
 ```yaml
 apiVersion: v1
@@ -270,13 +273,13 @@ metadata:
   selfLink: ""
 ```
 
-Note, if you change the variable or add a variable called **openshift_storage_glusterfs_storageclass_volume_type** to the inventory file it will give you control over the **volumetype** allocated when provisioning new volumes.  The values can be:
+Note, if you change the variable or add a variable called **openshift_storage_glusterfs_storageclass_volume_type** to the inventory file it will give you control over the default **volumetype** allocated when provisioning new volumes.  The values can be:
 
 * **none** specifies you want a storage class that does not enable replication on a volume
 * **replicate:3** specifies you want the storage class to have a replication of 3
 * **disperse:4:2** specifies a 4 data bricks and 2 replicas. The "disperse 4" means that each disperse-set is made of 4 bricks. "redundancy 2" means that two of those bricks will be redundant (i.e. it will work fine with 2 bricks down). Disperse doesn't allow redundancies greater or equal to "number of bricks" / 2. With redundancy 2, the minimum number of bricks/servers should be 5. Which is in reference to this response [https://lists.gluster.org/pipermail/gluster-users/2016-June/027022.html](https://lists.gluster.org/pipermail/gluster-users/2016-June/027022.html). Regarding the disperse, the minimum number of servers you would need is 3. Disperse requires at least 3 bricks to create a configuration with redundancy 1 (this is equivalent to a replica 2 in terms of redundancy), but if you put 2 of those bricks in a single server and that server dies, you will lose 2 bricks from a volume that only tolerates 1 brick failure.  For more information on disperse please see the [Gluster Documentation](https://docs.gluster.org/en/latest/Administrator%20Guide/Managing%20Volumes/).  This volume type is typically a little slower than the **replicate** type but in general is less wasteful on disk space.
 
-If you want to support replicated and non replicated volumetypes then you can add multiple storage classes but will have to be added after the installation is complete using this command:
+If you want to support replicated and non replicated volume types then you can add multiple storage classes but will have to be added after the installation is complete using this command:
 
 ```bash
 oc create -f glusterfs-dynamic-norep.yml
@@ -296,7 +299,8 @@ Should print something of the form:
 NAME                PROVISIONER               AGE
 glusterfs-dynamic   kubernetes.io/glusterfs   18h
 ```
-Create a file called glusterfs-pvc.yml with contents:
+
+To test our provisioner, create a file called glusterfs-pvc.yml with contents:
 
 ```yaml
 apiVersion: v1
@@ -321,7 +325,7 @@ oc create -f glusterfs-pvc.yml
 oc get pvc
 ```
 
-Should have output that shows your claim being bound glusterfs1.  Note it might take a second so if you run the oc get pvc right after the create you might not get the "Bound" state.
+Should have output that shows your claim being bound gluster1.  Note it might take a second so if you run the oc get pvc right after the create you might not get the "Bound" state.
 
 ```text
 gluster1   Bound     pvc-dbe9559b-6687-11e9-b140-0e3548ad372e   1Gi        RWX            glusterfs-dynamic   10s
@@ -342,7 +346,7 @@ cd ~/openshift-ansible
 ansible-playbook -i ~/openshift-inventory playbooks/adhoc/uninstall.yml
 ```
 
-If you want to completely wipe the glusterfs clean after you run the uninstall.yml you might have to do a `wipefs -a <device>` on all glusterfs nodes.  For example you can use this script as a template for a 6 node cluster:
+If you want to completely wipe the glusterfs clean after you run the uninstall.yml you might have to do a `wipefs -a <device>` on all glusterfs nodes.  For example you can use this script as a template for a 6 node gluster cluster:
 
 You might have volume groups created and wipefs will error out.   If you want to remove everything then you must wipe the volumes created on the gluster devices on each node or you will not be able to re-install gluster.
 
@@ -350,7 +354,7 @@ You might have volume groups created and wipefs will error out.   If you want to
 for x in {1..6}; do echo $x;ssh openshift-test-glusterfs-$x.private.ossim.io "sudo vgremove -q -y \$(sudo vgdisplay|grep 'VG Name'|awk '{print \$3}');";done
 ```
 
-Now wipe out each device.
+Now wipe out each device.  This script will need to be ran for each block device on the gluster nodes.
 
 ```bash
 for x in {1..6}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo wipefs -a <device>";done
@@ -360,14 +364,14 @@ for x in {1..6}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo wipef
 
 ### Evacuate and drain Nodes
 
-If for some reason a node is needing to be removed or something has happened to the node and you want to safely remove it or you just need to update and then reboot the nof then you will need to make the node not schedulable and drain any pods that are currently running on the node:
+If for some reason a node is needing to be removed or something has happened to the node and you want to safely remove it or you just need to update and then reboot the node then you will need to make the node not schedulable and drain any pods that are currently running on the node:
 
 ```bash
 oc adm manage-node <node> --schedulable=false
 oc adm drain <node> --ignore-daemonsets
 ```
 
-Now the node should no longer be scheduling and have any pods running on it.  We can now safely update or remove the node.  If we want to remove the node we can do:
+The node should no longer be scheduling and have any pods running on it.  We can now safely update or remove the node.  If we want to remove the node we can do:
 
 ```bash
 oc delete node <node>
