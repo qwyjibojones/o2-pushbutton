@@ -74,6 +74,11 @@ do
     shift
     shift
     ;;
+    --admin-password-hash)
+    ES_ADMIN_PASSWORD_HASH=$2
+    shift
+    shift
+    ;;
     *)
     echo "Unknown option $1"
     exit 1
@@ -87,6 +92,7 @@ if (( $ES_CLUSTER_MIN_MASTER_NODES > $ES_CLUSTER_REPLICAS )) ; then
 
     exit 1
 fi
+
 ES_CLUSTER_LOCATIONS=
 for ((i=0; i<$ES_CLUSTER_REPLICAS; ++i ))
 do

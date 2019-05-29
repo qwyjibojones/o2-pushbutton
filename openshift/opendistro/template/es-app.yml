@@ -29,8 +29,10 @@ spec:
           name: inter-node
           protocol: TCP
         volumeMounts:
-        - name: data
-          mountPath: /usr/share/elasticsearch/data
+          - name: data
+            mountPath: /usr/share/elasticsearch/data
+          - name: securityconfig
+            mountPath: /usr/share/elasticsearch/plugins/opendistro_security/securityconfig
         env:
           - name: cluster.name
             value: es-cluster
@@ -65,7 +67,10 @@ spec:
         #   command: ["sh", "-c", "ulimit -n 65536"]
         securityContext:
           runAsUser: 1000
-        #     privileged: true
+      volumes:
+        - name: securityconfig
+          configMap:
+            name: securityconfig  
   volumeClaimTemplates:
   - metadata:
       name: data

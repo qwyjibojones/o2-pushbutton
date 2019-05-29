@@ -16,6 +16,11 @@ PROJECT_NAMESPACE="es-stack"
 KIBANA_IMAGE="$INTERNAL_REGISTRY/$PROJECT_NAMESPACE/kibana-app"
 ES_IMAGE="$INTERNAL_REGISTRY/$PROJECT_NAMESPACE/es-app"
 
+# default password will be admin
+#
+ES_ADMIN_PASSWORD=admin
+ES_ADMIN_PASSWORD_HASH='$2y$12$CDBVfeo3DKox1ctmbwqIW.RVZxm9IQHov5t92aBKpobeB8g3F1Fjq'
+
 if [ "$SCRIPT_DIR" == "" ] ; then
   pushd `dirname ${BASH_SOURCE[0]}` >/dev/null
   SCRIPT_DIR=`pwd -P`
