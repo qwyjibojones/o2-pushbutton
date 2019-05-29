@@ -1,0 +1,143 @@
+# This is a sample YAML Vars file for openshift.   It might be better to separate the inventory 
+# file that lists nodes and labels from the variables.  There are lists that are 
+# easier to replace in YAML format than the inventory.
+#
+# Basically everything in the [OSEv3:vars] section in the inventory can be placed here in YAML format
+# where = are replaced with : and JSON is replaced with indentations.
+#
+
+# General Variables
+openshift_disable_check: memory_availability
+ansible_ssh_user: centos
+ansible_become: yes
+openshift_deployment_type: origin
+openshift_release: "3.11"
+
+
+# User name Password with simple authentication
+# Either generate a single user or create from htpasswd file
+#
+
+# pre-generated htpasswd file.  If you have an htpasswd file already generated and ready to go with all your users
+# then uncomment this and comment out the openshift_master_htpasswd_users
+#openshift_master_htpasswd_file: /location/to/htpasswd
+
+#
+# If you want to generate a htpasswd file it will put it under /etc/origin/master/htpasswd location.  It comes in 
+# pairs separated by commas.  <Username>:<htpasswd hash>
+#
+# You can use the command:  
+#       htpasswd -n <username>
+# to generate a hash  
+#
+# openshift_master_htpasswd_users:
+#   admin: "$apr1$/SVTdCha$88Z1FxrKwDBGPAwwNi7h21"
+
+#
+# For completely disconnected installations we need to override URLs for registry and RPMS
+# Override each with the proper disconnected local Rebgistry URL
+#
+
+# l_openshift_cluster_monitoring_image_dicts:
+#   origin:
+#     prometheus_operator: quay.io/coreos/prometheus-operator
+#     prometheus: openshift/prometheus
+#     alertmanager: openshift/prometheus-alertmanager
+#     node_exporter: openshift/prometheus-node-exporter
+#     prometheus_config_reloader: quay.io/coreos/prometheus-config-reloader
+#     configmap_reloader: quay.io/coreos/configmap-reload
+#     grafana: grafana/grafana
+#     kube_state_metrics: quay.io/coreos/kube-state-metrics
+#     kube_rbac_proxy: quay.io/coreos/kube-rbac-proxy
+#     oauth_proxy: openshift/oauth-proxy
+
+# l_openshift_cluster_monitoring_operator_image_dicts:
+#   origin: 'quay.io/coreos/cluster-monitoring-operator:v0.1.1'
+
+# This is the base URL for all origin components.  Replace the IP with your own registry location
+#
+# oreg_url: "<IP>/openshift/origin-${component}:${version}"
+
+# Override grafana by replacing IP
+#
+# openshift_cluster_monitoring_operator_grafan_image: "<IP>/grafana/grafana"
+
+# openshift_docker_insecure_registries: [ "<IP>"" , "docker-registry.default.svc.cluster.local:5000"]
+# openshift_docker_additional_registries: ["<IP>"]
+
+########################################END URL OVERRIDE###########################################
+
+
+#
+# Will need to add additional RPM repos for disconnected install of RPMS for openshift
+#
+# Replace the "<RPM URL ROOT PATH TO SERVER>" with the RPM server root for all RPMS
+#
+# openshift_additional_repos:
+#   - id: "openshift-origin-311"
+#     name: "openshift-origin-311"
+#     baseurl: "<RPM URL ROOT PATH TO SERVER>"
+#     enabled: 1
+#     gpgcheck: 0
+#     sslverify: 0
+#
+
+#
+# Override and add new node groups for custom labels.  
+# We must copy the original into here and then add to the list
+#
+# Uncomment openshift_node_groups and to the list 
+#
+# openshift_node_groups:
+#   - name: node-config-master
+#     labels:
+#       - 'node-role.kubernetes.io/master=true'
+#     edits: []
+#   - name: node-config-master-crio
+#     labels:
+#       - 'node-role.kubernetes.io/master=true'
+#       - "{{ openshift_crio_docker_gc_node_selector | lib_utils_oo_dict_to_keqv_list | join(',') }}"
+#     edits: "{{ openshift_node_group_edits_crio }}"
+#   - name: node-config-infra
+#     labels:
+#       - 'node-role.kubernetes.io/infra=true'
+#     edits: []
+#   - name: node-config-infra-crio
+#     labels:
+#       - 'node-role.kubernetes.io/infra=true'
+#       - "{{ openshift_crio_docker_gc_node_selector | lib_utils_oo_dict_to_keqv_list | join(',') }}"
+#     edits: "{{ openshift_node_group_edits_crio }}"
+#   - name: node-config-compute
+#     labels:
+#       - 'node-role.kubernetes.io/compute=true'
+#     edits: []
+#   - name: node-config-compute-crio
+#     labels:
+#       - 'node-role.kubernetes.io/compute=true'
+#       - "{{ openshift_crio_docker_gc_node_selector | lib_utils_oo_dict_to_keqv_list | join(',') }}"
+#     edits: "{{ openshift_node_group_edits_crio }}"
+#   - name: node-config-master-infra
+#     labels:
+#       - 'node-role.kubernetes.io/master=true'
+#       - 'node-role.kubernetes.io/infra=true'
+#     edits: []
+#   - name: node-config-master-infra-crio
+#     labels:
+#       - 'node-role.kubernetes.io/master=true'
+#       - 'node-role.kubernetes.io/infra=true'
+#       - "{{ openshift_crio_docker_gc_node_selector | lib_utils_oo_dict_to_keqv_list | join(',') }}"
+#     edits: "{{ openshift_node_group_edits_crio }}"
+#   - name: node-config-all-in-one
+#     labels:
+#       - 'node-role.kubernetes.io/master=true'
+#       - 'node-role.kubernetes.io/infra=true'
+#       - 'node-role.kubernetes.io/compute=true'
+#     edits: []
+#   - name: node-config-all-in-one-crio
+#     labels:
+#       - 'node-role.kubernetes.io/master=true'
+#       - 'node-role.kubernetes.io/infra=true'
+#       - 'node-role.kubernetes.io/compute=true'
+#       - "{{ openshift_crio_docker_gc_node_selector | lib_utils_oo_dict_to_keqv_list | join(',') }}"
+#     edits: "{{ openshift_node_group_edits_crio }}"
+

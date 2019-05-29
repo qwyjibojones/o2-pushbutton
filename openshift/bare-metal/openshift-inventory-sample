@@ -96,11 +96,6 @@ ansible_become=yes
 openshift_deployment_type=origin
 openshift_release="3.11"
 
-# I am using the subdomain of our wildcard cert.
-openshift_master_default_subdomain=ossim.io
-
-# Public route to the master load balancer
-openshift_master_cluster_public_hostname=openshift-test.ossim.io
 
 # the insecure registries list if any.
 openshift_docker_insecure_registries=["docker-registry.default.svc.cluster.local:5000"]
