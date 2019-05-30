@@ -127,6 +127,18 @@ Now install the proxy
 
 Now install the filebeats for logging the O2 cluster installation.
 
+```text
+Usage: ./install-filebeats.sh [options]
+ options:
+     --help Display this help
+     --project-namespace Give the namespace you wish to push the images to
+     --es-username Give the elastic search user name to use
+     --es-password Give the elastic search password to use
+
+Examples:
+./install-filebeats.sh --es-username admin --es-password mypassord
+```
+
 ``` bash
 ./install-filebeats.sh
 ```

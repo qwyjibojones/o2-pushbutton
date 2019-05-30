@@ -18,6 +18,11 @@ while [[ $# -gt 0 ]]
 do
   key="$1"
   case $key in
+    --help)
+    usage   
+    shift
+    exit 0
+    ;; 
     --project-namespace)
     PROJECT_NAMESPACE=$2
     shift
