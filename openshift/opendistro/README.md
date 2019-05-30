@@ -136,7 +136,7 @@ Usage: ./install-filebeats.sh [options]
      --es-password Give the elastic search password to use
 
 Examples:
-./install-filebeats.sh --es-username admin --es-password mypassord
+./install-filebeats.sh --es-username admin --es-password mypassword
 ```
 
 ``` bash
