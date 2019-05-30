@@ -9,6 +9,8 @@ function usage {
   echo " options:"
   echo "     --help Display this help"
   echo "     --project-namespace Give the namespace you wish to push the images to"
+  echo "     --es-username Give the elastic search user name to use"
+  echo "     --es-password Give the elastic search password to use"
 }
 
 POSITIONAL=()
