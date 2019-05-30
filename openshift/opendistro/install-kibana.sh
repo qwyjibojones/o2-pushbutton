@@ -14,10 +14,14 @@ function usage {
   echo "                   by the install-es.sh"
   echo "     --kibana-replicas This is the number of kibana replicas to set on startup"
   echo "     --es-image Is the source elasticsearch image stream to pull from "
-  echo "                example: docker-registry.default.svc:5000/es-stack/es-app:latest"
+  echo "                defaults to: docker-registry.default.svc:5000/es-stack/es-app:latest"
   echo "     --kibana-image Is the source kibana image stream to pull from "
-  echo "                example: docker-registry.default.svc:5000/es-stack/kibana-app:latest"
+  echo "                defaults to: docker-registry.default.svc:5000/es-stack/kibana-app:latest"
   echo "     --project-namespace Give the namespace you wish to push the images to"
+  echo ""
+  echo ""
+  echo "Example:"
+  echo "     ./install-kibana.sh --kibana-replicas 2 --es-replicas 6"
 }
 
 POSITIONAL=()

@@ -15,7 +15,7 @@ function usage {
   echo "     --mem-size Mem size formatted in JAVA: Example 512m for 512 megabytes"
   echo "                or 2g for 2 gigs"
   echo "     --es-image Is the source image stream to pull from "
-  echo "                example: docker-registry.default.svc:5000/es-stack/es-app:latest"
+  echo "                defaults to: docker-registry.default.svc:5000/es-stack/es-app:latest"
   echo "     --storage-size Formated in Openshift form of Storage sizes"
   echo "                10Gi is ten gigs or 1Ti is one terrabyte"
   echo "     --storage-class-name Specify the class name to use for the dynamic provisioning"

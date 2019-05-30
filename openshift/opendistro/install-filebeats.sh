@@ -21,6 +21,16 @@ do
     shift
     shift
     ;;
+    --es-username)
+    ES_USERNAME=$2
+    shift
+    shift
+    ;;
+    --es-password)
+    ES_PASSWORD=$2
+    shift
+    shift
+    ;;
     *)
     echo "Unknown option $1"
     exit 1
@@ -30,5 +40,12 @@ do
 done
 
 source $SCRIPT_DIR/common.sh
+
 oc adm policy add-scc-to-user privileged system:serviceaccount:$PROJECT_NAMESPACE:filebeat-es-cluster
+FILEBEAT_YAML=$(loadfile ${TEMPLATE_DIR}filebeat.yml)
+FILEBEAT_YAML=${FILEBEAT_YAML/PROJECT_NAMESPACE/"$PROJECT_NAMESPACE"}
+FILEBEAT_YAML=${FILEBEAT_YAML/ES_USERNAME/"$ES_USERNAME"}
+FILEBEAT_YAML=${FILEBEAT_YAML/ES_PASSWORD/"$ES_PASSWORD"}
+echo "$FILEBEAT_YAML" > $SCRIPT_DIR/yaml/filebeat.yml
+
 oc create -f $SCRIPT_DIR/logging/filebeat.yml

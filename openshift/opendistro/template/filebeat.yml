@@ -28,7 +28,7 @@ data:
     cloud.id: ${ELASTIC_CLOUD_ID}
     cloud.auth: ${ELASTIC_CLOUD_AUTH}
     output.elasticsearch:
-      hosts: ['https://kibana.es-stack.svc.cluster.local:9200']
+      hosts: ['https://kibana.PROJECT_NAMESPACE.svc.cluster.local:9200']
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
       index: "o2-filebeat-default-%{[beat.version]}-%{+yyyy.MM.dd}"
@@ -81,20 +81,20 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: filebeat
-        image: docker-registry.default.svc:5000/es-stack/filebeat:6.5.2
+        image: docker-registry.default.svc:5000/PROJECT_NAMESPACE/filebeat:6.5.2
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",
         ]
         env:
         - name: ELASTICSEARCH_HOST
-          value: https://kibana.es-stack.endpoints.cluster.local:9200
+          value: https://kibana.PROJECT_NAMESPACE.endpoints.cluster.local:9200
         - name: ELASTICSEARCH_PORT
           value: "9200"
         - name: ELASTICSEARCH_USERNAME
-          value: admin
+          value: ES_USERNAME
         - name: ELASTICSEARCH_PASSWORD
-          value: admin
+          value: ES_PASSWORD
         securityContext:
           runAsUser: 0
           privileged: true
@@ -139,7 +139,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: filebeat-es-cluster
-  namespace: es-stack
+  namespace: PROJECT_NAMESPACE
 roleRef:
   kind: ClusterRole
   name: filebeat-es-cluster
