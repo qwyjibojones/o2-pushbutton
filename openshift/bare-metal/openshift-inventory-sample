@@ -79,6 +79,9 @@ openshift-test-glusterfs-[1:6].private.ossim.io glusterfs_devices='["/dev/xvdb",
 
 [OSEv3:vars]
 
+# enable ntp on masters to ensure proper failover
+openshift_clock_enabled=true
+
 openshift_node_groups=[{'name': 'node-config-master', 'labels': ['node-role.kubernetes.io/master=true']}, {'name': 'node-config-infra', 'labels': ['node-role.kubernetes.io/infra=true']}, {'name': 'node-config-compute', 'labels': ['node-role.kubernetes.io/compute=true']}, {'name': 'node-config-compute-storage', 'labels': ['node-role.kubernetes.io/compute-storage=true']}]
 
 # we will disable failures on memory checks

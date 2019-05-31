@@ -13,6 +13,8 @@ ansible_become: yes
 openshift_deployment_type: origin
 openshift_release: "3.11"
 
+# enable ntp on masters to ensure proper failover
+openshift_clock_enabled: true
 
 # User name Password with simple authentication
 # Either generate a single user or create from htpasswd file
