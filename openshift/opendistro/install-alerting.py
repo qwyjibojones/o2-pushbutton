@@ -12,7 +12,7 @@ username = os.environ["ES_USERNAME"]
 password = os.environ["ES_PASSWORD"]
 deployment_name = os.environ["OMAR_DEPLOYMENT"]
 
-es_host = "http://es-cluster.es-stack.svc.cluster.local:9200"
+es_host = "http://elasticsearch.es-stack.svc.cluster.local:9200"
 endpoint = "http://nifi.omar-dev.svc.cluster.local:8081/alert"
 
 destination_id = str()
