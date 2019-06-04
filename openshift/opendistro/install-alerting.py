@@ -90,7 +90,7 @@ def create_destination(name, dest_type):
         "name": name,
         "type": dest_type,
         dest_type: {
-            str(endpoint)
+            "url": endpoint
         }
     }
 
