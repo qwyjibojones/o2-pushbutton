@@ -48,6 +48,7 @@ def post(body, path):
         path = path[1:]
 
     debug("<- Sending POST to {}{}".format(es_host, path), 1)
+    debug("<- Body: {}".format(body), 2)
     resp = requests.post(url=(es_host + path), data=json.dumps(body), auth=(username, password), verify=False)
     debug("-> Response: {} {}".format(resp.status_code, resp.content), 1)
 
