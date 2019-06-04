@@ -12,18 +12,22 @@ username = os.environ["ES_USERNAME"]
 password = os.environ["ES_PASSWORD"]
 deployment_name = os.environ["OMAR_DEPLOYMENT"]
 
-#deployment_name = "omar-dev"
-
-
 es_host = "http://es-cluster.es-stack.svc.cluster.local:9200"
 endpoint = "http://nifi.omar-dev.svc.cluster.local:8081/alert"
 
-destination_id = ""
+destination_id = str()
 
 log_level = 5
 
 
 def post(body, path):
+    global es_host
+
+    if path.startswith("/"):
+        path = path[1:]
+
+    if not es_host.endswith("/"):
+        es_host = es_host + "/"
 
     debug("Sending POST to {}{}".format(es_host, path), 1)
     resp = requests.post(url=es_host + path, data=str(body), auth=(username, password))
@@ -53,12 +57,12 @@ def create_monitor(name, query):
         "triggers": []
     }
 
-    return post(body, "/_opendistro/_alerting/monitors")
+    return post(body, "_opendistro/_alerting/monitors")
 
 
 def add_triggers_to_monitor(monitor_id, triggers_json):
 
-    return post(triggers_json, "/_opendistro/_alerting/monitors/" + monitor_id)
+    return post(triggers_json, "_opendistro/_alerting/monitors/" + monitor_id)
 
 
 def create_destination(name, dest_type):
