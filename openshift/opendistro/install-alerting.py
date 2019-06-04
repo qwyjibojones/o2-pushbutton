@@ -20,10 +20,26 @@ destination_id = str()
 log_level = 5
 
 
+def check_vars():
+
+    global es_host
+
+    if not es_host.endswith("/"):
+        es_host = es_host + "/"
+
+    if username == "":
+        print "No username, exiting..."
+        exit(1)
+
+    if password == "":
+        print "No password, exiting..."
+        exit(1)
+
+
 def post(body, path):
     """
 
-    :type body: str
+    :type body: dict
     :type path: str
     """
     global es_host
@@ -31,11 +47,8 @@ def post(body, path):
     if path.startswith("/"):
         path = path[1:]
 
-    if not es_host.endswith("/"):
-        es_host = es_host + "/"
-
     debug("<- Sending POST to {}{}".format(es_host, path), 1)
-    resp = requests.post(url=(es_host + path), data=str(body), auth=(username, password), verify=False)
+    resp = requests.post(url=(es_host + path), data=json.dumps(body), auth=(username, password), verify=False)
     debug("-> Response: {} {}".format(resp.status_code, resp.content), 1)
 
     return json.loads(resp.content)
@@ -194,6 +207,8 @@ def debug(message, msg_level):
 
 
 def main():
+
+    check_vars()
 
     # Create Kibana Alert "Destination"
 
