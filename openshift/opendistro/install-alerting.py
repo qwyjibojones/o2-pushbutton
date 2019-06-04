@@ -12,7 +12,7 @@ username = os.environ["ES_USERNAME"]
 password = os.environ["ES_PASSWORD"]
 deployment_name = os.environ["OMAR_DEPLOYMENT"]
 
-es_host = "http://elasticsearch.es-stack.svc.cluster.local:9200"
+es_host = "https://elasticsearch.es-stack.svc.cluster.local:9200"
 endpoint = "http://nifi.omar-dev.svc.cluster.local:8081/alert"
 
 destination_id = str()
@@ -21,6 +21,11 @@ log_level = 5
 
 
 def post(body, path):
+    """
+
+    :type body: str
+    :type path: str
+    """
     global es_host
 
     if path.startswith("/"):
@@ -29,8 +34,8 @@ def post(body, path):
     if not es_host.endswith("/"):
         es_host = es_host + "/"
 
-    debug("Sending POST to {}{}".format(es_host, path), 1)
-    resp = requests.post(url=es_host + path, data=str(body), auth=(username, password))
+    debug("<- Sending POST to {}{}".format(es_host, path), 1)
+    resp = requests.post(url=(es_host + path), data=str(body), auth=(username, password))
     debug("-> Response: {} {}".format(resp.status_code, resp.content), 1)
 
     return json.loads(resp.content)
