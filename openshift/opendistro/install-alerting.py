@@ -25,9 +25,9 @@ log_level = 5
 
 def post(body, path):
 
-    debug(f"Sending POST to {es_host}{path}", 1)
+    debug("Sending POST to {}{}".format(es_host, path), 1)
     resp = requests.post(url=es_host + path, data=str(body), auth=(username, password))
-    debug(f"-> Response: {resp.status_code} {resp.content}", 1)
+    debug("-> Response: {} {}".format(resp.status_code, resp.content), 1)
 
     return json.loads(resp.content)
 
@@ -46,7 +46,7 @@ def create_monitor(name, query):
         },
         "inputs": [{
             "search": {
-                "indices": [f"o2-filebeat-{deployment_name}-*"],
+                "indices": ["o2-filebeat-{}-*".format(deployment_name)],
                 "query": query
             }
         }],
@@ -74,9 +74,13 @@ def create_destination(name, dest_type):
     return post(body, "_opendistro/_alerting/destinations")
 
 
-def create_http_monitor(lower: int, upper: int):
+def create_http_monitor(lower, upper):
+    """
+    :type lower: int
+    :type upper: int
+    """
 
-    http_monitor_name = f"http {str(lower)}-{str(upper)} (last 10min)"
+    http_monitor_name = "http {}-{} (last 10min)".format(str(lower), str(upper))
 
     http_monitor_query = {
         "size": 0,
@@ -142,8 +146,11 @@ def create_slowness_monitor(slowness_monitor_name, slowness_threshold):
     return create_monitor(slowness_monitor_name, slowness_query)
 
 
-def add_trigger_json(trigger_name, trigger_severity, trigger_predicate, action_jsons: list):
+def add_trigger_json(trigger_name, trigger_severity, trigger_predicate, action_jsons):
+    """
 
+    :type action_jsons: list
+    """
     return {
         "triggers": [{
             "name": trigger_name,
@@ -199,7 +206,7 @@ def create_4xx_monitor():
     response = create_http_monitor(400, 499)
     monitor_id = response["_id"]
 
-    name = f"({deployment_name}) Excessive 4xx errors"
+    name = "({}) Excessive 4xx errors".format(deployment_name)
     notify_action = action_json(name, name, "msg")
     count_trigger = add_trigger_json(name, 1, "ctx.results[0].hits.total > 20", action_jsons=[notify_action])
     add_triggers_to_monitor(monitor_id, count_trigger)
@@ -210,7 +217,7 @@ def create_5xx_monitor():
     response = create_http_monitor(500, 599)
     monitor_id = response["_id"]
 
-    name = f"({deployment_name}) Excessive 5xx errors"
+    name = "({}) Excessive 5xx errors".format(deployment_name)
     notify_action = action_json(name, name, "msg")
     count_trigger = add_trigger_json(name, 1, "ctx.results[0].hits.total > 5", action_jsons=[notify_action])
     add_triggers_to_monitor(monitor_id, count_trigger)
@@ -221,7 +228,7 @@ def create_lag_monitor():
     add_lag_monitor_response = create_slowness_monitor("slow response monitor", 2000)
     monitor_id = add_lag_monitor_response["._id"]
 
-    name = f"{deployment_name} Excessive responsive times"
+    name = "{} Excessive responsive times".format(deployment_name)
     notify_action = action_json(name, name, "msg")
     count_trigger = add_trigger_json(name, 1, "ctx.results[0].hits.total > 3", action_jsons=[notify_action])
     add_triggers_to_monitor(monitor_id, count_trigger)
