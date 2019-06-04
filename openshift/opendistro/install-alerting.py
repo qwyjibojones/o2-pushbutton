@@ -15,7 +15,7 @@ deployment_name = os.environ["OMAR_DEPLOYMENT"]
 es_host = "https://elasticsearch.es-stack.svc.cluster.local:9200"
 endpoint = "http://nifi.omar-dev.svc.cluster.local:8081/alert"
 
-destination_id = str()
+destination_id = ""
 
 log_level = 5
 
@@ -49,7 +49,7 @@ def post(body, path):
 
     debug("<- Sending POST to {}{}".format(es_host, path), 1)
     debug("<- Body: {}".format(body), 2)
-    resp = requests.post(url=(es_host + path), data=json.dumps(body), auth=(username, password), verify=False)
+    resp = requests.post(url=(es_host + path), data=json.dumps(body), auth=(username, password))
     debug("-> Response: {} {}".format(resp.status_code, resp.content), 1)
 
     return json.loads(resp.content)
