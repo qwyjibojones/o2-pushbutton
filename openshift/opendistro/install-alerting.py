@@ -54,7 +54,7 @@ def post(body, path):
                          data=json.dumps(body),
                          auth=(username, password),
                          verify=False,
-                         params={'Content-Type': 'application/json'})
+                         headers={'Content-Type': 'application/json'})
 
     debug("-> Response: {} {}".format(resp.status_code, resp.content), 1)
 
