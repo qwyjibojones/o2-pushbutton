@@ -60,7 +60,7 @@ def send_request(method, body, path):
     if path.startswith("/"):
         path = path[1:]
 
-    debug("<- Sending POST to {}{}".format(es_host, path), 1)
+    debug("\n<- Sending {} to {}{}".format(method, es_host, path), 1)
     debug("   Body: {}".format(body), 2)
 
     resp = requests.request(method,
