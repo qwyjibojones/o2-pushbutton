@@ -11,10 +11,8 @@ import os
 username = os.environ["ES_USERNAME"]
 password = os.environ["ES_PASSWORD"]
 deployment_name = os.environ["OMAR_DEPLOYMENT"]
-
-# es_host = "https://elasticsearch.es-stack.svc.cluster.local:9200"
-es_host = "https://localhost:9200"
-endpoint = "http://nifi.omar-dev.svc.cluster.local:8081/alert"
+es_host = os.environ["ES_HOST"]
+notify_endpoint = os.environ["NOTIFY_ENDPOINT"]
 
 destination_id = ""
 
@@ -102,7 +100,7 @@ def create_destination(name, dest_type):
         "name": name,
         "type": dest_type,
         dest_type: {
-            "url": endpoint
+            "url": notify_endpoint
         }
     }
 
