@@ -26,19 +26,26 @@ def clean_vars():
     global es_host
 
     if es_host == "":
-        print "No Elasticsearch host, exiting..."
+        print "No ES_HOST, exiting..."
         exit(1)
 
     if not es_host.endswith("/"):
         es_host = es_host + "/"
 
     if username == "":
-        print "No username, exiting..."
+        print "No ES_USERNAME, exiting..."
         exit(1)
 
     if password == "":
-        print "No password, exiting..."
+        print "No ES_PASSWORD, exiting..."
         exit(1)
+
+    if deployment_name == "":
+        print "The OMAR_DEPLOYMENT name is empty, this is used to create index patterns for the monitors. Exiting..."
+        exit(1)
+
+    if notify_endpoint == "":
+        print "Warning: the notification endpoint is empty, the Alerting Destination will not work."
 
 
 def send_request(method, body, path):
