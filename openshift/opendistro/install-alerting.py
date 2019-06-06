@@ -19,10 +19,16 @@ destination_id = ""
 
 log_level = 5
 
+POST = 'port'
+PUT = 'put'
 
-def check_vars():
 
+def clean_vars():
     global es_host
+
+    if es_host == "":
+        print "No Elasticsearch host, exiting..."
+        exit(1)
 
     if not es_host.endswith("/"):
         es_host = es_host + "/"
@@ -36,9 +42,10 @@ def check_vars():
         exit(1)
 
 
-def post(body, path):
+def send_request(method, body, path):
     """
 
+    :param method: GET, POST, PUT, etc.
     :type body: dict
     :type path: str
     """
@@ -48,13 +55,14 @@ def post(body, path):
         path = path[1:]
 
     debug("<- Sending POST to {}{}".format(es_host, path), 1)
-    debug("<- Body: {}".format(body), 2)
+    debug("   Body: {}".format(body), 2)
 
-    resp = requests.post(url=(es_host + path),
-                         data=json.dumps(body),
-                         auth=(username, password),
-                         verify=False,
-                         headers={'Content-Type': 'application/json'})
+    resp = requests.request(method,
+                            url=(es_host + path),
+                            data=json.dumps(body),
+                            auth=(username, password),
+                            verify=False,
+                            headers={'Content-Type': 'application/json'})
 
     debug("-> Response: {} {}".format(resp.status_code, resp.content), 1)
 
@@ -62,9 +70,8 @@ def post(body, path):
 
 
 def create_monitor(name, query):
-
     body = {
-        "name": deployment_name+" "+name,
+        "name": deployment_name + " " + name,
         "type": "monitor",
         "enabled": True,
         "schedule": {
@@ -82,16 +89,14 @@ def create_monitor(name, query):
         "triggers": []
     }
 
-    return post(body, "_opendistro/_alerting/monitors")
+    return send_request(method=POST, body=body, path="_opendistro/_alerting/monitors")
 
 
 def add_triggers_to_monitor(monitor_id, triggers_json):
-
-    return post(triggers_json, "_opendistro/_alerting/monitors/" + monitor_id)
+    return send_request(method=PUT, body=triggers_json, path="_opendistro/_alerting/monitors/" + monitor_id)
 
 
 def create_destination(name, dest_type):
-
     body = {
         "name": name,
         "type": dest_type,
@@ -100,7 +105,7 @@ def create_destination(name, dest_type):
         }
     }
 
-    return post(body, "_opendistro/_alerting/destinations")
+    return send_request(method=POST, body=body, path="_opendistro/_alerting/destinations")
 
 
 def create_http_monitor(lower, upper):
@@ -145,7 +150,6 @@ def create_http_monitor(lower, upper):
 
 
 def create_slowness_monitor(slowness_monitor_name, slowness_threshold):
-
     slowness_query = {
         "query": {
             "bool": {
@@ -196,7 +200,6 @@ def add_trigger_json(trigger_name, trigger_severity, trigger_predicate, action_j
 
 
 def action_json(action_name, action_subject, action_message):
-
     return {
         "name": action_name,
         "destination_id": destination_id,
@@ -217,8 +220,7 @@ def debug(message, msg_level):
 
 
 def main():
-
-    check_vars()
+    clean_vars()
 
     # Create Kibana Alert "Destination"
 
@@ -236,7 +238,6 @@ def main():
 
 
 def create_4xx_monitor():
-
     response = create_http_monitor(400, 499)
     monitor_id = response["_id"]
 
@@ -247,7 +248,6 @@ def create_4xx_monitor():
 
 
 def create_5xx_monitor():
-
     response = create_http_monitor(500, 599)
     monitor_id = response["_id"]
 
@@ -258,7 +258,6 @@ def create_5xx_monitor():
 
 
 def create_lag_monitor():
-
     add_lag_monitor_response = create_slowness_monitor("slow response monitor", 2000)
     monitor_id = add_lag_monitor_response["_id"]
 
