@@ -185,7 +185,10 @@ def add_trigger_json(trigger_name, trigger_severity, trigger_predicate, action_j
             "name": trigger_name,
             "severity": trigger_severity,
             "condition": {
-                trigger_predicate
+                "script": {
+                    "source": trigger_predicate,
+                    "lang": "painless"
+                }
             },
             "actions": action_jsons
         }]
