@@ -260,7 +260,7 @@ def create_5xx_monitor():
 def create_lag_monitor():
 
     add_lag_monitor_response = create_slowness_monitor("slow response monitor", 2000)
-    monitor_id = add_lag_monitor_response["._id"]
+    monitor_id = add_lag_monitor_response["_id"]
 
     name = "{} Excessive responsive times".format(deployment_name)
     notify_action = action_json(name, name, "msg")
