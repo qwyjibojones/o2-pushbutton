@@ -6,7 +6,7 @@ import yaml
 
 def run_command(args, wait=False, log=True):
     if log:
-        logging.info('Running command: `%s`' % ' '.join(args))
+        logging.debug('Running command: `%s`' % ' '.join(args))
     process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if wait:
         process.wait()

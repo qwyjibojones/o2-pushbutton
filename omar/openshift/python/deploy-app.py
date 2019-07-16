@@ -33,7 +33,7 @@ def process_all(config_file, template_dir, configmap_dir, overrides, remove_app,
     phase_counter = 0
     for phase in phases:
         phase_counter += 1
-        logging.info('Running phase %s' % phase_counter)
+        logging.info('\n####### Running phase %s #######' % phase_counter)
         phase_processes = {}
         for app_name in phase:
             new_app_process = process_app(config_file=config_file,
@@ -59,7 +59,7 @@ def process_all(config_file, template_dir, configmap_dir, overrides, remove_app,
 
 
 def process_app(config_file, template_dir, configmap_dir, overrides, app_name, remove_app, deploy_app, wait):
-    logging.info('\n\n\n####### Processing application: %s #######' % app_name)
+    logging.info('\n####### Processing application: %s #######' % app_name)
 
     app_params = parse_deploy_sequence.get_params_for_service(config_file=config_file,
                                                               overrides=overrides,
