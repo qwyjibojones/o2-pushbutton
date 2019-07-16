@@ -11,7 +11,7 @@ def report_status(name, process):
         if len(error) > 0:
             logging.debug('stderr: %s' % error)
     else:
-        logging.error('!!!!! Failure with on object: %s !!!!!' % name)
+        logging.error('!!!!! Failure with object: %s !!!!!' % name)
         if len(output) > 0:
             logging.warning('stdout: %s' % output)
         if len(error) > 0:
