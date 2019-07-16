@@ -1,0 +1,223 @@
+###################### ERASE THESE COMMENTS WHEN DONE EDITING! ######################
+#
+# Instructions for adding a new application to the OpenShift deployment:
+#
+# 1. Save this file as <APPLICATION_NAME>.json
+# 2. Search and replace "EDIT_HERE" comments with the needed value. Especially
+#    important is the APP_NAME parameter value in the first position. The name specified
+#    must also be the name of the corresponding docker image
+# 3. Remove all "EDIT_HERE" messages.
+# 4. Also edit config-repo/deployment/deploySequence.txt and add the new service
+#    at the desired position.
+#
+# Refer to omar-oms-app.json for additional settings you may need.
+#
+# Note: this template is a subset of the full template needed by OpenShift. Additional
+# boilerplate items are needed for it to be properly parsed by OpenShift. Run
+# generate-template.sh script in parent dir to obtain a working template, if needed.
+#
+###################### ERASE THESE COMMENTS WHEN DONE EDITING! ######################
+{
+   "parameters": [
+      {
+         "name": "APP_NAME",
+         "value": "omar-fubar-app" <-- EDIT_HERE: insert the application name / ERASE ME
+      }
+   ],
+   "objects": [
+      {
+         "apiVersion": "v1",
+         "kind": "DeploymentConfig",
+         "metadata": {
+            "annotations": {
+               "openshift.io/generated-by": "OpenShiftNewApp"
+            },
+            "labels": {
+
+            },
+            "name": "${APP_NAME}"
+         },
+         "spec": {
+            "replicas": "${REPLICAS}",
+            "selector": {
+
+               "deploymentconfig": "${APP_NAME}"
+            },
+            "strategy": {
+               "resources": {},
+               "rollingParams": {
+                  "intervalSeconds": 1,
+                  "maxSurge": "25%",
+                  "maxUnavailable": "25%",
+                  "timeoutSeconds": 600,
+                  "updatePeriodSeconds": 1
+               },
+               "type": "Rolling"
+            },
+            "template": {
+               "metadata": {
+                  "annotations": {
+                     "openshift.io/generated-by": "OpenShiftNewApp"
+                  },
+                  "creationTimestamp": null,
+                  "labels": {
+
+                     "deploymentconfig": "${APP_NAME}"
+                  }
+               },
+               "spec": {
+                  "containers": [
+                     {
+                        "env": [
+                           {
+                              EDIT_HERE: Add additional environment variables / ERASE_ME
+                           }
+                        ],
+                        "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/${APP_NAME}:${TAG}",
+                        "imagePullPolicy": "Always",
+                        "livenessProbe": {
+                           "failureThreshold": 5,
+                           "initialDelaySeconds": 30,
+                           "periodSeconds": 15,
+                           "successThreshold": 1,
+                           "tcpSocket": {
+                              "port": 8080 EDIT_HERE: Set proper port number / ERASE_ME
+                           },
+                           "timeoutSeconds": 3
+                        },
+                        "name": "${APP_NAME}",
+                        "ports": [
+                           {
+                              "containerPort": 8080, EDIT_HERE: Set proper port number / ERASE_ME
+                              "protocol": "TCP"
+                           }
+                        ],
+                        "readinessProbe": {
+                           "failureThreshold": 15,
+                           "httpGet": {
+                              "path": "/${APP_NAME}/health",
+                              "port": 8080, EDIT_HERE: Set proper port number / ERASE_ME
+                              "scheme": "HTTP"
+                           },
+                           "initialDelaySeconds": 30,
+                           "periodSeconds": 15,
+                           "successThreshold": 1,
+                           "timeoutSeconds": 3
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "volumeMounts": [
+                           EDIT_HERE: Add list of mount points and associated names / ERASE_ME
+                           {
+                              "mountPath": "/MOUNT_POINT",
+                              "name": "volume-X"
+                           },
+                           {
+                              "mountPath": "/CONFIGMAP-Y_MOUNT",
+                              "name": "CONFIGMAP-Y"
+                           },
+
+                        ]
+                     }
+                  ],
+                  "dnsPolicy": "ClusterFirst",
+                  "restartPolicy": "Always",
+                  "securityContext": {},
+                  "terminationGracePeriodSeconds": 30,
+                  "volumes": [
+                     EDIT_HERE: Add list of Volumes. Samples for PVC and ConfigMaps provided: / ERASE_ME
+                     {
+                        "name": "volume-X",
+                        "persistentVolumeClaim": {
+                           "claimName": "${PV_NAME}-pvc"
+                        }
+                     },
+                     {
+                        "configMap": {
+                           "name": "CONFIGMAP-Y"
+                        },
+                        "name": "CONFIGMAP-Y"
+                     }
+                  ]
+               }
+            },
+            "test": false,
+            "triggers": [
+               {
+                  "imageChangeParams": {
+                     "automatic": true,
+                     "containerNames": [
+                        "${APP_NAME}"
+                     ],
+                     "from": {
+                        "kind": "ImageStreamTag",
+                        "name": "${APP_NAME}:${TAG}",
+                        "namespace": "${DEPLOYMENT_TARGET}"
+                     }
+                  },
+                  "type": "ImageChange"
+               },
+               {
+                  "type": "ConfigChange"
+               }
+            ]
+         }
+      },
+
+      EDIT_HERE: Remove this block if you don't need a dedicated route. Verify all settings:
+                 If the service needs multiple routes, put the default route first.
+                 See omar-web-proxy-app.json for example. / ERASE_ME
+      {
+         "apiVersion": "v1",
+         "kind": "Route",
+         "metadata": {
+            "creationTimestamp": null,
+            "name": "${APP_NAME}"
+         },
+         "spec": {
+            "host": "${DEPLOYMENT_TARGET}.${DOMAIN_NAME}",
+            "port": {
+               "targetPort": "8080-tcp" EDIT_HERE: Name to match service's port / ERASE_ME
+            },
+            "tls": {
+               "termination": "passthrough"
+            },
+            "to": {
+               "kind": "Service",
+               "name": "${APP_NAME}"
+            }
+         }
+      },
+
+      {
+         "apiVersion": "v1",
+         "kind": "Service",
+         "metadata": {
+            "annotations": {
+               "openshift.io/generated-by": "OpenShiftNewApp"
+            },
+            "creationTimestamp": null,
+            "labels": {
+
+            },
+            "name": "${APP_NAME}",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "ports": [
+               {
+                  EDIT_HERE: Verify correct. Add additional ports as needed: / ERASE_ME
+                  "name": "8080-tcp",
+                  "port": 8080,
+                  "protocol": "TCP",
+                  "targetPort": 8080
+               }
+            ],
+            "selector": {
+               "deploymentconfig": "${APP_NAME}"
+            },
+            "sessionAffinity": "None",
+            "type": "ClusterIP"
+         }
+      }
+   ]
+}

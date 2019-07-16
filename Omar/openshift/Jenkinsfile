@@ -1,0 +1,75 @@
+
+properties([
+        parameters([
+                string(name: 'BUILD_NODE', defaultValue: 'omar-build', description: 'Label to use for node selections'),
+                string(name: 'GIT_PRIVATE_SERVER_URL', defaultValue: 'git@github.com:ossimlabs', description: 'Git url'),
+                string(name: 'CREDENTIALS_ID', defaultValue: 'cicdGithub', description: 'Credentials ID for github'),
+                string(name: 'CONFIG_REPO_NAME', defaultValue: 'config-repo', description: 'The config-repo repository name that will be checked out'),
+                string(name: 'CONFIG_REPO_BRANCH', defaultValue: 'RD-37-refactor-deployment-procedure', description: 'The config-repo branch that will be checked out'),
+                string(name: 'OPENSHIFT_URL', defaultValue: 'https://openshift.ossim.io:8443', description: 'The url of the openshift instance to deploy to'),
+                text(name: 'ADHOC_CONFIG_YML', defaultValue: '', description: 'Use this as the config file instead of pulling one from a repo'),
+                booleanParam(name: 'CLEAN_WORKSPACE', defaultValue: true, description: 'Clean the workspace at the end of the run')
+        ]),
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '3', daysToKeepStr: '', numToKeepStr: '20')),
+        disableConcurrentBuilds()
+])
+
+node ("${BUILD_NODE}"){
+    stage("Load Variables"){
+        dir("o2-pushbutton"){
+            checkout(scm)
+        }
+        load "ossim-ci/jenkins/variables/common-variables.groovy"
+        load "ossim-ci/jenkins/variables/deploy-variables.groovy"
+
+    }
+
+    try {
+        stage("Checkout"){
+            dir( "${CONFIG_REPO_NAME}" ){
+
+                println "Using ${CONFIG_REPO_NAME} branch: ${CONFIG_REPO_BRANCH}"
+
+                final String refSpec = "+refs/heads/*:refs/remotes/origin/*"
+                checkout([
+                        $class: 'GitSCM',
+                        branches: [[ name: CONFIG_REPO_BRANCH ]],
+                        userRemoteConfigs: [[
+                                                    refspec: refSpec,
+                                                    url: "${GIT_PRIVATE_SERVER_URL}/${CONFIG_REPO_NAME}.git"]]
+                ])
+            }
+        }
+
+        stage("Deploy"){
+            withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                              credentialsId: 'dockerCredentials',
+                              usernameVariable: 'DOCKER_REGISTRY_USERNAME',
+                              passwordVariable: 'DOCKER_REGISTRY_PASSWORD'],
+                             [$class: 'UsernamePasswordMultiBinding',
+                              credentialsId: 'openshiftCredentials',
+                              usernameVariable: 'OPENSHIFT_USERNAME',
+                              passwordVariable: 'OPENSHIFT_PASSWORD']])
+                    {
+                        if (ADHOC_CONFIG_YML){
+                            sh "echo '${ADHOC_CONFIG_YML}' > adhocDeployConfig.yml"
+                            sh "python o2-pushbutton/omar/openshift/python/deploy-app.py -t o2-pushbutton/omar/openshift/templates -c adhocDeployConfig.yml -m ${CONFIG_REPO_NAME}/configmaps -o ${OPENSHIFT_URL} --remove --loglevel debug --all DOCKER_REGISTRY_PASSWORD=${DOCKER_REGISTRY_PASSWORD}"
+                        } else {
+                            sh "python o2-pushbutton/omar/openshift/python/deploy-app.py -t o2-pushbutton/omar/openshift/templates -c ./${CONFIG_REPO_NAME}/deployConfig.yml -m ${CONFIG_REPO_NAME}/configmaps -o ${OPENSHIFT_URL} --remove --loglevel debug --all DOCKER_REGISTRY_PASSWORD=${DOCKER_REGISTRY_PASSWORD}"
+                        }
+                    }
+        }
+
+        stage("Archive Build Package"){
+            sh """
+                ./o2-pushbutton/omar/openshift/build-omar-deploy-package.sh ${CONFIG_REPO_NAME}
+            """
+            archiveArtifacts("omar-builder.tgz")
+        }
+    } finally {
+        stage("Clean Workspace") {
+            if (Boolean.parseBoolean(CLEAN_WORKSPACE))
+                step([$class: 'WsCleanup'])
+        }
+    }
+}

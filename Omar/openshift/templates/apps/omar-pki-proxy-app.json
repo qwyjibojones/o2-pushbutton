@@ -1,0 +1,272 @@
+{
+  "apiVersion": "v1",
+  "kind": "Template",
+  "metadata": {
+    "name": "omar-openshift-template"
+  },
+  "labels": {
+    "template": "omar-openshift-template"
+  },
+  "parameters": [
+    {
+      "description": "",
+      "displayName": "",
+      "name": "DOCKER_IMAGE_REPO",
+      "value": "quay.io/radiantsolutions/"
+    },
+    {
+      "description": "",
+      "displayName": "",
+      "name": "APP_NAME",
+      "value": "omar-pki-proxy-app"
+    },
+    {
+      "name": "DEPLOYMENT_TARGET",
+      "displayName": "DEPLOYMENT_TARGET",
+      "description": "Deployment target (dev|stage|blue|green)",
+      "required": true,
+      "value": "dev"
+    },
+    {
+      "name": "OPENSHIFT_DOCKER_REGISTRY_URL",
+      "displayName": "OPENSHIFT_DOCKER_REGISTRY_URL",
+      "description": "Openshift Docker Registry URL",
+      "required": true,
+      "value": "docker-registry-default.ossim.io"
+    },
+    {
+      "name": "TAG",
+      "displayName": "TAG",
+      "description": "Docker Container Image Version Tag",
+      "required": true,
+      "value": "latest"
+    },
+    {
+      "name": "REPLICAS",
+      "displayName": "REPLICAS",
+      "description": "Number of replicas to deploy for a given service",
+      "required": true,
+      "value": "1"
+    },
+    {
+      "name": "IMAGE_NAME",
+      "displayName": "IMAGE_NAME",
+      "description": "The name of the docker image to pull",
+      "required": true,
+      "value": ""
+    },
+    {
+      "name": "INSECURE_REPOSITORY",
+      "displayName": "INSECURE_REPOSITORY",
+      "description": "Mark the image stream as an insecure repository",
+      "value": "false"
+    }
+  ],
+  "objects": [
+    {
+      "apiVersion": "v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftWebConsole"
+        },
+        "creationTimestamp": null,
+        "generation": 238,
+        "labels": {
+          "app": "omar-pki-proxy-app"
+        },
+        "name": "omar-pki-proxy-app",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "replicas": "${REPLICAS}",
+        "selector": {
+          "app": "omar-pki-proxy-app",
+          "deploymentconfig": "omar-pki-proxy-app"
+        },
+        "strategy": {
+          "resources": {},
+          "rollingParams": {
+            "intervalSeconds": 1,
+            "maxSurge": "25%",
+            "maxUnavailable": "25%",
+            "timeoutSeconds": 600,
+            "updatePeriodSeconds": 1
+          },
+          "type": "Rolling"
+        },
+        "template": {
+          "metadata": {
+            "annotations": {
+              "openshift.io/generated-by": "OpenShiftWebConsole"
+            },
+            "creationTimestamp": null,
+            "labels": {
+              "app": "omar-pki-proxy-app",
+              "deploymentconfig": "omar-pki-proxy-app"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "USE_PKI",
+                    "value": "true"
+                  }
+                ],
+                "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/omar-web-proxy-app",
+                "imagePullPolicy": "Always",
+                "name": "omar-pki-proxy-app",
+                "ports": [
+                  {
+                    "containerPort": 80,
+                    "protocol": "TCP"
+                  },
+                  {
+                    "containerPort": 443,
+                    "protocol": "TCP"
+                  }
+                ],
+                "resources": {},
+                "terminationMessagePath": "/dev/termination-log",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/etc/ssl/server-certs",
+                    "name": "volume-lnn7o"
+                  },
+                  {
+                    "mountPath": "/etc/httpd/conf.d",
+                    "name": "volume-9cw59"
+                  },
+                  {
+                    "mountPath": "/etc/ssl/crl",
+                    "name": "volume-atbby"
+                  }
+                ]
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "restartPolicy": "Always",
+            "securityContext": {},
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "configMap": {
+                  "name": "pki-proxy-certs"
+                },
+                "name": "volume-lnn7o"
+              },
+              {
+                "configMap": {
+                  "name": "pki-proxy-conf"
+                },
+                "name": "volume-9cw59"
+              },
+              {
+                "configMap": {
+                  "name": "pki-proxy-crl"
+                },
+                "name": "volume-atbby"
+              }
+            ]
+          }
+        },
+        "test": false,
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "omar-pki-proxy-app"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "omar-web-proxy-app:${TAG}",
+                "namespace": "${DEPLOYMENT_TARGET}"
+              }
+            },
+            "type": "ImageChange"
+          }
+        ]
+      },
+      "waitForReady": false
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftWebConsole"
+        },
+        "creationTimestamp": null,
+        "labels": {
+          "app": "omar-pki-proxy-app"
+        },
+        "name": "omar-pki-proxy-app",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "80-tcp",
+            "port": 80,
+            "protocol": "TCP",
+            "targetPort": 80
+          },
+          {
+            "name": "443-tcp",
+            "port": 443,
+            "protocol": "TCP",
+            "targetPort": 443
+          }
+        ],
+        "selector": {
+          "deploymentconfig": "omar-pki-proxy-app"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+      },
+      "waitForReady": false
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ImageStream",
+      "metadata": {
+        "name": "omar-pki-proxy-app",
+        "namespace": "${DEPLOYMENT_TARGET}",
+        "labels": {
+          "application": "test"
+        },
+        "annotations": {
+          "openshift.io/image.insecureRepository": "${INSECURE_REPOSITORY}"
+        }
+      },
+      "spec": {
+        "lookupPolicy": {
+          "local": false
+        },
+        "tags": [
+          {
+            "annotations": null,
+            "from": {
+              "kind": "DockerImage",
+              "name": "${DOCKER_IMAGE_REPO}${IMAGE_NAME}:${TAG}"
+            },
+            "importPolicy": {
+              "scheduled": true,
+              "insecure": "${{INSECURE_REPOSITORY}}"
+            },
+            "name": "${TAG}",
+            "referencePolicy": {
+              "type": "Source"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

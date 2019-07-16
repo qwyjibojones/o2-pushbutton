@@ -1,0 +1,370 @@
+{
+  "apiVersion": "v1",
+  "kind": "Template",
+  "metadata": {
+    "name": "omar-openshift-template"
+  },
+  "labels": {
+    "template": "omar-openshift-template"
+  },
+  "parameters": [
+    {
+      "description": "",
+      "displayName": "",
+      "name": "DOCKER_IMAGE_REPO",
+      "value": "quay.io/radiantsolutions/"
+    },
+    {
+      "description": "",
+      "displayName": "",
+      "name": "APP_NAME",
+      "value": "omar-ml"
+    },
+    {
+      "name": "DEPLOYMENT_TARGET",
+      "displayName": "DEPLOYMENT_TARGET",
+      "description": "Deployment target (dev|stage|blue|green)",
+      "required": true,
+      "value": "dev"
+    },
+    {
+      "name": "DOMAIN_NAME",
+      "displayName": "DOMAIN_NAME",
+      "description": "Host Domain Name",
+      "required": true,
+      "value": "ossim.io"
+    },
+    {
+      "name": "OPENSHIFT_DOCKER_REGISTRY_URL",
+      "displayName": "OPENSHIFT_DOCKER_REGISTRY_URL",
+      "description": "Openshift Docker Registry URL",
+      "required": true,
+      "value": "docker-registry-default.ossim.io"
+    },
+    {
+      "name": "TAG",
+      "displayName": "TAG",
+      "description": "Docker Container Image Version Tag",
+      "required": true,
+      "value": "latest"
+    },
+    {
+      "name": "OSSIM_DATA_PV_NAME",
+      "displayName": "OSSIM_DATA_PV_NAME",
+      "description": "Persistent volume storage base name",
+      "required": true,
+      "value": "ossim-data"
+    },
+    {
+      "name": "OSSIM_DATA_PV_SIZE",
+      "displayName": "OSSIM_DATA_PV_SIZE",
+      "description": "Persistent volume storage space",
+      "required": true,
+      "value": "500Gi"
+    },
+    {
+      "name": "OSSIM_DATA_MOUNT_PT",
+      "displayName": "OSSIM_DATA_MOUNT_PT",
+      "description": "Mount point on NFS server for this PV",
+      "required": true,
+      "value": "/mnt/ossim-data"
+    },
+    {
+      "name": "OSSIM_VIDEO_DATA_PV_NAME",
+      "displayName": "OSSIM_VIDEO_DATA_PV_NAME",
+      "description": "Persistent volume storage base name",
+      "required": true,
+      "value": "ossim-video-data"
+    },
+    {
+      "name": "OSSIM_VIDEO_DATA_PV_SIZE",
+      "displayName": "OSSIM_VIDEO_DATA_PV_SIZE",
+      "description": "Persistent volume storage space",
+      "required": true,
+      "value": "500Gi"
+    },
+    {
+      "name": "OSSIM_VIDEO_DATA_MOUNT_PT",
+      "displayName": "OSSIM_VIDEO_DATA_MOUNT_PT",
+      "description": "Mount point on NFS server for this PV",
+      "required": true,
+      "value": "/mnt/ossim-data"
+    },
+    {
+      "name": "BASEMAP_PV_NAME",
+      "displayName": "BASEMAP_PV_NAME",
+      "description": "Persistent volume storage base name",
+      "required": true,
+      "value": "basemap"
+    },
+    {
+      "name": "BASEMAP_PV_SIZE",
+      "displayName": "BASEMAP_PV_SIZE",
+      "description": "Persistent volume storage space",
+      "required": true,
+      "value": "75Gi"
+    },
+    {
+      "name": "BASEMAP_MOUNT_PT",
+      "displayName": "BASEMAP_MOUNT_PT",
+      "description": "Mount point on NFS server for this PV",
+      "required": true,
+      "value": "/mnt/basemap"
+    },
+    {
+      "name": "MAPPROXY_PV_NAME",
+      "displayName": "MAPPROXY_PV_NAME",
+      "description": "Persistent volume storage base name",
+      "required": true,
+      "value": "basemap-cache"
+    },
+    {
+      "name": "MAPPROXY_PV_SIZE",
+      "displayName": "MAPPROXY_PV_SIZE",
+      "description": "Persistent volume storage space",
+      "required": true,
+      "value": "100Gi"
+    },
+    {
+      "name": "MAPPROXY_MOUNT_PT",
+      "displayName": "MAPPROXY_MOUNT_PT",
+      "description": "Mount point on NFS server for this PV",
+      "required": true,
+      "value": "/mnt/basemap-cache"
+    },
+    {
+      "name": "WEB_PROXY_CRL_PV_NAME",
+      "displayName": "WEB_PROXY_CRL_PV_NAME",
+      "description": "Persistent volume storage base name",
+      "required": true,
+      "value": "web-proxy-crl"
+    },
+    {
+      "name": "WEB_PROXY_CRL_PV_SIZE",
+      "displayName": "WEB_PROXY_CRL_PV_SIZE",
+      "description": "Persistent volume storage space",
+      "required": true,
+      "value": "1Gi"
+    },
+    {
+      "name": "WEB_PROXY_CRL_MOUNT_PT",
+      "displayName": "WEB_PROXY_CRL_MOUNT_PT",
+      "description": "Mount point on NFS server for this PV",
+      "required": true,
+      "value": "/mnt/web_proxy_crl"
+    },
+    {
+      "name": "NFS_SERVER_URL",
+      "displayName": "NFS_SERVER_URL",
+      "description": "Persistent volume storage server URL",
+      "required": true,
+      "value": "ip-172-31-11-42.ec2.internal"
+    },
+    {
+      "name": "REPLICAS",
+      "displayName": "REPLICAS",
+      "description": "Number of replicas to deploy for a given service",
+      "required": true,
+      "value": "1"
+    },
+    {
+      "name": "IMAGE_NAME",
+      "displayName": "IMAGE_NAME",
+      "description": "The name of the docker image to pull",
+      "required": true,
+      "value": ""
+    },
+    {
+      "name": "INSECURE_REPOSITORY",
+      "displayName": "INSECURE_REPOSITORY",
+      "description": "Mark the image stream as an insecure repository",
+      "value": "false"
+    },
+    {
+      "name": "IMAGE_PULL_SECRET",
+      "displayName": "IMAGE_PULL_SECRET",
+      "description": "The name of the secret to use for pulling docker images from an external registry",
+      "required": true,
+      "value": ""
+    }
+  ],
+  "objects": [
+    {
+      "apiVersion": "v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "labels": {
+        },
+        "name": "${APP_NAME}",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "replicas": "${REPLICAS}",
+        "selector": {
+          "deploymentconfig": "${APP_NAME}"
+        },
+        "strategy": {
+          "resources": {},
+          "rollingParams": {
+            "intervalSeconds": 1,
+            "maxSurge": "25%",
+            "maxUnavailable": "25%",
+            "timeoutSeconds": 600,
+            "updatePeriodSeconds": 1
+          },
+          "type": "Rolling"
+        },
+        "template": {
+          "metadata": {
+            "annotations": {
+              "openshift.io/generated-by": "OpenShiftNewApp"
+            },
+            "creationTimestamp": null,
+            "labels": {
+              "deploymentconfig": "${APP_NAME}"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                ],
+                "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/${APP_NAME}:${TAG}",
+                "imagePullPolicy": "Always",
+                "livenessProbe": {
+                  "failureThreshold": 5,
+                  "initialDelaySeconds": 30,
+                  "periodSeconds": 15,
+                  "successThreshold": 1,
+                  "tcpSocket": {
+                    "port": 8080
+                  },
+                  "timeoutSeconds": 3
+                },
+                "name": "${APP_NAME}",
+                "ports": [
+                  {
+                    "containerPort": 8080,
+                    "protocol": "TCP"
+                  }
+                ],
+                "terminationMessagePath": "/dev/termination-log",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/data",
+                    "name": "volume-ml"
+                  }
+                ]
+              }
+            ],
+            "imagePullSecrets": [
+              {
+                "name": "${IMAGE_PULL_SECRET}"
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "restartPolicy": "Always",
+            "securityContext": {},
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "volume-ml",
+                "persistentVolumeClaim": {
+                  "claimName": "${OSSIM_DATA_PV_NAME}-pvc"
+                }
+              }
+            ]
+          }
+        },
+        "test": false,
+        "triggers": [
+          {
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "${APP_NAME}"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "${APP_NAME}:${TAG}",
+                "namespace": "${DEPLOYMENT_TARGET}"
+              }
+            },
+            "type": "ImageChange"
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "creationTimestamp": null,
+        "labels": {
+        },
+        "name": "${APP_NAME}",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "8080-tcp",
+            "port": 8080,
+            "protocol": "TCP",
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "deploymentconfig": "${APP_NAME}"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ImageStream",
+      "metadata": {
+        "name": "omar-ml",
+        "namespace": "${DEPLOYMENT_TARGET}",
+        "labels": {
+          "application": "test"
+        },
+        "annotations": {
+          "openshift.io/image.insecureRepository": "${INSECURE_REPOSITORY}"
+        }
+      },
+      "spec": {
+        "lookupPolicy": {
+          "local": false
+        },
+        "tags": [
+          {
+            "annotations": null,
+            "from": {
+              "kind": "DockerImage",
+              "name": "${DOCKER_IMAGE_REPO}${IMAGE_NAME}:${TAG}"
+            },
+            "importPolicy": {
+              "scheduled": true,
+              "insecure": "${{INSECURE_REPOSITORY}}"
+            },
+            "name": "${TAG}",
+            "referencePolicy": {
+              "type": "Source"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
