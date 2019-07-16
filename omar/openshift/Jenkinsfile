@@ -19,9 +19,6 @@ node ("${BUILD_NODE}"){
         dir("o2-pushbutton"){
             checkout(scm)
         }
-        load "ossim-ci/jenkins/variables/common-variables.groovy"
-        load "ossim-ci/jenkins/variables/deploy-variables.groovy"
-
     }
 
     try {
