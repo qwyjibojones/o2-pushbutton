@@ -2,7 +2,7 @@
 properties([
         parameters([
                 string(name: 'BUILD_NODE', defaultValue: 'omar-build', description: 'Label to use for node selections'),
-                string(name: 'GIT_PRIVATE_SERVER_URL', defaultValue: 'git@github.com:ossimlabs', description: 'Git url'),
+                string(name: 'GIT_PRIVATE_SERVER_URL', defaultValue: 'git@github.com:Maxar-Corp', description: 'Git url for config-repo'),
                 string(name: 'CREDENTIALS_ID', defaultValue: 'cicdGithub', description: 'Credentials ID for github'),
                 string(name: 'CONFIG_REPO_NAME', defaultValue: 'config-repo', description: 'The config-repo repository name that will be checked out'),
                 string(name: 'CONFIG_REPO_BRANCH', defaultValue: 'RD-37-refactor-deployment-procedure', description: 'The config-repo branch that will be checked out'),
