@@ -1,0 +1,72 @@
+defaults:
+  DEPLOYMENT_TARGET: test
+  DOMAIN_NAME: <your-domain-here>
+  NFS_SERVER_URL: <your-nfs-server-here>
+  DOCKER_REGISTRY_URL: <openshift-docker-registry-endpoint>
+  INSECURE_REPOSITORY: false
+  TAG: <which-image-tags-to-pull>
+  REPLICAS: <number-of-default-replicas> # This can be overwritten by redefining this under an individual application definition
+  IMAGE_PULL_SECRET: registry-creds
+  type: template
+
+  RELEASE_NAME: <which-release>
+  RELEASE_NUMBER: <which-release-number>
+
+  OSSIM_DATA_PV_NAME: ossim-data-test
+  OSSIM_DATA_PV_SIZE: 1500Gi
+  OSSIM_DATA_MOUNT_PT: /mnt/ossim-data-dev
+
+  OSSIM_VIDEO_DATA_PV_NAME: ossim-video-data-test
+  OSSIM_VIDEO_DATA_PV_SIZE: 1500Gi
+  OSSIM_VIDEO_DATA_MOUNT_PT: /mnt/ossim-data-dev
+
+  BASEMAP_PV_NAME: basemap-test
+  BASEMAP_PV_SIZE: 75Gi
+  BASEMAP_MOUNT_PT: /mnt/basemap-dev
+
+  MAPPROXY_PV_NAME: basemap-cache-test
+  MAPPROXY_PV_SIZE: 100Gi
+  MAPPROXY_MOUNT_PT: /mnt/basemap-cache-dev
+
+  WEB_PROXY_CRL_PV_NAME: web-proxy-crl-test
+  WEB_PROXY_CRL_PV_SIZE: 1Gi
+  WEB_PROXY_CRL_MOUNT_PT: /mnt/web_proxy_crl
+
+  # These are the prefixes of the route before the domain name is appended
+  WEB_PROXY_ROUTE_PREFIX: omar-test
+  PKI_PROXY_ROUTE_PREFIX: pki-omar-test
+
+# This is a list of dictionaries, defining "phases" of deployment
+apps:
+  # Creating the project should ALWAYS be phase 1
+  - project:
+      template_file: infra/project.json
+
+  # PVs, PVCs, and configmaps make up Phase 2 in this case
+  - persistent-volumes:
+      template_file: infra/persistent-volumes.json # template_file is the relative path from <path-to-template-dir> passed into the script at runtime
+
+    registry-creds:
+      template_file: secrets/registry-creds.json
+      DOCKER_REGISTRY_SERVER: <main-docker-registry> # where to originally pull images from before adding to OpenShift registry
+      DOCKER_REGISTRY_USERNAME:
+      DOCKER_REGISTRY_PASSWORD:
+      DOCKER_REGISTRY_EMAIL:
+
+    spring-config:
+      type: configmap
+      from-file: spring-config # from-file is the relative path from <path-to-configmap-dir> passed into the script at runtime
+
+  # This first set of applications make up Phase 3 in this case
+  - omar-config-server:
+      IMAGE_NAME: omar-config-server
+      template_file: apps/omar-config-server.json
+
+  # The rest of the application make up Phase 4 in this case
+  - omar-web-proxy-app:
+      IMAGE_NAME: omar-web-proxy-app
+      template_file: apps/omar-web-proxy-app.json
+
+    omar-pki-proxy-app:
+      IMAGE_NAME: omar-pki-proxy-app
+      template_file: apps/omar-pki-proxy-app.json
