@@ -40,7 +40,7 @@ After cloning the pushbutton repo, navigate to the `python` directory. Below are
 ### deploymentConfig.yml
 The `deploymentConfig.yml` is the main configuration for the deployment suite. For a templated sample `deploymentConfig.yml` look in this directory under `TEMPLATE-deploymentConfig.yml`.
 
-For the `deploymentConfig.yml` to be valid all environment variables required for your deployment must be specified under the `defaults` dictionary. Then all objects/apps must be listed under the `apps` dictionary. The script will build all object listed under `phases`. Since `phases` is a list of dictionaries, each phase is separated by being a separate entry in that list. A phase will not be built until all previous phases are done building.
+For the `deploymentConfig.yml` to be valid all environment variables required for your deployment must be specified under the `defaults` dictionary. Then all objects/apps must be listed under the `phases` dictionary. The script will build all object listed under `phases`. Since `phases` is a list of dictionaries, each phase is separated by being a separate entry in that list. A phase will not be built until all previous phases are done building.
 
 All objects under the `phases` section must have at least one of the following specifications
 
