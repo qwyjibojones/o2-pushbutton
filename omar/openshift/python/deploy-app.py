@@ -90,7 +90,7 @@ def process_configmap(app_name, configmap_dir, app_params, remove_app, deploy_ap
 
     if remove_app:
         logging.info('Removing existing configmap %s' % app_name)
-        openshift.remove_configmap(app_name)
+        openshift.remove_configmap(app_name, namespace=app_params['DEPLOYMENT_TARGET'])
 
     if deploy_app:
         logging.info('Adding configmap %s' % app_name)

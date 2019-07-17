@@ -33,8 +33,8 @@ def write_temporary_file(input_data):
     return tmp.name
 
 
-def remove_configmap(item_name):
-    return run_command(['oc', 'delete', '--now', '--wait', 'configmap', item_name], wait=True)
+def remove_configmap(item_name, namespace):
+    return run_command(['oc', 'delete', '--now', '--wait', 'configmap', item_name, '--namespace', namespace], wait=True)
 
 
 def create_configmap(name, fromfile, namespace, wait=False):
