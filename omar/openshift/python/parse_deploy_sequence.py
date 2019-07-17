@@ -22,6 +22,7 @@ def load_deployment_config(config_file):
     return yaml.load(open(config_file).read())
 
 
+# Convert overrides from a list of key=value pairs to a dictionary
 def convert_overrides_to_dict(overrides):
     overrides_dict = {}
     for item in overrides:
@@ -34,6 +35,7 @@ def convert_overrides_to_dict(overrides):
     return overrides_dict
 
 
+# Get the final parameters for a service after taking defaults, app-specific configs, and overrides into account
 def get_params_for_service(config_file, service_name, overrides=[]):
     overrides_dict = convert_overrides_to_dict(overrides)
     loaded_config = load_deployment_config(config_file)

@@ -22,16 +22,18 @@ argument_parser.add_argument('--remove', required=False, action='store_true', he
 argument_parser.add_argument('--nodeploy', required=False, action='store_true', help='Avoid deploying apps, just remove them')
 argument_parser.add_argument('--loglevel', default='INFO', type=str.upper, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL'], help='The log level to use')
 argument_parser.add_argument('--abort-on-failure', action='store_true', help='Abort the process when there is an error')
+argument_parser.add_argument('--start-phase', type=int, default=1, help='The phase to start with, the first phase (0) by default')
 argument_parser.add_argument('overrides', nargs='*', help='A set of key-value pairs to override settings in the config file')
 
 final_return_code = 0
 
 
-def process_all(config_file, template_dir, configmap_dir, overrides, remove_app, deploy_app, abort_on_failure):
+# Process all apps defined in the deployConfig.yml file in order of phases
+def process_all(config_file, template_dir, configmap_dir, overrides, remove_app, deploy_app, abort_on_failure, start_phase):
     global final_return_code
     phases = parse_deploy_sequence.get_deployment_phases(config_file)
-    phase_counter = 0
-    for phase in phases:
+    phase_counter = start_phase-1
+    for phase in phases[start_phase-1:]:
         phase_counter += 1
         logging.info('\n####### Running phase %s #######' % phase_counter)
         phase_processes = {}
@@ -83,6 +85,9 @@ def process_app(config_file, template_dir, configmap_dir, overrides, app_name, r
                                 wait=wait)
 
 
+# Config maps are special and need to be handled differently from other apps
+# This currently only supports loading config maps from files, rather than a template
+# However, if a template exists that is supported by `oc new-app`, it can be used with process_template
 def process_configmap(app_name, configmap_dir, app_params, remove_app, deploy_app, wait):
     full_fromfile_path = get_fromfile_path(app_name=app_name,
                                            configmap_dir=configmap_dir,
@@ -165,7 +170,8 @@ def main(args):
                     overrides=parsed_args.overrides,
                     remove_app=parsed_args.remove,
                     deploy_app=not parsed_args.nodeploy,
-                    abort_on_failure=parsed_args.abort_on_failure)
+                    abort_on_failure=parsed_args.abort_on_failure,
+                    start_phase=parsed_args.start_phase)
     else:
         deploy_process = process_app(config_file=parsed_args.config_file,
                                      template_dir=parsed_args.template_dir,

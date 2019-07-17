@@ -45,28 +45,28 @@ For the `deploymentConfig.yml` to be valid all environment variables required fo
 All objects under the `apps` section must have at least one of the following specifications
 
  - Spec 1
-	 - `type` - The type of object you want OpenShift to create (i.e. configmap)
-	 - `from-file` - Place where files for the configmap are located relative to the `path-to-configmap-dir` passed into the script
+	 - `type` - The type of object you want OpenShift to create (i.e. configmap). Currently, only configmap is treated differently from templates.
+	 - `from-file` - Place where files for the configmaps are located relative to the `--configmap-dir` passed into the script
  - Spec 2
-	 - `template_file` - Location of the template file for the object to be created relative to the `path-to-template-dir` passed into the script
+	 - `template_file` - Location of the template file for the object to be created relative to the `--template-dir` passed into the script
 
 ### OpenShift Object Creation Guidelines
 
 As far as OpenShift object creation is concerned, we suggest grouping/creating objects with the following guidelines.
 - **Project:**
-For the overall project, we ***strongly suggest*** creating it on its own through a separate .json template and it ***must*** be the first object created (appearing first under `apps` in the `deploymentConfig.yml`). An example can be seen in `templates/infra/project.json`
+For the overall project, we ***strongly suggest*** creating it on its own through a separate .json template and it ***must*** be the first object created (appearing first under `apps` in the `deploymentConfig.yml`). An example can be seen in `templates/infra/project.json`. Otherwise, the project must be created manually before any other apps are deployed.
 - **PVs and PVCs:**
-For PVs and PVCs we suggest creating them using the same .json template where the PVCs are listed before any PVs are listed. Examples of this can be seen in `templates/infra/persisten-volumes.json`
+For PVs and PVCs we suggest creating them using the same .json template where the PVCs are listed before any PVs are listed. Examples of this can be seen in `templates/infra/persistent-volumes.json`
 - **Registry Creds:**
 We suggest defining any credentials used for your docker registry to be defined in the 	`deploymentConfig.yml` after the project and any PV/PVCs are defined. An example of the .json template can be found under `templates/secrets/registry-creds.json`
 - **Routes:**
-For routes, we suggest creating them as an object separate from everything else that way they are contained per deployment/project. Examples of this can be seen in `templates/infra/routes.json`
+For routes, we suggest creating them as an object separate from everything else so that they can be updated, deployed, and removed separately. Examples of this can be seen in `templates/infra/routes.json`
 - **ConfigMaps:**
 For ConfigMaps, we suggest each ConfigMap having its own entry in the `deploymentConfig.yml` before any of the individual applications are listed
-- **Applications:**
-For applications, we suggest each app have its own .json template and appear in the deploymentConfig.yml ***after*** the above objects. Examples can be seen in `templates/apps/*` and a template can be found in `templates/A-SAMPLE-TEMPLATE.json`
+- **Services/deployments/pods:**
+For these applications, we suggest each app have its own .json template and appear in the deploymentConfig.yml ***after*** the above objects. Examples can be seen in `templates/apps/*` and a sample template can be found in `templates/A-SAMPLE-TEMPLATE.json`
 
 ### omar-builder.tgz
-Within this repository also exists a script called `build-omar-deploy-package.sh` which bundles all configuration files used for an O2 deployment and a `run.sh` which can then be run from any machine to deploy that version of the deployment configured in the same way to any OpenShift cluster. To use the `run.sh` simply untar the deployment package and run `./run.sh <OpenShift-Cluster-Endpoint>`. This will deploy O2 with whatever configuration files were last used to the endpoint specified at runtime.
+Within this repository also exists a script called `build-omar-deploy-package.sh` which bundles all configuration files used for an O2 deployment and a `run.sh` which can then be run from any machine to deploy that version of the deployment configured in the same way to any OpenShift cluster. To use the `run.sh` simply untar the deployment package, cd into the new `omar-deployment-package` dir, and run `./run.sh <OpenShift-Cluster-Endpoint>`. This will deploy O2 with whatever configuration files were last used to the endpoint specified at runtime.
 
-**NOTE:** The `build-omar-deploy-package.sh` bundles the files based off pathnames that exists when the Jenkins Pipeline file is run. So you will either need to edit the script slightly or make sure the pathnames for your own set of configuration files match that of the script. Also, using the `omar-build.tgz` has the sam requirements as running the deployment scripts directly.
+**NOTE:** The `build-omar-deploy-package.sh` bundles the files based off pathnames that exists when the Jenkins Pipeline file is run. So you will either need to edit the script slightly or make sure the pathnames for your own set of configuration files match that of the script. Also, using the `omar-build.tgz` has the same requirements as running the deployment scripts directly.
