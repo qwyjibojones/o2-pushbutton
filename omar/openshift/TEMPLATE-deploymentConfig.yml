@@ -12,26 +12,6 @@ defaults:
   RELEASE_NAME: <which-release>
   RELEASE_NUMBER: <which-release-number>
 
-  OSSIM_DATA_PV_NAME: ossim-data-test
-  OSSIM_DATA_PV_SIZE: 1500Gi
-  OSSIM_DATA_MOUNT_PT: /mnt/ossim-data-dev
-
-  OSSIM_VIDEO_DATA_PV_NAME: ossim-video-data-test
-  OSSIM_VIDEO_DATA_PV_SIZE: 1500Gi
-  OSSIM_VIDEO_DATA_MOUNT_PT: /mnt/ossim-data-dev
-
-  BASEMAP_PV_NAME: basemap-test
-  BASEMAP_PV_SIZE: 75Gi
-  BASEMAP_MOUNT_PT: /mnt/basemap-dev
-
-  MAPPROXY_PV_NAME: basemap-cache-test
-  MAPPROXY_PV_SIZE: 100Gi
-  MAPPROXY_MOUNT_PT: /mnt/basemap-cache-dev
-
-  WEB_PROXY_CRL_PV_NAME: web-proxy-crl-test
-  WEB_PROXY_CRL_PV_SIZE: 1Gi
-  WEB_PROXY_CRL_MOUNT_PT: /mnt/web_proxy_crl
-
   # These are the prefixes of the route before the domain name is appended
   WEB_PROXY_ROUTE_PREFIX: omar-test
   PKI_PROXY_ROUTE_PREFIX: pki-omar-test
