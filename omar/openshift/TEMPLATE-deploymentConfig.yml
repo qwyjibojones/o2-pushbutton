@@ -17,7 +17,7 @@ defaults:
   PKI_PROXY_ROUTE_PREFIX: pki-omar-test
 
 # This is a list of dictionaries, defining "phases" of deployment
-apps:
+phases:
   # Creating the project should ALWAYS be phase 1
   - project:
       template_file: infra/project.json

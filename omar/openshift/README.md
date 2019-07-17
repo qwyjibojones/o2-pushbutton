@@ -40,9 +40,9 @@ After cloning the pushbutton repo, navigate to the `python` directory. Below are
 ### deploymentConfig.yml
 The `deploymentConfig.yml` is the main configuration for the deployment suite. For a templated sample `deploymentConfig.yml` look in this directory under `TEMPLATE-deploymentConfig.yml`.
 
-For the `deploymentConfig.yml` to be valid all environment variables required for your deployment must be specified under the `defaults` dictionary. Then all objects/apps must be listed under the `apps` dictionary. The script will build all object listed under `apps` in phases. Since `apps` is a list of dictionaries, each phase is separated by being a separate entry in that list. A phase will not be built until all previous phases are done building.
+For the `deploymentConfig.yml` to be valid all environment variables required for your deployment must be specified under the `defaults` dictionary. Then all objects/apps must be listed under the `apps` dictionary. The script will build all object listed under `phases`. Since `phases` is a list of dictionaries, each phase is separated by being a separate entry in that list. A phase will not be built until all previous phases are done building.
 
-All objects under the `apps` section must have at least one of the following specifications
+All objects under the `phases` section must have at least one of the following specifications
 
  - Spec 1
 	 - `type` - The type of object you want OpenShift to create (i.e. configmap). Currently, only configmap is treated differently from templates.
@@ -54,7 +54,7 @@ All objects under the `apps` section must have at least one of the following spe
 
 As far as OpenShift object creation is concerned, we suggest grouping/creating objects with the following guidelines.
 - **Project:**
-For the overall project, we ***strongly suggest*** creating it on its own through a separate .json template and it ***must*** be the first object created (appearing first under `apps` in the `deploymentConfig.yml`). An example can be seen in `templates/infra/project.json`. Otherwise, the project must be created manually before any other apps are deployed.
+For the overall project, we ***strongly suggest*** creating it on its own through a separate .json template and it ***must*** be the first object created (appearing first under `phases` in the `deploymentConfig.yml`). An example can be seen in `templates/infra/project.json`. Otherwise, the project must be created manually before any other apps are deployed.
 - **PVs and PVCs:**
 For PVs and PVCs we suggest creating them using the same .json template where the PVCs are listed before any PVs are listed. Examples of this can be seen in `templates/infra/persistent-volumes.json`
 - **Registry Creds:**

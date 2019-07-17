@@ -40,7 +40,7 @@ def get_params_for_service(config_file, service_name, overrides=[]):
     overrides_dict = convert_overrides_to_dict(overrides)
     loaded_config = load_deployment_config(config_file)
     params = loaded_config['defaults']
-    for phase in loaded_config['apps']:
+    for phase in loaded_config['phases']:
         if service_name in phase:
             params.update(phase[service_name])
             params.update(overrides_dict)
@@ -50,7 +50,7 @@ def get_params_for_service(config_file, service_name, overrides=[]):
 
 def get_deployment_phases(config_file):
     loaded_config = load_deployment_config(config_file)
-    phases = [phase.keys() for phase in loaded_config['apps']]
+    phases = [phase.keys() for phase in loaded_config['phases']]
     return phases
 
 
