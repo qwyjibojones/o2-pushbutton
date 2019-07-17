@@ -5,7 +5,7 @@ properties([
                 string(name: 'GIT_PRIVATE_SERVER_URL', defaultValue: 'git@github.com:Maxar-Corp', description: 'Git url for config-repo'),
                 string(name: 'CREDENTIALS_ID', defaultValue: 'cicdGithub', description: 'Credentials ID for github'),
                 string(name: 'CONFIG_REPO_NAME', defaultValue: 'config-repo', description: 'The config-repo repository name that will be checked out'),
-                string(name: 'CONFIG_REPO_BRANCH', defaultValue: 'RD-37-refactor-deployment-procedure', description: 'The config-repo branch that will be checked out'),
+                string(name: 'CONFIG_REPO_BRANCH', defaultValue: 'dev', description: 'The config-repo branch that will be checked out'),
                 string(name: 'OPENSHIFT_URL', defaultValue: 'https://openshift.ossim.io:8443', description: 'The url of the openshift instance to deploy to'),
                 string(name: 'APP_TO_DEPLOY', defaultValue: 'all', description: 'The single app to deploy to the cluster, defaults to all apps'),
                 text(name: 'ADHOC_CONFIG_YML', defaultValue: '', description: 'Use this as the config file instead of pulling one from a repo'),
