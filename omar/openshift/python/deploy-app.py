@@ -22,7 +22,7 @@ argument_parser.add_argument('--remove', required=False, action='store_true', he
 argument_parser.add_argument('--nodeploy', required=False, action='store_true', help='Avoid deploying apps, just remove them')
 argument_parser.add_argument('--loglevel', default='INFO', type=str.upper, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL'], help='The log level to use')
 argument_parser.add_argument('--abort-on-failure', action='store_true', help='Abort the process when there is an error')
-argument_parser.add_argument('--start-phase', type=int, default=1, help='The phase to start with, the first phase (0) by default')
+argument_parser.add_argument('--start-phase', type=int, default=1, help='The phase to start with, the first phase (1) by default')
 argument_parser.add_argument('overrides', nargs='*', help='A set of key-value pairs to override settings in the config file')
 
 final_return_code = 0
