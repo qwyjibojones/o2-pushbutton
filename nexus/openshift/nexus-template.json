@@ -1,0 +1,331 @@
+{
+  "apiVersion": "v1",
+  "kind": "Template",
+  "labels": {
+    "app": "nexus",
+    "template": "nexus-template"
+  },
+  "message": "A Nexus service has been created",
+  "metadata": {
+    "annotations": {
+      "description": "Nexus service, with persistent storage.",
+      "openshift.io/display-name": "O2-Nexus",
+      "tags": "instant-app,nexus"
+    },
+    "name": "nexus"
+  },
+  "objects": [
+    {
+      "apiVersion": "v1",
+      "kind": "Route",
+      "metadata": {
+        "annotations": {
+          "haproxy.router.openshift.io/timeout": "4m",
+          "template.openshift.io/expose-uri": "http://{.spec.host}{.spec.path}"
+        },
+        "name": "${NEXUS_SERVICE_NAME}"
+      },
+      "spec": {
+        "host": "${NEXUS_ROUTE}",
+        "tls": {
+          "insecureEdgeTerminationPolicy": "Redirect",
+          "termination": "edge"
+        },
+        "port": {
+          "targetPort": "web"
+        },
+        "to": {
+          "kind": "Service",
+          "name": "${NEXUS_SERVICE_NAME}"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "${NEXUS_PV_NAME}-pvc"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "${VOLUME_CAPACITY}"
+          }
+        },
+        "selector": {
+          "matchLabels": {
+            "name": "${NEXUS_PV_NAME}"
+          }
+        },
+        "storageClassName": ""
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolume",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp",
+          "pv.kubernetes.io/bound-by-controller": "yes"
+        },
+        "creationTimestamp": null,
+        "finalizers": [
+          "kubernetes.io/pv-protection"
+        ],
+        "labels": {
+          "app": "persistent-volumes",
+          "template": "persistent-volumes-template",
+          "name": "${NEXUS_PV_NAME}"
+        },
+        "name": "${NEXUS_PV_NAME}"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "capacity": {
+          "storage": "${VOLUME_CAPACITY}"
+        },
+        "nfs": {
+          "path": "${NFS_MOUNT_PATH}",
+          "server": "${NFS_SERVER}"
+        },
+        "persistentVolumeReclaimPolicy": "Retain"
+      },
+      "status": {}
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "annotations": {
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "name": "${NEXUS_SERVICE_NAME}"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "name": "${NEXUS_SERVICE_NAME}"
+        },
+        "strategy": {
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "name": "${NEXUS_SERVICE_NAME}"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "capabilities": {},
+                "env": [],
+                "image": " ",
+                "imagePullPolicy": "IfNotPresent",
+                "livenessProbe": {
+                  "failureThreshold": 2,
+                  "httpGet": {
+                    "path": "/",
+                    "port": 8081
+                  },
+                  "initialDelaySeconds": 420,
+                  "periodSeconds": 360,
+                  "timeoutSeconds": 240
+                },
+                "name": "nexus",
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/",
+                    "port": 8081
+                  },
+                  "initialDelaySeconds": 3,
+                  "timeoutSeconds": 240
+                },
+                "resources": {
+                  "limits": {
+                    "memory": "${MEMORY_LIMIT}"
+                  }
+                },
+                "securityContext": {
+                  "capabilities": {},
+                  "privileged": false
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/nexus-data",
+                    "name": "${NEXUS_PV_NAME}"
+                  }
+                ]
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "restartPolicy": "Always",
+            "volumes": [
+              {
+                "name": "${NEXUS_PV_NAME}",
+                "persistentVolumeClaim": {
+                  "claimName": "${NEXUS_PV_NAME}-pvc"
+                }
+              }
+            ]
+          }
+        },
+        "triggers": [
+          {
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "nexus"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "${NEXUS_IMAGE_NAME}:${NEXUS_IMAGE_STREAM_TAG}",
+                "namespace": "devops"
+              },
+              "lastTriggeredImage": ""
+            },
+            "type": "ImageChange"
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "service.openshift.io/infrastructure": "true"
+        },
+        "name": "${NEXUS_SERVICE_NAME}"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "web",
+            "nodePort": 0,
+            "port": 80,
+            "protocol": "TCP",
+            "targetPort": 8081
+          }
+        ],
+        "selector": {
+          "name": "${NEXUS_SERVICE_NAME}"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ImageStream",
+      "metadata": {
+        "name": "nexus",
+        "labels": {
+        },
+        "annotations": {
+        }
+      },
+      "spec": {
+        "lookupPolicy": {
+          "local": false
+        },
+        "tags": [
+          {
+            "annotations": null,
+            "from": {
+              "kind": "DockerImage",
+              "name": "${NAMESPACE}/${NEXUS_IMAGE_NAME}:${NEXUS_IMAGE_STREAM_TAG}"
+            },
+            "importPolicy": {
+              "scheduled": true
+            },
+            "name": "${NEXUS_IMAGE_STREAM_TAG}",
+            "referencePolicy": {
+              "type": "Source"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "parameters": [
+    {
+      "description": "The name of the OpenShift Service exposed for the Nexus container.",
+      "displayName": "Nexus Service Name",
+      "name": "NEXUS_SERVICE_NAME",
+      "value": "nexus"
+    },
+    {
+      "description": "The name of the OpenShift PV used by the volume claim.",
+      "displayName": "Nexus PV Name",
+      "name": "NEXUS_PV_NAME",
+      "value": "nexus-pv"
+    },
+    {
+      "description": "Whether to enable OAuth OpenShift integration. If false, the static account 'admin' will be initialized with the password 'password'.",
+      "displayName": "Enable OAuth in Nexus",
+      "name": "ENABLE_OAUTH",
+      "value": "true"
+    },
+    {
+      "description": "Maximum amount of memory the container can use.",
+      "displayName": "Memory Limit",
+      "name": "MEMORY_LIMIT",
+      "value": "4096Mi"
+    },
+    {
+      "description": "Volume space available for data, e.g. 512Mi, 2Gi.",
+      "displayName": "Volume Capacity",
+      "name": "VOLUME_CAPACITY",
+      "required": true,
+      "value": "100Gi"
+    },
+    {
+      "description": "The mount point on the NFS",
+      "displayName": "NFS Mount Path",
+      "name": "NFS_MOUNT_PATH",
+      "required": true,
+      "value": "/mnt/nexus-data"
+    },
+    {
+      "description": "The location of the NFS server (e.g. o2-nfs.private.ossim.io)",
+      "displayName": "NFS Server",
+      "name": "NFS_SERVER",
+      "required": true,
+      "value": "o2-nfs.private.ossim.io"
+    },
+    {
+      "description": "The OpenShift Namespace where the Nexus ImageStream resides.",
+      "displayName": "Nexus ImageStream Namespace",
+      "name": "NAMESPACE",
+      "value": "quay.io/radiantsolutions"
+    },
+    {
+      "description": "The Route that will redirect to Nexus",
+      "displayName": "Nexus Route",
+      "name": "NEXUS_ROUTE",
+      "value": "nexus.ossim.io"
+    },
+    {
+      "description": "Name of the Image to be used for the container.",
+      "displayName": "Nexus Image Name",
+      "name": "NEXUS_IMAGE_NAME",
+      "value": "nexus3"
+    },
+    {
+      "description": "Name of the ImageStreamTag to be used for the Nexus image.",
+      "displayName": "Nexus ImageStreamTag",
+      "name": "NEXUS_IMAGE_STREAM_TAG",
+      "value": "latest"
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+   "apiVersion": "v1",
+   "kind": "Template",
+   "metadata": {
+      "name": "omar-openshift-template"
+   },
+   "labels": {
+      "template": "omar-openshift-template"
+   },
+   "parameters": [
+      {
+         "name": "DEPLOYMENT_TARGET",
+         "displayName": "DEPLOYMENT_TARGET",
+         "description": "Deployment target (dev|stage|blue|green)",
+         "required": true,
+         "value": "dev"
+      },
+      {
+         "name": "DOMAIN_NAME",
+         "displayName": "DOMAIN_NAME",
+         "description": "Host Domain Name",
+         "required": true,
+         "value": "ossim.io"
+      },
+      {
+         "name": "DOCKER_REGISTRY_URL",
+         "displayName": "DOCKER_REGISTRY_URL",
+         "description": "Openshift Docker Registry URL",
+         "required": true,
+         "value": "docker-registry-default.ossim.io"
+      },
+      {
+         "name": "TAG",
+         "displayName": "TAG",
+         "description": "Docker Container Image Version Tag",
+         "required": true,
+         "value": "latest"
+      },
+      {
+         "name": "OSSIM_DATA_PV_NAME",
+         "displayName": "OSSIM_DATA_PV_NAME",
+         "description": "Persistent volume storage base name",
+         "required": true,
+         "value": "ossim-data"
+      },
+      {
+         "name": "OSSIM_DATA_PV_SIZE",
+         "displayName": "OSSIM_DATA_PV_SIZE",
+         "description": "Persistent volume storage space",
+         "required": true,
+         "value": "500Gi"
+      },
+      {
+         "name": "OSSIM_DATA_MOUNT_PT",
+         "displayName": "OSSIM_DATA_MOUNT_PT",
+         "description": "Mount point on NFS server for this PV",
+         "required": true,
+         "value": "/mnt/ossim-data"
+      },
+      {
+         "name": "OSSIM_VIDEO_DATA_PV_NAME",
+         "displayName": "OSSIM_VIDEO_DATA_PV_NAME",
+         "description": "Persistent volume storage base name",
+         "required": true,
+         "value": "ossim-video-data"
+      },
+      {
+         "name": "OSSIM_VIDEO_DATA_PV_SIZE",
+         "displayName": "OSSIM_VIDEO_DATA_PV_SIZE",
+         "description": "Persistent volume storage space",
+         "required": true,
+         "value": "500Gi"
+      },
+      {
+         "name": "OSSIM_VIDEO_DATA_MOUNT_PT",
+         "displayName": "OSSIM_VIDEO_DATA_MOUNT_PT",
+         "description": "Mount point on NFS server for this PV",
+         "required": true,
+         "value": "/mnt/ossim-data"
+      },
+      {
+         "name": "BASEMAP_PV_NAME",
+         "displayName": "BASEMAP_PV_NAME",
+         "description": "Persistent volume storage base name",
+         "required": true,
+         "value": "basemap"
+      },
+      {
+         "name": "BASEMAP_PV_SIZE",
+         "displayName": "BASEMAP_PV_SIZE",
+         "description": "Persistent volume storage space",
+         "required": true,
+         "value": "75Gi"
+      },
+      {
+         "name": "BASEMAP_MOUNT_PT",
+         "displayName": "BASEMAP_MOUNT_PT",
+         "description": "Mount point on NFS server for this PV",
+         "required": true,
+         "value": "/mnt/basemap"
+      },
+      {
+         "name": "MAPPROXY_PV_NAME",
+         "displayName": "MAPPROXY_PV_NAME",
+         "description": "Persistent volume storage base name",
+         "required": true,
+         "value": "basemap-cache"
+      },
+      {
+         "name": "MAPPROXY_PV_SIZE",
+         "displayName": "MAPPROXY_PV_SIZE",
+         "description": "Persistent volume storage space",
+         "required": true,
+         "value": "100Gi"
+      },
+      {
+         "name": "MAPPROXY_MOUNT_PT",
+         "displayName": "MAPPROXY_MOUNT_PT",
+         "description": "Mount point on NFS server for this PV",
+         "required": true,
+         "value": "/mnt/basemap-cache"
+      },
+      {
+         "name": "WEB_PROXY_CRL_PV_NAME",
+         "displayName": "WEB_PROXY_CRL_PV_NAME",
+         "description": "Persistent volume storage base name",
+         "required": true,
+         "value": "web-proxy-crl"
+      },
+      {
+         "name": "WEB_PROXY_CRL_PV_SIZE",
+         "displayName": "WEB_PROXY_CRL_PV_SIZE",
+         "description": "Persistent volume storage space",
+         "required": true,
+         "value": "1Gi"
+      },
+      {
+         "name": "WEB_PROXY_CRL_MOUNT_PT",
+         "displayName": "WEB_PROXY_CRL_MOUNT_PT",
+         "description": "Mount point on NFS server for this PV",
+         "required": true,
+         "value": "/mnt/web_proxy_crl"
+      },
+    {
+      "name": "REPLICAS",
+      "displayName": "REPLICAS",
+      "description": "Number of replicas to deploy for a given service",
+      "required": true,
+      "value": "1"
+    },
+    {
+      "name": "IMAGE_NAME",
+      "displayName": "IMAGE_NAME",
+      "description": "The name of the docker image to pull",
+      "required": true,
+      "value": ""
+    },
+    {
+      "name": "INSECURE_REPOSITORY",
+      "displayName": "INSECURE_REPOSITORY",
+      "description": "Mark the image stream as an insecure repository",
+      "value": "false"
+    }
+   ]
+}

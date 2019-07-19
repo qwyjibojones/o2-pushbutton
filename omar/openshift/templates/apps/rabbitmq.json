@@ -1,0 +1,246 @@
+{
+  "apiVersion": "v1",
+  "kind": "Template",
+  "metadata": {
+    "name": "omar-openshift-template"
+  },
+  "labels": {
+    "template": "omar-openshift-template"
+  },
+  "parameters": [
+    {
+      "description": "",
+      "displayName": "",
+      "name": "DOCKER_IMAGE_REPO",
+      "value": "quay.io/radiantsolutions/"
+    },
+    {
+      "description": "",
+      "displayName": "",
+      "name": "APP_NAME",
+      "value": "rabbitmq"
+    },
+    {
+      "name": "DEPLOYMENT_TARGET",
+      "displayName": "DEPLOYMENT_TARGET",
+      "description": "Deployment target (dev|stage|blue|green)",
+      "required": true,
+      "value": "dev"
+    },
+    {
+      "name": "OPENSHIFT_DOCKER_REGISTRY_URL",
+      "displayName": "OPENSHIFT_DOCKER_REGISTRY_URL",
+      "description": "Openshift Docker Registry URL",
+      "required": true,
+      "value": "docker-registry-default.ossim.io"
+    },
+    {
+      "name": "TAG",
+      "displayName": "TAG",
+      "description": "Docker Container Image Version Tag",
+      "required": true,
+      "value": "latest"
+    },
+    {
+      "name": "REPLICAS",
+      "displayName": "REPLICAS",
+      "description": "Number of replicas to deploy for a given service",
+      "required": true,
+      "value": "1"
+    },
+    {
+      "name": "IMAGE_NAME",
+      "displayName": "IMAGE_NAME",
+      "description": "The name of the docker image to pull",
+      "required": true,
+      "value": ""
+    },
+    {
+      "name": "INSECURE_REPOSITORY",
+      "displayName": "INSECURE_REPOSITORY",
+      "description": "Mark the image stream as an insecure repository",
+      "value": "false"
+    }
+  ],
+  "objects": [
+    {
+      "apiVersion": "v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "creationTimestamp": null,
+        "generation": 320,
+        "labels": {
+        },
+        "name": "rabbitmq",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "replicas": "${REPLICAS}",
+        "selector": {
+          "deploymentconfig": "rabbitmq"
+        },
+        "strategy": {
+          "resources": {},
+          "rollingParams": {
+            "intervalSeconds": 1,
+            "maxSurge": "25%",
+            "maxUnavailable": "25%",
+            "timeoutSeconds": 600,
+            "updatePeriodSeconds": 1
+          },
+          "type": "Rolling"
+        },
+        "template": {
+          "metadata": {
+            "annotations": {
+              "openshift.io/generated-by": "OpenShiftNewApp"
+            },
+            "creationTimestamp": null,
+            "labels": {
+              "deploymentconfig": "rabbitmq"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "SPRING_PROFILES_ACTIVE",
+                    "value": "production"
+                  },
+                  {
+                    "name": "SPRING_CLOUD_CONFIG_LABEL",
+                    "value": "master"
+                  }
+                ],
+                "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/rabbitmq:${TAG}",
+                "imagePullPolicy": "Always",
+                "livenessProbe": {
+                  "failureThreshold": 5,
+                  "initialDelaySeconds": 30,
+                  "periodSeconds": 15,
+                  "successThreshold": 1,
+                  "tcpSocket": {
+                    "port": 5672
+                  },
+                  "timeoutSeconds": 3
+                },
+                "name": "rabbitmq",
+                "ports": [
+                  {
+                    "containerPort": 5672,
+                    "protocol": "TCP"
+                  }
+                ],
+                "readinessProbe": {
+                  "failureThreshold": 15,
+                  "initialDelaySeconds": 30,
+                  "periodSeconds": 15,
+                  "successThreshold": 1,
+                  "tcpSocket": {
+                    "port": 5672
+                  },
+                  "timeoutSeconds": 3
+                },
+                "resources": {},
+                "terminationMessagePath": "/dev/termination-log"
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "restartPolicy": "Always",
+            "securityContext": {},
+            "terminationGracePeriodSeconds": 30
+          }
+        },
+        "test": false,
+        "triggers": [
+          {
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "rabbitmq"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "rabbitmq:${TAG}",
+                "namespace": "${DEPLOYMENT_TARGET}"
+              }
+            },
+            "type": "ImageChange"
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "creationTimestamp": null,
+        "labels": {
+        },
+        "name": "rabbitmq",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "5672-tcp",
+            "port": 5672,
+            "protocol": "TCP",
+            "targetPort": 5672
+          }
+        ],
+        "selector": {
+          "deploymentconfig": "rabbitmq"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ImageStream",
+      "metadata": {
+        "name": "rabbitmq",
+        "namespace": "${DEPLOYMENT_TARGET}",
+        "labels": {
+          "application": "test"
+        },
+        "annotations": {
+          "openshift.io/image.insecureRepository": "${INSECURE_REPOSITORY}"
+        }
+      },
+      "spec": {
+        "lookupPolicy": {
+          "local": false
+        },
+        "tags": [
+          {
+            "annotations": null,
+            "from": {
+              "kind": "DockerImage",
+              "name": "${DOCKER_IMAGE_REPO}${IMAGE_NAME}:${TAG}"
+            },
+            "importPolicy": {
+              "scheduled": true,
+              "insecure": "${{INSECURE_REPOSITORY}}"
+            },
+            "name": "${TAG}",
+            "referencePolicy": {
+              "type": "Source"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,290 @@
+{
+  "apiVersion": "v1",
+  "kind": "Template",
+  "metadata": {
+    "name": "omar-openshift-template"
+  },
+  "labels": {
+    "template": "omar-openshift-template"
+  },
+  "parameters": [
+    {
+      "description": "",
+      "displayName": "",
+      "name": "DOCKER_IMAGE_REPO",
+      "value": "quay.io/radiantsolutions/"
+    },
+    {
+      "description": "",
+      "displayName": "",
+      "name": "APP_NAME",
+      "value": "ossim-jpip-server"
+    },
+    {
+      "name": "DEPLOYMENT_TARGET",
+      "displayName": "DEPLOYMENT_TARGET",
+      "description": "Deployment target (dev|stage|blue|green)",
+      "required": true,
+      "value": "dev"
+    },
+    {
+      "name": "DOMAIN_NAME",
+      "displayName": "DOMAIN_NAME",
+      "description": "Host Domain Name",
+      "required": true,
+      "value": "ossim.io"
+    },
+    {
+      "name": "OPENSHIFT_DOCKER_REGISTRY_URL",
+      "displayName": "OPENSHIFT_DOCKER_REGISTRY_URL",
+      "description": "Openshift Docker Registry URL",
+      "required": true,
+      "value": "docker-registry-default.ossim.io"
+    },
+    {
+      "name": "TAG",
+      "displayName": "TAG",
+      "description": "Docker Container Image Version Tag",
+      "required": true,
+      "value": "latest"
+    },
+    {
+      "name": "OSSIM_DATA_PV_NAME",
+      "displayName": "OSSIM_DATA_PV_NAME",
+      "description": "Persistent volume storage base name",
+      "required": true,
+      "value": "ossim-data"
+    },
+    {
+      "name": "REPLICAS",
+      "displayName": "REPLICAS",
+      "description": "Number of replicas to deploy for a given service",
+      "required": true,
+      "value": "1"
+    },
+    {
+      "name": "IMAGE_NAME",
+      "displayName": "IMAGE_NAME",
+      "description": "The name of the docker image to pull",
+      "required": true,
+      "value": ""
+    },
+    {
+      "name": "INSECURE_REPOSITORY",
+      "displayName": "INSECURE_REPOSITORY",
+      "description": "Mark the image stream as an insecure repository",
+      "value": "false"
+    }
+  ],
+  "objects": [
+    {
+      "apiVersion": "v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftWebConsole"
+        },
+        "creationTimestamp": null,
+        "generation": 461,
+        "labels": {
+          "app": "ossim-jpip-server"
+        },
+        "name": "ossim-jpip-server",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "replicas": "${REPLICAS}",
+        "selector": {
+          "app": "ossim-jpip-server",
+          "deploymentconfig": "ossim-jpip-server"
+        },
+        "strategy": {
+          "resources": {},
+          "rollingParams": {
+            "intervalSeconds": 1,
+            "maxSurge": "25%",
+            "maxUnavailable": "25%",
+            "timeoutSeconds": 600,
+            "updatePeriodSeconds": 1
+          },
+          "type": "Rolling"
+        },
+        "template": {
+          "metadata": {
+            "annotations": {
+              "openshift.io/generated-by": "OpenShiftWebConsole"
+            },
+            "creationTimestamp": null,
+            "labels": {
+              "app": "ossim-jpip-server",
+              "deploymentconfig": "ossim-jpip-server"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "JPIP_DATA_DIR",
+                    "value": "/data/jpip-cache/"
+                  },
+                  {
+                    "name": "OSSIM_PREFS_FILE",
+                    "value": "/usr/share/ossim/ossim-site-preferences"
+                  },
+                  {
+                    "name": "OSSIM_DATA",
+                    "value": "/data"
+                  },
+                  {
+                    "name": "OSSIM_INSTALL_PREFIX",
+                    "value": "/usr"
+                  },
+                  {
+                    "name": "ADDRESS",
+                    "value": "0.0.0.0"
+                  }
+                ],
+                "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/ossim-jpip-server:${TAG}",
+                "imagePullPolicy": "Always",
+                "name": "ossim-jpip-server",
+                "ports": [
+                  {
+                    "containerPort": 8080,
+                    "protocol": "TCP"
+                  }
+                ],
+                "resources": {},
+                "terminationMessagePath": "/dev/termination-log",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/data",
+                    "name": "volume-x52tj"
+                  }
+                ]
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "restartPolicy": "Always",
+            "securityContext": {},
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "volume-x52tj",
+                "persistentVolumeClaim": {
+                  "claimName": "${OSSIM_DATA_PV_NAME}-pvc"
+                }
+              }
+            ]
+          }
+        },
+        "test": false,
+        "triggers": [
+          {
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "ossim-jpip-server"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "ossim-jpip-server:${TAG}",
+                "namespace": "${DEPLOYMENT_TARGET}"
+              }
+            },
+            "type": "ImageChange"
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ]
+      },
+      "waitForReady": true
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Route",
+      "metadata": {
+        "creationTimestamp": null,
+        "name": "ossim-jpip-server",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "host": "${DEPLOYMENT_TARGET}-jpip.${DOMAIN_NAME}",
+        "port": {
+          "targetPort": "8080-tcp"
+        },
+        "to": {
+          "kind": "Service",
+          "name": "ossim-jpip-server"
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftWebConsole"
+        },
+        "creationTimestamp": null,
+        "labels": {
+          "app": "ossim-jpip-server"
+        },
+        "name": "ossim-jpip-server",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "8080-tcp",
+            "port": 8080,
+            "protocol": "TCP",
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "deploymentconfig": "ossim-jpip-server"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ImageStream",
+      "metadata": {
+        "name": "ossim-jpip-server",
+        "namespace": "${DEPLOYMENT_TARGET}",
+        "labels": {
+          "application": "test"
+        },
+        "annotations": {
+          "openshift.io/image.insecureRepository": "${INSECURE_REPOSITORY}"
+        }
+      },
+      "spec": {
+        "lookupPolicy": {
+          "local": false
+        },
+        "tags": [
+          {
+            "annotations": null,
+            "from": {
+              "kind": "DockerImage",
+              "name": "${DOCKER_IMAGE_REPO}${IMAGE_NAME}:${TAG}"
+            },
+            "importPolicy": {
+              "scheduled": true,
+              "insecure": "${{INSECURE_REPOSITORY}}"
+            },
+            "name": "${TAG}",
+            "referencePolicy": {
+              "type": "Source"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+   "apiVersion": "v1",
+   "kind": "Template",
+   "metadata": {
+      "name": "omar-openshift-template"
+   },
+   "labels": {
+      "template": "omar-openshift-template"
+   },
+   "parameters": [
+      {
+         "name": "DEPLOYMENT_TARGET",
+         "displayName": "DEPLOYMENT_TARGET",
+         "description": "Deployment target (dev|stage|blue|green)",
+         "required": true,
+         "value": "dev"
+      }
+   ],
+   "objects": [
+      {
+         "kind": "Project",
+         "apiVersion": "v1",
+         "metadata": {
+            "name": "${DEPLOYMENT_TARGET}",
+            "labels": {
+            },
+            "annotations": {
+               "openshift.io/description": "EXPERIMENTAL",
+               "openshift.io/display-name": "${DEPLOYMENT_TARGET}"
+            }
+         },
+         "spec": {
+            "finalizers": [
+               "openshift.io/origin",
+               "kubernetes"
+            ]
+         }
+      }
+   ]
+}

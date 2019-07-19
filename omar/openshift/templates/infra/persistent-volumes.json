@@ -1,0 +1,377 @@
+{
+   "apiVersion": "v1",
+   "kind": "Template",
+   "metadata": {
+      "name": "omar-openshift-template"
+   },
+   "labels": {
+      "template": "omar-openshift-template"
+   },
+   "parameters": [
+      {
+      "description": "",
+      "displayName": "",
+      "name": "DOCKER_IMAGE_REPO",
+      "value": "quay.io/radiantsolutions/"
+       },
+       {
+         "description": "",
+         "displayName": "",
+         "name": "APP_NAME",
+         "value": "icarus-app"
+       },
+       {
+         "description": "",
+         "displayName": "",
+         "name": "TARGET_NAMESPACE",
+         "value": "omar-dev"
+       },
+      {
+         "name": "DEPLOYMENT_TARGET",
+         "displayName": "DEPLOYMENT_TARGET",
+         "description": "Deployment target (dev|stage|blue|green)",
+         "required": true,
+         "value": "dev"
+      },
+      {
+         "name": "DOMAIN_NAME",
+         "displayName": "DOMAIN_NAME",
+         "description": "Host Domain Name",
+         "required": true,
+         "value": "ossim.io"
+      },
+      {
+         "name": "DOCKER_REGISTRY_URL",
+         "displayName": "DOCKER_REGISTRY_URL",
+         "description": "Openshift Docker Registry URL",
+         "required": true,
+         "value": "docker-registry-default.ossim.io"
+      },
+      {
+         "name": "TAG",
+         "displayName": "TAG",
+         "description": "Docker Container Image Version Tag",
+         "required": true,
+         "value": "latest"
+      },
+      {
+         "name": "OSSIM_DATA_PV_NAME",
+         "displayName": "OSSIM_DATA_PV_NAME",
+         "description": "Persistent volume storage base name",
+         "required": true,
+         "value": "ossim-data"
+      },
+      {
+         "name": "OSSIM_DATA_PV_SIZE",
+         "displayName": "OSSIM_DATA_PV_SIZE",
+         "description": "Persistent volume storage space",
+         "required": true,
+         "value": "500Gi"
+      },
+      {
+         "name": "OSSIM_DATA_MOUNT_PT",
+         "displayName": "OSSIM_DATA_MOUNT_PT",
+         "description": "Mount point on NFS server for this PV",
+         "required": true,
+         "value": "/mnt/ossim-data"
+      },
+      {
+         "name": "OSSIM_VIDEO_DATA_PV_NAME",
+         "displayName": "OSSIM_VIDEO_DATA_PV_NAME",
+         "description": "Persistent volume storage base name",
+         "required": true,
+         "value": "ossim-video-data"
+      },
+      {
+         "name": "OSSIM_VIDEO_DATA_PV_SIZE",
+         "displayName": "OSSIM_VIDEO_DATA_PV_SIZE",
+         "description": "Persistent volume storage space",
+         "required": true,
+         "value": "500Gi"
+      },
+      {
+         "name": "OSSIM_VIDEO_DATA_MOUNT_PT",
+         "displayName": "OSSIM_VIDEO_DATA_MOUNT_PT",
+         "description": "Mount point on NFS server for this PV",
+         "required": true,
+         "value": "/mnt/ossim-data"
+      },
+      {
+         "name": "BASEMAP_PV_NAME",
+         "displayName": "BASEMAP_PV_NAME",
+         "description": "Persistent volume storage base name",
+         "required": true,
+         "value": "basemap"
+      },
+      {
+         "name": "BASEMAP_PV_SIZE",
+         "displayName": "BASEMAP_PV_SIZE",
+         "description": "Persistent volume storage space",
+         "required": true,
+         "value": "75Gi"
+      },
+      {
+         "name": "BASEMAP_MOUNT_PT",
+         "displayName": "BASEMAP_MOUNT_PT",
+         "description": "Mount point on NFS server for this PV",
+         "required": true,
+         "value": "/mnt/basemap"
+      },
+      {
+         "name": "MAPPROXY_PV_NAME",
+         "displayName": "MAPPROXY_PV_NAME",
+         "description": "Persistent volume storage base name",
+         "required": true,
+         "value": "basemap-cache"
+      },
+      {
+         "name": "MAPPROXY_PV_SIZE",
+         "displayName": "MAPPROXY_PV_SIZE",
+         "description": "Persistent volume storage space",
+         "required": true,
+         "value": "100Gi"
+      },
+      {
+         "name": "MAPPROXY_MOUNT_PT",
+         "displayName": "MAPPROXY_MOUNT_PT",
+         "description": "Mount point on NFS server for this PV",
+         "required": true,
+         "value": "/mnt/basemap-cache"
+      },
+      {
+         "name": "WEB_PROXY_CRL_PV_NAME",
+         "displayName": "WEB_PROXY_CRL_PV_NAME",
+         "description": "Persistent volume storage base name",
+         "required": true,
+         "value": "web-proxy-crl"
+      },
+      {
+         "name": "WEB_PROXY_CRL_PV_SIZE",
+         "displayName": "WEB_PROXY_CRL_PV_SIZE",
+         "description": "Persistent volume storage space",
+         "required": true,
+         "value": "1Gi"
+      },
+      {
+         "name": "WEB_PROXY_CRL_MOUNT_PT",
+         "displayName": "WEB_PROXY_CRL_MOUNT_PT",
+         "description": "Mount point on NFS server for this PV",
+         "required": true,
+         "value": "/mnt/web_proxy_crl"
+      },
+      {
+         "name": "NFS_SERVER_URL",
+         "displayName": "NFS_SERVER_URL",
+         "description": "Persistent volume storage server URL",
+         "required": true,
+         "value": "ip-172-31-11-42.ec2.internal"
+      }
+   ],
+   "objects": [
+      {
+         "apiVersion": "v1",
+         "kind": "PersistentVolumeClaim",
+         "metadata": {
+            "name": "${OSSIM_DATA_PV_NAME}-pvc",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "accessModes": [
+               "ReadWriteMany"
+            ],
+            "storageClassName": "",
+            "resources": {
+               "requests": {
+                  "storage": "${OSSIM_DATA_PV_SIZE}"
+               }
+            },
+            "volumeName": "${OSSIM_DATA_PV_NAME}"
+         }
+      },
+      {
+         "apiVersion": "v1",
+         "kind": "PersistentVolumeClaim",
+         "metadata": {
+            "name": "${OSSIM_VIDEO_DATA_PV_NAME}-pvc",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "accessModes": [
+               "ReadWriteMany"
+            ],
+            "storageClassName": "",
+            "resources": {
+               "requests": {
+                  "storage": "${OSSIM_VIDEO_DATA_PV_SIZE}"
+               }
+            },
+            "volumeName": "${OSSIM_VIDEO_DATA_PV_NAME}"
+         }
+      },
+      {
+         "apiVersion": "v1",
+         "kind": "PersistentVolumeClaim",
+         "metadata": {
+            "name": "${BASEMAP_PV_NAME}-pvc",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "accessModes": [
+               "ReadOnlyMany"
+            ],
+            "storageClassName": "",
+            "resources": {
+               "requests": {
+                  "storage": "${BASEMAP_PV_SIZE}"
+               }
+            },
+            "volumeName": "${BASEMAP_PV_NAME}"
+         }
+      },
+      {
+         "apiVersion": "v1",
+         "kind": "PersistentVolumeClaim",
+         "metadata": {
+            "name": "${MAPPROXY_PV_NAME}-pvc",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "accessModes": [
+               "ReadWriteMany"
+            ],
+            "storageClassName": "",
+            "resources": {
+               "requests": {
+                  "storage": "${MAPPROXY_PV_SIZE}"
+               }
+            },
+            "volumeName": "${MAPPROXY_PV_NAME}"
+         }
+      },
+      {
+         "apiVersion": "v1",
+         "kind": "PersistentVolumeClaim",
+         "metadata": {
+            "name": "${WEB_PROXY_CRL_PV_NAME}-pvc",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "accessModes": [
+               "ReadWriteMany"
+            ],
+            "storageClassName": "",
+            "resources": {
+               "requests": {
+                  "storage": "${WEB_PROXY_CRL_PV_SIZE}"
+               }
+            },
+            "volumeName": "${WEB_PROXY_CRL_PV_NAME}"
+         }
+      },
+      {
+         "apiVersion": "v1",
+         "kind": "PersistentVolume",
+         "metadata": {
+            "name": "${OSSIM_DATA_PV_NAME}",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "capacity": {
+               "storage": "${OSSIM_DATA_PV_SIZE}"
+            },
+            "accessModes": [
+               "ReadWriteMany"
+            ],
+            "nfs": {
+               "path": "${OSSIM_DATA_MOUNT_PT}",
+               "server": "${NFS_SERVER_URL}"
+            },
+            "persistentVolumeReclaimPolicy": "Retain"
+         }
+      },
+      {
+         "apiVersion": "v1",
+         "kind": "PersistentVolume",
+         "metadata": {
+            "name": "${OSSIM_VIDEO_DATA_PV_NAME}",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "capacity": {
+               "storage": "${OSSIM_VIDEO_DATA_PV_SIZE}"
+            },
+            "accessModes": [
+               "ReadWriteMany"
+            ],
+            "nfs": {
+               "path": "${OSSIM_VIDEO_DATA_MOUNT_PT}",
+               "server": "${NFS_SERVER_URL}"
+            },
+            "persistentVolumeReclaimPolicy": "Retain"
+         }
+      },
+      {
+         "apiVersion": "v1",
+         "kind": "PersistentVolume",
+         "metadata": {
+            "name": "${BASEMAP_PV_NAME}",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "capacity": {
+               "storage": "${BASEMAP_PV_SIZE}"
+            },
+            "accessModes": [
+               "ReadOnlyMany"
+            ],
+            "nfs": {
+               "path": "${BASEMAP_MOUNT_PT}",
+               "server": "${NFS_SERVER_URL}"
+            },
+            "persistentVolumeReclaimPolicy": "Retain"
+         }
+      },
+      {
+         "apiVersion": "v1",
+         "kind": "PersistentVolume",
+         "metadata": {
+            "name": "${MAPPROXY_PV_NAME}",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "capacity": {
+               "storage": "${MAPPROXY_PV_SIZE}"
+            },
+            "accessModes": [
+               "ReadWriteMany"
+            ],
+            "nfs": {
+               "path": "${MAPPROXY_MOUNT_PT}",
+               "server": "${NFS_SERVER_URL}"
+            },
+            "persistentVolumeReclaimPolicy": "Retain"
+         }
+      },
+      {
+         "apiVersion": "v1",
+         "kind": "PersistentVolume",
+         "metadata": {
+            "name": "${WEB_PROXY_CRL_PV_NAME}",
+            "namespace": "${DEPLOYMENT_TARGET}"
+         },
+         "spec": {
+            "capacity": {
+               "storage": "${WEB_PROXY_CRL_PV_SIZE}"
+            },
+            "accessModes": [
+               "ReadWriteMany"
+            ],
+            "nfs": {
+               "path": "${WEB_PROXY_CRL_MOUNT_PT}",
+               "server": "${NFS_SERVER_URL}"
+            },
+            "persistentVolumeReclaimPolicy": "Retain"
+         }
+      }
+   ]
+}
