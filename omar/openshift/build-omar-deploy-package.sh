@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 CONFIG_REPO_NAME="$1"
+PACKAGE_NAME="$2"
 
 mkdir omar-deploy-package
 
@@ -15,4 +16,4 @@ cp -r \
 cp o2-pushbutton/omar/openshift/README-tar.md omar-deploy-package/README.md
 
 chmod a+x omar-deploy-package/run.sh
-tar -czf omar-builder.tgz omar-deploy-package
+tar -czf ${PACKAGE_NAME} omar-deploy-package

@@ -8,6 +8,8 @@ properties([
                 string(name: 'CONFIG_REPO_BRANCH', defaultValue: 'dev', description: 'The config-repo branch that will be checked out'),
                 string(name: 'OPENSHIFT_URL', defaultValue: 'https://openshift.ossim.io:8443', description: 'The url of the openshift instance to deploy to'),
                 string(name: 'APP_TO_DEPLOY', defaultValue: 'all', description: 'The single app to deploy to the cluster, defaults to all apps'),
+                string(name: 'PACKAGE_NAME', defaultValue:'', description: 'Desired name for the O2 deliverable'),
+                string(name: 'BUCKET_NAME', defaultValue:'o2-delivery', description: 'Desired S3 bucket to archive the O2 deliverable'),
                 text(name: 'ADHOC_CONFIG_YML', defaultValue: '', description: 'Use this as the config file instead of pulling one from a repo'),
                 booleanParam(name: 'CLEAN_WORKSPACE', defaultValue: true, description: 'Clean the workspace at the end of the run')
         ]),
@@ -79,10 +81,16 @@ node ("${BUILD_NODE}"){
         }
 
         stage("Archive Build Package"){
+            if (PACKAGE_NAME == ''){
+                TAR_NAME = 'omar-builder.tgz'
+            } else {
+                TAR_NAME = PACKAGE_NAME
+            }
             sh """
-                ./o2-pushbutton/omar/openshift/build-omar-deploy-package.sh ${CONFIG_REPO_NAME}
+                ./o2-pushbutton/omar/openshift/build-omar-deploy-package.sh ${CONFIG_REPO_NAME} ${TAR_NAME}
+                aws s3 cp ${TAR_NAME} s3://${BUCKET_NAME}/o2-builder-packages/${TAR_NAME}
             """
-            archiveArtifacts("omar-builder.tgz")
+            archiveArtifacts(TAR_NAME)
         }
     } finally {
         stage("Clean Workspace") {
