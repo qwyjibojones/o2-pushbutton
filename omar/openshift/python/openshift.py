@@ -2,6 +2,7 @@ import subprocess
 import tempfile
 import logging
 import yaml
+import os
 
 
 # The location of the oc executable, defaults to just 'oc',

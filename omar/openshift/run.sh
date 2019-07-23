@@ -16,4 +16,4 @@ fi
 OPENSHIFT_URL="${1}"
 shift
 
-python ./python/deploy-app.py -t ./templates -c ./deployConfig.yml -m ./configmaps -o "${OPENSHIFT_URL}" --remove --loglevel info --all "$@"
+python ./python/deploy-app.py -t ./templates -c ./deployConfig.yml -m ./configmaps -o "${OPENSHIFT_URL}" --oc-location ./oc --remove --loglevel info --all "$@"
