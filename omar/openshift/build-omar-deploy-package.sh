@@ -6,6 +6,7 @@ PACKAGE_NAME="$2"
 mkdir omar-deploy-package
 
 cp -r \
+  "$(which oc)" \
   o2-pushbutton/omar/openshift/run.sh \
   o2-pushbutton/omar/openshift/python \
   o2-pushbutton/omar/openshift/templates \

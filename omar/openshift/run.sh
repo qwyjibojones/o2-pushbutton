@@ -5,14 +5,15 @@ if [[ $# -lt 1 ]]; then
   exit 1
 fi
 
-if [[ -z $OPENSHIFT_USERNAME || -z $OPENSHIFT_PASSWORD || -z $DOCKER_REGISTRY_PASSWORD ]]; then
-  echo "Please provide the openshift username and password, and the external docker registry password in the following environment variables:
-    OPENSHIFT_USERNAME
-    OPENSHIFT_PASSWORD
-    DOCKER_REGISTRY_PASSWORD"
-  exit 2
+if [[ -z $OPENSHIFT_USERNAME ]]; then
+    read -p "Openshift Username: " OPENSHIFT_USERNAME
+fi
+
+if [[ -z $OPENSHIFT_PASSWORD ]]; then
+    read -p "Openshift Password: " -s OPENSHIFT_PASSWORD
 fi
 
 OPENSHIFT_URL="${1}"
+shift
 
-python ./python/deploy-app.py -t ./templates -c ./deployConfig.yml -m ./configmaps -o "${OPENSHIFT_URL}" --remove --loglevel info --all DOCKER_REGISTRY_PASSWORD="${DOCKER_REGISTRY_PASSWORD}"
+python ./python/deploy-app.py -t ./templates -c ./deployConfig.yml -m ./configmaps -o "${OPENSHIFT_URL}" --remove --loglevel info --all "$@"

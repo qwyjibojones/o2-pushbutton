@@ -23,6 +23,7 @@ argument_parser.add_argument('--nodeploy', required=False, action='store_true', 
 argument_parser.add_argument('--loglevel', default='INFO', type=str.upper, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL'], help='The log level to use')
 argument_parser.add_argument('--abort-on-failure', action='store_true', help='Abort the process when there is an error')
 argument_parser.add_argument('--start-phase', type=int, default=1, help='The phase to start with, the first phase (1) by default')
+argument_parser.add_argument('--oc-location', default=None, help='The location of the oc executable, if it must be manually specified')
 argument_parser.add_argument('overrides', nargs='*', help='A set of key-value pairs to override settings in the config file')
 
 final_return_code = 0
@@ -158,6 +159,8 @@ def main(args):
     parsed_args = argument_parser.parse_args(args)
     logging.getLogger().setLevel(getattr(logging, parsed_args.loglevel))
     logging.info('Using config file: %s\nand template dir:%s' % (parsed_args.config_file, parsed_args.template_dir))
+
+    openshift.set_oc_location(parsed_args.oc_location)
 
     openshift.login(openshift_url=parsed_args.openshift_url,
                     username=os.getenv('OPENSHIFT_USERNAME'),

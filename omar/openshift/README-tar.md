@@ -25,4 +25,5 @@ This O2 builder package serves as a static copy of the state/configuration of an
 
 ### Usage
 
-To redeploy this package version of O2 simply run `./run.sh <OpenShift-Cluster-Endpoint>`, where `<OpenShift-Cluster-Endpoint>` is the url of the OpenShift cluster you would like to deploy this version of O2 on.
+To redeploy this package version of O2 simply run `./run.sh <OpenShift-Cluster-Endpoint> <Overrides>`, where `<OpenShift-Cluster-Endpoint>` is the url of the OpenShift cluster you would like to deploy this version of O2 on, and `<Overrides>` is zero or more KEY=VALUE variable overrides.
+These overrides may be useful in cases such as passing in credentials from environment variables.
