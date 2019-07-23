@@ -83,7 +83,7 @@ node ("${BUILD_NODE}"){
         stage("Archive Build Package"){
             sh """
                 ./o2-pushbutton/omar/openshift/build-omar-deploy-package.sh ${CONFIG_REPO_NAME} ${PACKAGE_NAME}
-                aws s3 cp ${PACKAGE_NAME} s3://${BUCKET_NAME}/o2-builder-packages/${PACKAGE_NAME}
+                aws s3 cp ${PACKAGE_NAME} s3://${BUCKET_NAME}/o2-builder-packages/${PACKAGE_NAME} --no-progress
             """
             archiveArtifacts(PACKAGE_NAME)
         }
