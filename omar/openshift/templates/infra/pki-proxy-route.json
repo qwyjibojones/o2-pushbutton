@@ -23,25 +23,11 @@
       "value": "ossim.io"
     },
     {
-      "name": "WEB_PROXY_ROUTE_PREFIX",
-      "displayName": "WEB_PROXY_ROUTE_PREFIX",
-      "description": "Prefix for the web proxy mount",
-      "required": true,
-      "value": ""
-    },
-    {
       "name": "PKI_PROXY_ROUTE_PREFIX",
       "displayName": "PKI_PROXY_ROUTE_PREFIX",
       "description": "Prefix for the pki proxy mount",
       "required": true,
       "value": ""
-    },
-    {
-      "name": "WEB_PROXY_ROUTE_NAME",
-      "displayName": "WEB_PROXY_ROUTE_NAME",
-      "description": "Name for the web proxy mount",
-      "required": false,
-      "value": "route-omar-target"
     },
     {
       "name": "PKI_PROXY_ROUTE_NAME",
@@ -52,29 +38,6 @@
     }
   ],
   "objects": [
-    {
-      "apiVersion": "v1",
-      "kind": "Route",
-      "metadata": {
-        "creationTimestamp": null,
-        "name": "${WEB_PROXY_ROUTE_NAME}",
-        "namespace": "${DEPLOYMENT_TARGET}"
-      },
-      "spec": {
-        "host": "${WEB_PROXY_ROUTE_PREFIX}.${DOMAIN_NAME}",
-        "port": {
-          "targetPort": "443-tcp"
-        },
-        "tls": {
-          "termination": "passthrough",
-          "insecureEdgeTerminationPolicy": "Redirect"
-        },
-        "to": {
-          "kind": "Service",
-          "name": "omar-web-proxy-app"
-        }
-      }
-    },
     {
       "apiVersion": "v1",
       "kind": "Route",
