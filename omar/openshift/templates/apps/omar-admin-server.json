@@ -11,7 +11,7 @@
       "description": "",
       "displayName": "",
       "name": "DOCKER_IMAGE_REPO",
-      "value": "quay.io/radiantsolutions/"
+      "value": "quay.io/radiantsolutions"
     },
     {
       "description": "",
@@ -31,7 +31,7 @@
       "displayName": "OPENSHIFT_DOCKER_REGISTRY_URL",
       "description": "Openshift Docker Registry URL",
       "required": true,
-      "value": "docker-registry-default.ossim.io"
+      "value": "docker-registry.default.svc:5000"
     },
     {
       "name": "TAG",
@@ -216,7 +216,7 @@
             "annotations": null,
             "from": {
               "kind": "DockerImage",
-              "name": "${DOCKER_IMAGE_REPO}${IMAGE_NAME}:${TAG}"
+              "name": "${DOCKER_IMAGE_REPO}/${IMAGE_NAME}:${TAG}"
             },
             "importPolicy": {
               "scheduled": true,

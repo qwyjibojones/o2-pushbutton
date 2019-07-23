@@ -25,7 +25,6 @@
             "labels": {
             },
             "annotations": {
-               "openshift.io/description": "EXPERIMENTAL",
                "openshift.io/display-name": "${DEPLOYMENT_TARGET}"
             }
          },

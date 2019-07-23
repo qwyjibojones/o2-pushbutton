@@ -27,7 +27,7 @@
          "displayName": "DOCKER_REGISTRY_URL",
          "description": "Openshift Docker Registry URL",
          "required": true,
-         "value": "docker-registry-default.ossim.io"
+         "value": "docker-registry.default.svc:5000"
       },
       {
          "name": "TAG",
