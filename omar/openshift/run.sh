@@ -13,6 +13,9 @@ if [[ -z $OPENSHIFT_PASSWORD ]]; then
     read -p "Openshift Password: " -s OPENSHIFT_PASSWORD
 fi
 
+export OPENSHIFT_USERNAME
+export OPENSHIFT_PASSWORD
+
 OPENSHIFT_URL="${1}"
 shift
 
