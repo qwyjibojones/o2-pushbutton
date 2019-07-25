@@ -9,7 +9,7 @@ properties([
                 string(name: 'OPENSHIFT_URL', defaultValue: 'https://openshift.ossim.io:8443', description: 'The url of the openshift instance to deploy to'),
                 string(name: 'APP_TO_DEPLOY', defaultValue: 'all', description: 'The single app to deploy to the cluster, defaults to all apps'),
                 string(name: 'PACKAGE_NAME', defaultValue:'omar-dev.tgz', description: 'Desired name for the O2 deliverable'),
-                string(name: 'BUCKET_NAME', defaultValue:'o2-delivery', description: 'Desired S3 bucket to archive the O2 deliverable'),
+                string(name: 'BUCKET_NAME', defaultValue:'o2-private', description: 'Desired S3 bucket to archive the O2 deliverable'),
                 text(name: 'ADHOC_CONFIG_YML', defaultValue: '', description: 'Use this as the config file instead of pulling one from a repo'),
                 booleanParam(name: 'CLEAN_WORKSPACE', defaultValue: true, description: 'Clean the workspace at the end of the run')
         ]),
