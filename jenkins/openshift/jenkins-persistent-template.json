@@ -57,11 +57,7 @@
                         "storage": "${VOLUME_CAPACITY}"
                     }
                 },
-                "selector": { 
-                    "matchLabels": {
-                        "name": "${JENKINS_PV_NAME}"
-                    }
-                },
+                "volumeName": "${JENKINS_PV_NAME}",
                 "storageClassName": ""
             }
         },

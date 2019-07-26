@@ -55,11 +55,7 @@
             "storage": "${VOLUME_CAPACITY}"
           }
         },
-        "selector": {
-          "matchLabels": {
-            "name": "${NEXUS_PV_NAME}"
-          }
-        },
+        "volumeName": "${NEXUS_PV_NAME}",
         "storageClassName": ""
       }
     },
