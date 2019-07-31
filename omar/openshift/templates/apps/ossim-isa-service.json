@@ -67,6 +67,18 @@
       "displayName": "INSECURE_REPOSITORY",
       "description": "Mark the image stream as an insecure repository",
       "value": "false"
+    },
+    {
+      "name": "MEMORY_MAX",
+      "displayName": "MEMORY_MAX",
+      "description": "Maximum memory for this app to have",
+      "value": "1000Mi"
+    },
+    {
+      "name": "JAVA_OPTS_VALUE",
+      "displayName": "JAVA_OPTS_VALUE",
+      "description": "Desired value for the JAVA_OPTS environment variable",
+      "value": ""
     }
   ],
   "objects": [
@@ -134,6 +146,10 @@
                   {
                     "name": "BUCKETS",
                     "value": "o2-test-data"
+                  },
+                  {
+                    "name": "JAVA_OPTS",
+                    "value": "${JAVA_OPTS_VALUE}"
                   }
                 ],
                 "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/ossim-isa-service:${TAG}",
@@ -167,7 +183,11 @@
                   "successThreshold": 1,
                   "timeoutSeconds": 3
                 },
-                "resources": {},
+                "resources": {
+                  "limits": {
+                    "memory": "${MEMORY_MAX}"
+                  }
+                },
                 "securityContext": {
                   "capabilities": {
                     "add": [
