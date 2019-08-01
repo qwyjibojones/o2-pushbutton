@@ -179,6 +179,18 @@
       "displayName": "INSECURE_REPOSITORY",
       "description": "Mark the image stream as an insecure repository",
       "value": "false"
+    },
+    {
+      "name": "MEMORY_MAX",
+      "displayName": "MEMORY_MAX",
+      "description": "Maximum memory for this app to have",
+      "value": "1000Mi"
+    },
+    {
+      "name": "JAVA_OPTS",
+      "displayName": "JAVA_OPTS",
+      "description": "Desired value for the JAVA_OPTS environment variable",
+      "value": ""
     }
   ],
   "parameters": [
@@ -288,9 +300,20 @@
                   {
                     "name": "PUBLIC_URL",
                     "value": "/omar-streetview"
+                  },
+                  {
+                    "name": "JAVA_OPTS",
+                    "value": "${JAVA_OPTS}"
                   }
                 ],
-                "resources": {},
+                "resources": {
+                  "requests": {
+                    "memory": "${MEMORY_MAX}"
+                  },
+                  "limits": {
+                    "memory": "${MEMORY_MAX}"
+                  }
+                },
                 "volumeMounts": [
                   {
                     "name": "volume-data",

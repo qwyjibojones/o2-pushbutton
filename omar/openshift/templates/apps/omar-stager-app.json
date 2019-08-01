@@ -67,6 +67,18 @@
       "displayName": "INSECURE_REPOSITORY",
       "description": "Mark the image stream as an insecure repository",
       "value": "false"
+    },
+    {
+      "name": "MEMORY_MAX",
+      "displayName": "MEMORY_MAX",
+      "description": "Maximum memory for this app to have",
+      "value": "1000Mi"
+    },
+    {
+      "name": "JAVA_OPTS",
+      "displayName": "JAVA_OPTS",
+      "description": "Desired value for the JAVA_OPTS environment variable",
+      "value": ""
     }
   ],
   "objects": [
@@ -136,6 +148,10 @@
                   {
                     "name": "BUCKETS",
                     "value": "o2-test-data"
+                  },
+                  {
+                    "name": "JAVA_OPTS",
+                    "value": "${JAVA_OPTS}"
                   }
                 ],
                 "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/omar-stager-app:${TAG}",
@@ -169,7 +185,14 @@
                   "successThreshold": 1,
                   "timeoutSeconds": 3
                 },
-                "resources": {},
+                "resources": {
+                  "requests": {
+                    "memory": "${MEMORY_MAX}"
+                  },
+                  "limits": {
+                    "memory": "${MEMORY_MAX}"
+                  }
+                },
                 "securityContext": {
                   "capabilities": {
                     "add": [
