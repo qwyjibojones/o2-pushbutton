@@ -68,8 +68,8 @@
       "value": "1000Mi"
     },
     {
-      "name": "JAVA_OPTS_VALUE",
-      "displayName": "JAVA_OPTS_VALUE",
+      "name": "JAVA_OPTS",
+      "displayName": "JAVA_OPTS",
       "description": "Desired value for the JAVA_OPTS environment variable",
       "value": ""
     }
@@ -125,7 +125,7 @@
                   },
                   {
                     "name": "JAVA_OPTS",
-                    "value": "${JAVA_OPTS_VALUE}"
+                    "value": "${JAVA_OPTS}"
                   }
                 ],
                 "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/omar-reachback-app:${TAG}",
