@@ -170,6 +170,9 @@
                   "timeoutSeconds": 3
                 },
                 "resources": {
+                  "requests": {
+                    "memory": "${MEMORY_MAX}"
+                  },
                   "limits": {
                     "memory": "${MEMORY_MAX}"
                   }
