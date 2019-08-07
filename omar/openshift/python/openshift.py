@@ -65,7 +65,7 @@ def remove_objects_in_processed_template(processed_file, wait=True):
 
 
 def process_template(template_file, params):
-    temp_params_file = write_temporary_file(yaml.dump(params, default_flow_style=False))
+    temp_params_file = write_temporary_file(yaml.dump(params, default_flow_style=False, width=float("inf")))
     command_args = [oc, 'process', '-f', template_file, '--param-file', temp_params_file,
                     '--ignore-unknown-parameters']
     temp_processed_file = write_temporary_file(run_command(command_args, True).stdout.read())
@@ -73,6 +73,6 @@ def process_template(template_file, params):
 
 
 def new_app(template_file, params, wait=False):
-    temp_params_file = write_temporary_file(yaml.dump(params, default_flow_style=False))
+    temp_params_file = write_temporary_file(yaml.dump(params, default_flow_style=False, width=float("inf")))
     command_args = [oc, 'new-app', '-f', template_file, '--param-file', temp_params_file, '--ignore-unknown-parameters']
     return run_command(command_args, wait)
