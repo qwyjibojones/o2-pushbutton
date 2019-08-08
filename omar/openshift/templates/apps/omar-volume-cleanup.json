@@ -309,10 +309,6 @@
                   {
                     "name": "DATABASE_PASSWORD",
                     "value": "${DATABASE_PASSWORD}"
-                  },
-                  {
-                    "name": "JAVA_OPTS",
-                    "value": "${JAVA_OPTS}"
                   }
                 ],
                 "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/${APP_NAME}:${TAG}",
