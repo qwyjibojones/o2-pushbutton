@@ -16,7 +16,7 @@ Docker-compose will then volume this folder into one of the containers on start.
 ### Imagery
 The imagery that has been loaded into the database can be found at: https://s3.amazonaws.com/o2-test-data/sanfrancisco.tgz
 
-It will need to be extracted with `tar -xzf`, and will produce an `sanfrancisco` folder.
+It will need to be extracted with `tar -xzf`, and will produce a `sanfrancisco` folder.
 This folder needs to be present in this project folder, next to the `docker-compose.yml` file.
 Docker-compose will then volume this folder into one of the containers on start.
 
