@@ -235,8 +235,8 @@
       "value": "omarftw123"
     },
     {
-      "name": "JAVA_TOOL_OPTIONS",
-      "displayName": "JAVA_TOOL_OPTIONS",
+      "name": "JAVA_OPTS",
+      "displayName": "JAVA_OPTS",
       "description": "The Java tool options",
       "value": ""
     }
