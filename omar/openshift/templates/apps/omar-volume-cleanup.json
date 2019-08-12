@@ -220,19 +220,22 @@
       "name": "DATABASE_URL",
       "displayName": "DATABASE_URL",
       "description": "The full JDBC url to the Omar database (e.g. jdbc://test/db/url:1234)",
-      "value": "jdbc:postgresql://omar-dev.cfussmnw2zzg.us-east-1.rds.amazonaws.com:5432/o2_omar_db"
+      "required": true,
+      "value": ""
     },
     {
       "name": "DATABASE_USERNAME",
       "displayName": "DATABASE_USERNAME",
       "description": "The username for the Omar database",
-      "value": "postgres"
+      "required": true,
+      "value": ""
     },
     {
       "name": "DATABASE_PASSWORD",
       "displayName": "DATABASE_PASSWORD",
       "description": "The password for the Omar database",
-      "value": "omarftw123"
+      "required": true,
+      "value": ""
     },
     {
       "name": "JAVA_OPTS",
