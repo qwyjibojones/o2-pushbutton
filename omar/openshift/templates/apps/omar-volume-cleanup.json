@@ -233,6 +233,12 @@
       "displayName": "DATABASE_PASSWORD",
       "description": "The password for the Omar database",
       "value": "omarftw123"
+    },
+    {
+      "name": "JAVA_TOOL_OPTIONS",
+      "displayName": "JAVA_TOOL_OPTIONS",
+      "description": "The Java tool options",
+      "value": ""
     }
   ],
   "objects": [
@@ -309,6 +315,10 @@
                   {
                     "name": "DATABASE_PASSWORD",
                     "value": "${DATABASE_PASSWORD}"
+                  },
+                  {
+                    "name": "JAVA_TOOL_OPTIONS",
+                    "value": "${JAVA_OPTS}"
                   }
                 ],
                 "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/${APP_NAME}:${TAG}",
