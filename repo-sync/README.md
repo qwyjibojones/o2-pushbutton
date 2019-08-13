@@ -1,6 +1,6 @@
 # Synchronize the RPM distribution OpenShift Origin Version 3.11
 
-We have a [Dockerfile](./Dockerfile) that we use to build a synchronization image so we can download and synchronize the RPM repo from the Origin 3.11 repo.  You have docker running and must be able to mount your destination directory that you choose to cache the RPMs to.
+We have a [Dockerfile](Dockerfile) that we use to build a synchronization image so we can download and synchronize the RPM repo from the Origin 3.11 repo.  You have docker running and must be able to mount your destination directory that you choose to cache the RPMs to.
 
 ```bash
 ./build-sync.sh
@@ -11,7 +11,7 @@ The **build-synch.sh** is responsible for
 
 * Pulling a CentOS latest distribution
 * Making sure the reposync RPM is installed
-* Copying the [CentOS-OpenShift-Origin311.repo](./rpm-repos/CentOS-OpenShift-Origin311.repo) repo under rpm-repos the /etc/yum.repos.d/ location
+* Copying the [CentOS-OpenShift-Origin311.repo](rpm-repos/CentOS-OpenShift-Origin311.repo) repo under rpm-repos the /etc/yum.repos.d/ location
 * Tagging a new base image called os-sync where "os" stands for OpenShift
 
 We then need to run the command **repo-synch.sh** to then call a script that runs the docker and then executes the reposync command against the repo ID centos-openshift-origin311.  
