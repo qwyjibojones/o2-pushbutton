@@ -1,97 +1,92 @@
 # Disconnected OpenShift 3.11 origin (Now OKD) Installation Dependencies
 
+
 ## Syncronizing Repos for Disconnected Installation
 
-**Step 1.:** [Syncrhonize the RPMs](./repo-sync/README.md)
+**Step 01.** [Syncrhonize the RPMs](./repo-sync/README.md)
 
 *Notes:* For disconnected installations of OpenShift 3.11 we need to synchronize RPM repos for the containers that will be running in the OpenShift environment.
 
-**Step 2.:** [Download all Containers](./containers/README.md)
+**Step 02.** [Download all Containers](./containers/README.md)
 
 *Notes:* For disconnected installations of OpenShift 3.11 we need to download all images for the containers that will be running in the OpenShift environment. 
 
-**Step 3.:**
+**Step 03.**
 ```bash
   cp server-certs /data/disconnected/
   cp reverse-proxy.conf /data/disconnected
 ```
 
-*Notes:* These are self signed CERTS so we can proxy https.  Please copy the **/server-certs** directory to the working location.
+*Notes:* The server-certs are self signed CERTS so we can proxy https.
+
 
 ## Load Dependencies
 
-Somehow bring `/data/disconnected` and this repository to a disconnected location we need to run the proxy server which serves as a https proxy to the docker registry and also serves up the YUM repository that we just cached.
-
+**Step 04.** By whatever witchcraft or wizardy that may be available get `/data/disconnected` and a copy of this repository to a disconnected location. It should look like this:
 ```bash
-docker load -i registry.tgz
-docker load -i httpd.tgz
-docker load -i ansible.tgz
+[centos]$ ls -l /data/disconnected
+docker-registry-data
+httpd.tgz
+o2-pushbutton
+registry.tgz
+reverse-proxy.conf
+rpms
+server-certs
 ```
+
+**Step 05.** Ensure ansible is installed, normally done with `sudo yum -y install ansible`
+
+**Step 06.** Ensure docker is installed, normally done with `sudo yum -y install docker`
+
+**Step 07.** Create a docker group: `sudo groupadd docker`
+
+**Step 08.** Attach a user to the group: `sudo user add -aG docker lentos`
+
+**Step 09.** Start the docker daemon: `sudo systemctl start docker`
+
 
 ### Serve out dependencies
 
-Once we have loaded the docker images into our docker we can now execute the run-services.  It will take an argument that is the working directory that serves at the root directory for the container registry cache, rpms, ... etc.
-
-In this section we will now assume all dependencies will be extracted to a root working directory indicated by WORKING_DIRECTORY.  For example, let's assume we have extracted bundled all dependencies under a tgz call disconnected.tgz into the working directory giving us so far:
-
-* **$WORKING_DIRECTORY/docker-registry-data**
-* **$WORKING_DIRECTORY/rpms**
-* **$WORKING_DIRECTORY/server-certs**
-* **$WORKING_DIRECTORY/reverse-proxy.conf**
-
-We can now serve these out via our local proxy **httpd** and our **registry** by running [run-services.sh](./run-services.sh).
-
-`./run-services.sh <working directory>`
-
-
-## NOTES TO INTEGRATE
-
-### File Context Type
-
-Changes context to allow directory and files to be accessed via a running container.  Needed for the registry
-
-`sudo chcon -Rt svirt_sandbox_file_t <data-dir-to-mount>`
-
-### Ports To Open
-
-Open ports for our registry server:
-
+**Step 10.**
 ```bash
-firewall-cmd --zone-public --permanent --add-port=5000/tcp
-firewall-cmd --zone=public --add-service=http
-firewall-cmd --zone=public --add-service=https
-firewall-cmd --reload
+  docker load -i /data/disconnected/registry.tgz
+  docker load -i /data/disconnected/httpd.tgz
 ```
 
-### SELINUX
+*Notes:* We need to run the proxy server which serves as a https proxy to the docker registry and also serves up the YUM repository that we cached.
 
-Enable selinus for web access on the installer.
-
-`sudo setsebool -P httpd_can_network_connect on`
-
-### Enable IP Forwarding
-
-Add IP forward to all nodes
-
-`sudo vi /etc/sysctl.d/99-sysctl.conf`
-
-then add the line
-
-`net.ipv4.ip_forward = 1`
-
-Then reload:
-
-sudo systctl --load /etc/sysctl.d/99-sysctl.conf
+**Step 11.** Start the docker containers: `/data/disconnected/o2-pushbutton/openshift/disconnected/run-services.sh /data/disconnected`
 
 
-# Testing docker registry:
+### Server Configuration
 
-curl -X GET https://localhost/v2/_catalog
+**Step 12.** Change the security context of the working directory: `sudo chcon -Rt svirt_sandbox_file_t /data.disconnected`
 
-list tags for a specific image listed in the catalog:
+*Notes:* This will allow the directory and files to be accessed via a running container.
 
-curl -X GET https://localhost/v2/<image-path-and-name>/tags/list
+**Step 13.** Ensure port 5000 is open for the registry container:
+```bash
+  firewall-cmd --zone-public --permanent --add-port=5000/tcp
+  firewall-cmd --zone=public --add-service=http
+  firewall-cmd --zone=public --add-service=https
+  firewall-cmd --reload
+```
 
+**Step 14.** Enable selinus for web access on the installer: `sudo setsebool -P httpd_can_network_connect on`
 
+**Step 15.** Add IP forward to all nodes: 
+```bash
+  sudo vi /etc/sysctl.d/99-sysctl.conf`
+  
+  # add this line
+  net.ipv4.ip_forward = 1
+  
+  # then reload
+  sudo systctl --load /etc/sysctl.d/99-sysctl.conf
+```
 
-
+**Step 16.** Test the docker registry: 
+```bash
+  curl -k https://localhost/v2/_catalog
+  curl -k https://localhost/v2/<image-path-and-name>/tags/list
+```
