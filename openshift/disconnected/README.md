@@ -2,21 +2,22 @@
 
 ## Syncronizing Repos for Disconnected Installation
 
-For disconnected installations of OpenShift 3.11 we need to synchronize RPM repos and download all images for the containers that will be running in the OpenShift environment.  We have created a directory that called repo-sync that will manage synchronizing the RPMs required for the OpenShift Origin 3.11 installation.
+Step 1.: [Syncrhonize the RPMs](./repo-sync/README.md)
+**Notes:** For disconnected installations of OpenShift 3.11 we need to synchronize RPM repos for the containers that will be running in the OpenShift environment.
 
-* Synchronize RPMs [README.md](./repo-sync/README.md)
-* Download all Containers [README.md](./containers/README.md).
+Step 2.: [Download all Containers](./containers/README.md)
+**Notes:** For disconnected installations of OpenShift 3.11 we need to download all images for the containers that will be running in the OpenShift environment. 
 
-We also provided some self signed CERTS so we can proxy https.  Please copy the **/server-certs** directory to the working location.  Also, copy the reverse-proxy.conf to the location $WORKING_DIRECTORY/ giving you:
-
-* **$WORKING_DIRECTORY/server-certs**
-* **$WORKING_DIRECTORY/reverse-proxy.conf**
-
-The containers README specifies how to download the containers used to serve up the okd-311 installation as well as downloading the 3.11 installation
+Step 3.: 
+```bash
+  cp server-certs /data/disconnected/
+  cp reverse-proxy.conf /data/disconnected
+```
+**Notes:** These are self signed CERTS so we can proxy https.  Please copy the **/server-certs** directory to the working location.
 
 ## Load Dependencies
 
-Once all dependencies are downloaded and brought to a disconnected location we need to run the proxy server which serves as a https proxy to the docker registry and also serves up the YUM repository that we just cached.
+Somehow bring `/data/disconnected` and this repository to a disconnected location we need to run the proxy server which serves as a https proxy to the docker registry and also serves up the YUM repository that we just cached.
 
 ```bash
 docker load -i registry.tgz
