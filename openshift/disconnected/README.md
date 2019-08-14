@@ -2,18 +2,21 @@
 
 ## Syncronizing Repos for Disconnected Installation
 
-Step 1.: [Syncrhonize the RPMs](./repo-sync/README.md)
-**Notes:** For disconnected installations of OpenShift 3.11 we need to synchronize RPM repos for the containers that will be running in the OpenShift environment.
+**Step 1.:** [Syncrhonize the RPMs](./repo-sync/README.md)
 
-Step 2.: [Download all Containers](./containers/README.md)
-**Notes:** For disconnected installations of OpenShift 3.11 we need to download all images for the containers that will be running in the OpenShift environment. 
+*Notes:* For disconnected installations of OpenShift 3.11 we need to synchronize RPM repos for the containers that will be running in the OpenShift environment.
 
-Step 3.: 
+**Step 2.:** [Download all Containers](./containers/README.md)
+
+*Notes:* For disconnected installations of OpenShift 3.11 we need to download all images for the containers that will be running in the OpenShift environment. 
+
+**Step 3.:**
 ```bash
   cp server-certs /data/disconnected/
   cp reverse-proxy.conf /data/disconnected
 ```
-**Notes:** These are self signed CERTS so we can proxy https.  Please copy the **/server-certs** directory to the working location.
+
+*Notes:* These are self signed CERTS so we can proxy https.  Please copy the **/server-certs** directory to the working location.
 
 ## Load Dependencies
 
