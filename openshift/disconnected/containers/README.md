@@ -10,7 +10,7 @@ Although the registry Dockerfile is no more than a pointer to the docker hub reg
 
 ```bash
 ./build-images.sh
-./bundle-images.sh <optional destination>
+./bundle-images.sh /data/disconnected
 ```
 
 where:
@@ -25,21 +25,21 @@ We are going to use a registry we just built and downloaded to store our OpenShi
 
 We will first create a directory for our cache.  This directory can be anywhere that you can mount to your local docker registry:
 
-`mkdir /data/disconnected/docker-registry-data`
+`mkdir /data/disconnected/registry`
 
 We will next run a local registry as a docker container:
 
-`docker run -d   -p 5000:5000   --restart=always   --name registry   -v /data/disconnected/docker-registry-data:/var/lib/registry   registry`
+`docker run -d   -p 5000:5000   --restart=always   --name registry   -v /data/disconnected/registry:/var/lib/registry   registry`
 
-This will mount the directory /data/docker-registry-data to the container /var/lib/registry.
+This will mount the directory /data/disconnected/registry to the container /var/lib/registry.
 
 You can use this shell script to download the images and push to your local registry [pull-okd-311-images](./pull-okd-311-images.sh):
 
-Now you can tar up your data directory and take it to a disconnected location. Assuming you have the registry created in /data/docker-registry-data
+Now you can tar up your data directory and take it to a disconnected location. Assuming you have the registry created in /data/disconnected/registry
 
 ```bash
-cd /data/
-tar cvfz docker-registry-data.tgz docker-registry-data
+cd /data/disconnected
+tar cvfz registry.tgz registry
 ```
 
 The only caveat is that you must bring your docker registry container as a separate tgz and then make sure you have the docker client installed on your disconnected machine.  
