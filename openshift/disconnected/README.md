@@ -40,7 +40,7 @@ server-certs
 
 **Step 07.** Create a docker group: `sudo groupadd docker`
 
-**Step 08.** Attach a user to the group: `sudo user add -aG docker lentos`
+**Step 08.** Attach a user to the group: `sudo usermod -aG docker centos`
 
 **Step 09.** Start the docker daemon: `sudo systemctl start docker`
 
