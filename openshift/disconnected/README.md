@@ -49,7 +49,7 @@ server-certs
 
 ### Serve out dependencies
 
-**Step 10.**
+**Step 11.**
 ```bash
   docker load -i /data/disconnected/registry.tgz
   docker load -i /data/disconnected/httpd.tgz
@@ -57,16 +57,16 @@ server-certs
 
 *Notes:* We need to run the proxy server which serves as a https proxy to the docker registry and also serves up the YUM repository that we cached.
 
-**Step 11.** Start the docker containers: `/data/disconnected/o2-pushbutton/openshift/disconnected/run-services.sh /data/disconnected`
+**Step 12.** Start the docker containers: `/data/disconnected/o2-pushbutton/openshift/disconnected/run-services.sh /data/disconnected`
 
 
 ### Server Configuration
 
-**Step 12.** Change the security context of the working directory: `sudo chcon -Rt svirt_sandbox_file_t /data/disconnected`
+**Step 13.** Change the security context of the working directory: `sudo chcon -Rt svirt_sandbox_file_t /data/disconnected`
 
 *Notes:* This will allow the directory and files to be accessed via a running container.
 
-**Step 13.** Ensure port 5000 is open for the registry container:
+**Step 14.** Ensure port 5000 is open for the registry container:
 ```bash
   firewall-cmd --zone-public --permanent --add-port=5000/tcp
   firewall-cmd --zone=public --add-service=http
@@ -74,20 +74,15 @@ server-certs
   firewall-cmd --reload
 ```
 
-**Step 14.** Enable selinus for web access on the installer: `sudo setsebool -P httpd_can_network_connect on`
+**Step 15.** Enable selinus for web access on the installer: `sudo setsebool -P httpd_can_network_connect on`
 
-**Step 15.** Add IP forward to all nodes: 
+**Step 16.** Add IP forward to all nodes: 
 ```bash
-  sudo vi /etc/sysctl.d/99-sysctl.conf`
-  
-  # add this line
-  net.ipv4.ip_forward = 1
-  
-  # then reload
+  sudo bash -c 'echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/99-sysctl.conf'
   sudo systctl --load /etc/sysctl.d/99-sysctl.conf
 ```
 
-**Step 16.** Test the docker registry: 
+**Step 17.** Test the docker registry: 
 ```bash
   curl -k https://localhost/v2/_catalog
   curl -k https://localhost/v2/<image-path-and-name>/tags/list
