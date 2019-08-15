@@ -79,7 +79,7 @@ server-certs
 **Step 16.** Add IP forward to all nodes: 
 ```bash
   sudo bash -c 'echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/99-sysctl.conf'
-  sudo systctl --load /etc/sysctl.d/99-sysctl.conf
+  sudo sysctl --load /etc/sysctl.d/99-sysctl.conf
 ```
 
 **Step 17.** Test the docker registry: 
