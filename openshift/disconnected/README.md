@@ -44,6 +44,8 @@ server-certs
 
 **Step 09.** Start the docker daemon: `sudo systemctl start docker`
 
+**Step 10.** Logout and log back in so the user modifications can take effect. 
+
 
 ### Serve out dependencies
 
@@ -60,7 +62,7 @@ server-certs
 
 ### Server Configuration
 
-**Step 12.** Change the security context of the working directory: `sudo chcon -Rt svirt_sandbox_file_t /data.disconnected`
+**Step 12.** Change the security context of the working directory: `sudo chcon -Rt svirt_sandbox_file_t /data/disconnected`
 
 *Notes:* This will allow the directory and files to be accessed via a running container.
 
