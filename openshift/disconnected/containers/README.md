@@ -2,7 +2,6 @@
 
 We have included three docker files for containers you will be needing to bundle so we can serve up the OpenShift container dependencies.
 
-* ansible
 * httpd
 * registry
 
