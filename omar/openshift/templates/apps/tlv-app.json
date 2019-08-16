@@ -171,7 +171,7 @@
                 "volumeMounts": [
                   {
                     "mountPath": "/data",
-                    "name": "volume-tlv"
+                    "name": "${OSSIM_DATA_PV_NAME}"
                   }
                 ]
               }
