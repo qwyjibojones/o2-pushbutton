@@ -11,6 +11,9 @@ properties([
                 string(name: 'PACKAGE_NAME', defaultValue:'omar-dev.tgz', description: 'Desired name for the O2 deliverable'),
                 string(name: 'BUCKET_NAME', defaultValue:'o2-private', description: 'Desired S3 bucket to archive the O2 deliverable'),
                 text(name: 'ADHOC_CONFIG_YML', defaultValue: '', description: 'Use this as the config file instead of pulling one from a repo'),
+                booleanParam(name: 'PUSH_TO_REPO', defaultValue: false, description: 'Push the built package to a git repo'),
+                string(name: 'DEPLOY_PACKAGE_REPO_NAME', defaultValue: 'omar-deploy-package', description: 'The repo name that will be deployed to'),
+                string(name: 'DEPLOY_PACKAGE_REPO_BRANCH', defaultValue: 'dev', description: 'The repo branch that will be pushed to'),
                 booleanParam(name: 'CLEAN_WORKSPACE', defaultValue: true, description: 'Clean the workspace at the end of the run')
         ]),
         buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '3', daysToKeepStr: '', numToKeepStr: '20')),
@@ -87,6 +90,24 @@ node ("${BUILD_NODE}"){
             """
             archiveArtifacts(PACKAGE_NAME)
         }
+
+        stage("Push deploy package to repo"){
+            if (Boolean.parseBoolean(PUSH_TO_REPO)) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ossimlabs-minion-ssh-key', keyFileVariable: 'SSH_KEYFILE', passphraseVariable: '', usernameVariable: '')]) {
+                    sh """
+                        cd omar-deploy-package
+                        git init
+                        git checkout -b "${DEPLOY_PACKAGE_REPO_BRANCH}"
+                        rm ./oc
+                        git add . --all
+                        git commit -m "Push of deploy package"
+                        export GIT_SSH_COMMAND="ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no"
+                        git push -f -u "${GIT_PRIVATE_SERVER_URL}/${DEPLOY_PACKAGE_REPO_NAME}" "${DEPLOY_PACKAGE_REPO_BRANCH}"
+                    """
+                }
+            }
+        }
+        
     } finally {
         stage("Clean Workspace") {
             if (Boolean.parseBoolean(CLEAN_WORKSPACE))
