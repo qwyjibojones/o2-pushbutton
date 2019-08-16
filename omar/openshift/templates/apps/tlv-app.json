@@ -167,7 +167,13 @@
                     "memory": "${MEMORY_MAX}"
                   }
                 },
-                "terminationMessagePath": "/dev/termination-log"
+                "terminationMessagePath": "/dev/termination-log",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/data",
+                    "name": "volume-tlv"
+                  }
+                ]
               }
             ],
             "dnsPolicy": "ClusterFirst",
