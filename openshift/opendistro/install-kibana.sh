@@ -68,13 +68,15 @@ do
 done
 
 ES_CLUSTER_LOCATIONS=
-for i in $(eval echo "{1..$ES_CLUSTER_REPLICAS}") ; do
+for ((i=0; i<$ES_CLUSTER_REPLICAS; ++i ))
+do
   if [ "$ES_CLUSTER_LOCATIONS" == "" ] ; then
     ES_CLUSTER_LOCATIONS="es-cluster-$i.elasticsearch"
   else
     ES_CLUSTER_LOCATIONS="$ES_CLUSTER_LOCATIONS,es-cluster-$i.elasticsearch"
   fi
 done
+
 KIBANA_YAML=$(loadfile ${TEMPLATE_DIR}kibana-app.yml)
 KIBANA_YAML=${KIBANA_YAML/KIBANA_REPLICAS/"$KIBANA_REPLICAS"}
 KIBANA_YAML=${KIBANA_YAML/CLUSTER_LOCATIONS/"$ES_CLUSTER_LOCATIONS"}

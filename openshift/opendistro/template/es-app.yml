@@ -31,8 +31,6 @@ spec:
         volumeMounts:
           - name: data
             mountPath: /usr/share/elasticsearch/data
-          - name: securityconfig
-            mountPath: /usr/share/elasticsearch/plugins/opendistro_security/securityconfig
         env:
           - name: cluster.name
             value: es-cluster
@@ -42,10 +40,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-          - name: discovery.zen.ping.unicast.hosts
+          - name: discovery.seed_hosts
+            valus: "CLUSTER_LOCATIONS"
+          - name: cluster.initial_master_nodes
             value: "CLUSTER_LOCATIONS"
-          - name: discovery.zen.minimum_master_nodes
-            value: "MIN_MASTER_NODES"
           - name: ES_JAVA_OPTS
             value: "-XmsMEM_SIZE -XmxMEM_SIZE"
         # initContainers:

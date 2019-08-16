@@ -88,6 +88,7 @@ list tags for a specific image listed in the catalog:
 
 curl -X GET https://localhost/v2/<image-path-and-name>/tags/list
 
+# Enable IPsec for Encrypting Pod Traffic
 
-
-
+Root CA: https://roll.urown.net/ca/ca_root_setup.html
+Gen Certs: https://gist.github.com/fntlnz/cf14feb5a46b2eda428e000157447309
