@@ -11,7 +11,7 @@ properties([
                 string(name: 'PACKAGE_NAME', defaultValue:'omar-dev.tgz', description: 'Desired name for the O2 deliverable'),
                 string(name: 'BUCKET_NAME', defaultValue:'o2-private', description: 'Desired S3 bucket to archive the O2 deliverable'),
                 text(name: 'ADHOC_CONFIG_YML', defaultValue: '', description: 'Use this as the config file instead of pulling one from a repo'),
-                booleanParam(name: 'PUSH_TO_REPO', defaultValue: false, description: 'Push the built package to a git repo')
+                booleanParam(name: 'PUSH_TO_REPO', defaultValue: false, description: 'Push the built package to a git repo'),
                 string(name: 'DEPLOY_PACKAGE_REPO_NAME', defaultValue: 'omar-deploy-package', description: 'The repo name that will be deployed to'),
                 string(name: 'DEPLOY_PACKAGE_REPO_BRANCH', defaultValue: 'dev', description: 'The repo branch that will be pushed to'),
                 booleanParam(name: 'CLEAN_WORKSPACE', defaultValue: true, description: 'Clean the workspace at the end of the run')
