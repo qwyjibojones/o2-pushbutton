@@ -92,7 +92,7 @@ node ("${BUILD_NODE}"){
         }
 
         stage("Push deploy package to repo"){
-            if (Boolean.parseBoolean(PUSH_TO_REPO) {
+            if (Boolean.parseBoolean(PUSH_TO_REPO)) {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ossimlabs-minion-ssh-key', keyFileVariable: 'SSH_KEYFILE', passphraseVariable: '', usernameVariable: '')]) {
                     sh """
                         cd omar-deploy-package
