@@ -216,9 +216,14 @@ set the variables:
 allowPrivilegeEscalation: true
 allowPrivilegedContainer: true
 
+defaultAddCapabilities:
+- SYS_ADMIN
+
 runAsUser:
   type: RunAsAny
 ```
+
+**Note:** The defaultAddCapabilities might be set to NULL initially.  This is needed for some of the pods that wish to have s3 mounting via goofys.
 
 then exit with the command sequence Escape key, then hit colin key ":" then "wq" key this will save the modifications.  We are now ready to install a sample ElasticCluster using our dynamic provisioning.
 
