@@ -25,9 +25,9 @@
 **Step 04.** By whatever witchcraft or wizardy that may be available get `/data/disconnected` and a copy of this repository to a disconnected location. It should look like this:
 ```bash
 [centos]$ ls -l /data/disconnected
-docker-registry-data
 httpd.tgz
 o2-pushbutton
+registry
 registry.tgz
 reverse-proxy.conf
 rpms
