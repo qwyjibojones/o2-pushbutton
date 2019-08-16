@@ -1,46 +1,37 @@
 # Containers
 
-We have included three docker files for containers you will be needing to bundle so we can serve up the OpenShift container dependencies.
+## Build & Bundle
 
-* ansible
-* httpd
-* registry
-
-Although the registry Dockerfile is no more than a pointer to the docker hub registry:2 location, we supplied the docker file for completeness.  We will first build the 3 docker images and tgz them [build-images.sh](./bundle-images.sh) and [bundle-images.sh](./bundle-images.sh):
-
+**Step 01.** Build the docker containers 
 ```bash
-./build-images.sh
-./bundle-images.sh <optional destination>
+  ./build-images.sh
 ```
 
-where:
+*Notes:* Although the registry Dockerfile is no more than a pointer to the docker hub registry:2 location, we supplied the docker file for completeness.
 
-* **optional destination** is a output location for the bundled images for ansible, httpd, and registry.  Note the output must have a trailing slash. for example: `./bundle-images.sh /data/disconnected/`.  If this is left off then it will output to the current directory
+**Step 02.** Bundle the docker containers 
+```bash
+  ./bundle-images.sh /data/disconnected/
+```
 
-We should now have the **ansible**, **httpd**, and the **registry** images in our local docker and we are ready to move on to the downloading of the dependencies for OpenShift
+*Notes:* The output must have a trailing slash. If this is left off then it will output to the current directory.
+
 
 ## Download Container Dependencies
 
-We are going to use a registry we just built and downloaded to store our OpenShift 3.11 dependencies.
-
-We will first create a directory for our cache.  This directory can be anywhere that you can mount to your local docker registry:
-
-`mkdir /data/disconnected/docker-registry-data`
-
-We will next run a local registry as a docker container:
-
-`docker run -d   -p 5000:5000   --restart=always   --name registry   -v /data/disconnected/docker-registry-data:/var/lib/registry   registry`
-
-This will mount the directory /data/docker-registry-data to the container /var/lib/registry.
-
-You can use this shell script to download the images and push to your local registry [pull-okd-311-images](./pull-okd-311-images.sh):
-
-Now you can tar up your data directory and take it to a disconnected location. Assuming you have the registry created in /data/docker-registry-data
-
+**Step 03.** Create a directory for our cache 
 ```bash
-cd /data/
-tar cvfz docker-registry-data.tgz docker-registry-data
+  mkdir /data/disconnected/registry
 ```
 
-The only caveat is that you must bring your docker registry container as a separate tgz and then make sure you have the docker client installed on your disconnected machine.  
+**Step 04.** Run a local registry as a docker container 
+```bash
+  docker run -d -p 5000:5000 --restart=always --name registry -v /data/disconnected/registry:/var/lib/registry registry
+```
 
+*Notes:* This will mount the directory `/data/disconnected/registry` to the container `/var/lib/registry`.
+
+**Step 05.** Run the shell script to download the images and push to your local registry 
+```bash
+  ./pull-okd-311-images.sh
+```

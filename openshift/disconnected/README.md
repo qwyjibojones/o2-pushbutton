@@ -1,94 +1,136 @@
 # Disconnected OpenShift 3.11 origin (Now OKD) Installation Dependencies
 
+
 ## Syncronizing Repos for Disconnected Installation
 
-For disconnected installations of OpenShift 3.11 we need to synchronize RPM repos and download all images for the containers that will be running in the OpenShift environment.  We have created a directory that called repo-sync that will manage synchronizing the RPMs required for the OpenShift Origin 3.11 installation.
+**Step 01.** [Syncrhonize the RPMs](./repo-sync)
 
-* Synchronize RPMs [README.md](./repo-sync/README.md)
-* Download all Containers [README.md](./containers/README.md).
+*Notes:* For disconnected installations of OpenShift 3.11 we need to synchronize RPM repos for the containers that will be running in the OpenShift environment.
 
-We also provided some self signed CERTS so we can proxy https.  Please copy the **/server-certs** directory to the working location.  Also, copy the reverse-proxy.conf to the location $WORKING_DIRECTORY/ giving you:
+**Step 02.** [Download all Containers](./containers)
 
-* **$WORKING_DIRECTORY/server-certs**
-* **$WORKING_DIRECTORY/reverse-proxy.conf**
+*Notes:* For disconnected installations of OpenShift 3.11 we need to download all images for the containers that will be running in the OpenShift environment. 
 
-The containers README specifies how to download the containers used to serve up the okd-311 installation as well as downloading the 3.11 installation
+**Step 03.** Copy the server certificates 
+```bash
+  cp server-certs /data/disconnected/
+```
+
+*Notes:* The server-certs are self signed CERTS so we can proxy https.
+
+**Step 04.** Copy the reverse proxy file
+```bash
+  cp reverse-proxy.conf /data/disconnected
+```
 
 ## Load Dependencies
 
-Once all dependencies are downloaded and brought to a disconnected location we need to run the proxy server which serves as a https proxy to the docker registry and also serves up the YUM repository that we just cached.
+**Step 05.** By whatever witchcraft or wizardy that may be available get `/data/disconnected` and a copy of this repository to a disconnected location. It should look like this:
+```bash
+[centos]$ ls -l /data/disconnected
+httpd.tgz
+o2-pushbutton
+registry
+registry.tgz
+reverse-proxy.conf
+rpms
+server-certs
+```
+
+**Step 06.** Ensure ansible is installed, first isntall the repo with the latest ansible and then install ansible, normally done with 
 
 ```bash
-docker load -i registry.tgz
-docker load -i httpd.tgz
-docker load -i ansible.tgz
+  sudo yum install -y git centos-release-ansible26
+  sudo yum -y install ansible
+ ```
+
+**Step 07.** Ensure docker is installed, normally done with 
+
+```bash
+  sudo yum -y install docker
 ```
+
+**Step 08.** Create a docker group 
+
+```bash
+  sudo groupadd docker
+```
+
+**Step 09.** Attach a user to the group 
+
+```bash
+  sudo usermod -aG docker centos
+```
+
+**Step 10.** Start the docker daemon
+
+```bash
+  sudo systemctl start docker
+```
+
+**Step 11.** Logout and log back in so the user modifications can take effect. 
+
 
 ### Serve out dependencies
 
-Once we have loaded the docker images into our docker we can now execute the run-services.  It will take an argument that is the working directory that serves at the root directory for the container registry cache, rpms, ... etc.
-
-In this section we will now assume all dependencies will be extracted to a root working directory indicated by WORKING_DIRECTORY.  For example, let's assume we have extracted bundled all dependencies under a tgz call disconnected.tgz into the working directory giving us so far:
-
-* **$WORKING_DIRECTORY/docker-registry-data**
-* **$WORKING_DIRECTORY/rpms**
-* **$WORKING_DIRECTORY/server-certs**
-* **$WORKING_DIRECTORY/reverse-proxy.conf**
-
-We can now serve these out via our local proxy **httpd** and our **registry** by running [run-services.sh](./run-services.sh).
-
-`./run-services.sh <working directory>`
-
-
-## NOTES TO INTEGRATE
-
-### File Context Type
-
-Changes context to allow directory and files to be accessed via a running container.  Needed for the registry
-
-`sudo chcon -Rt svirt_sandbox_file_t <data-dir-to-mount>`
-
-### Ports To Open
-
-Open ports for our registry server:
+**Step 12.** Load the registry container
 
 ```bash
-firewall-cmd --zone-public --permanent --add-port=5000/tcp
-firewall-cmd --zone=public --add-service=http
-firewall-cmd --zone=public --add-service=https
-firewall-cmd --reload
+  docker load -i /data/disconnected/registry.tgz
 ```
 
-### SELINUX
+**Step 13.** Load the httpd container
 
-Enable selinus for web access on the installer.
+```bash
+  docker load -i /data/disconnected/httpd.tgz
+```
 
-`sudo setsebool -P httpd_can_network_connect on`
+*Notes:* We need to run the proxy server which serves as a https proxy to the docker registry and also serves up the YUM repository that we cached.
 
-### Enable IP Forwarding
+**Step 14.** Start the docker containers
 
-Add IP forward to all nodes
+```bash
+  /data/disconnected/o2-pushbutton/openshift/disconnected/run-services.sh /data/disconnected
+  ```
 
-`sudo vi /etc/sysctl.d/99-sysctl.conf`
+### Server Configuration
 
-then add the line
+**Step 15.** Change the security context of the working directory 
 
-`net.ipv4.ip_forward = 1`
+```bash
+  sudo chcon -Rt svirt_sandbox_file_t /data/disconnected
+  ```
 
-Then reload:
+*Notes:* This will allow the directory and files to be accessed via a running container.
 
-sudo systctl --load /etc/sysctl.d/99-sysctl.conf
+**Step 16.** Ensure port 5000 is open for the registry container
 
+```bash
+  firewall-cmd --zone-public --permanent --add-port=5000/tcp
+  firewall-cmd --zone=public --add-service=http
+  firewall-cmd --zone=public --add-service=https
+  firewall-cmd --reload
+```
 
-# Testing docker registry:
+**Step 17.** Enable selinus for web access on the installer 
 
-curl -X GET https://localhost/v2/_catalog
+```bash
+  sudo setsebool -P httpd_can_network_connect on
+  ```
 
-list tags for a specific image listed in the catalog:
+**Step 18.** Add IP forwarding to all nodes
 
-curl -X GET https://localhost/v2/<image-path-and-name>/tags/list
+```bash
+  sudo bash -c 'echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/99-sysctl.conf'
+  sudo sysctl --load /etc/sysctl.d/99-sysctl.conf
+```
 
-# Enable IPsec for Encrypting Pod Traffic
+**Step 19.** Test the docker registry
 
-Root CA: https://roll.urown.net/ca/ca_root_setup.html
-Gen Certs: https://gist.github.com/fntlnz/cf14feb5a46b2eda428e000157447309
+```bash
+  curl -k https://localhost/v2/_catalog
+  {"repositories":["cockpit/kubernetes","coreos/cluster-monitoring-operator","coreos/configmap-reload","coreos/etcd","coreos/kube-rbac-proxy","coreos/kube-state-metrics","coreos/prometheus-config-reloader","coreos/prometheus-operator","grafana/grafana","openshift/oauth-proxy","openshift/origin-console","openshift/origin-control-plane","openshift/origin-deployer","openshift/origin-docker-registry","openshift/origin-haproxy-router","openshift/origin-metrics-cassandra","openshift/origin-metrics-hawkular-metrics","openshift/origin-metrics-heapster","openshift/origin-metrics-schema-installer","openshift/origin-metrics-server","openshift/origin-node","openshift/origin-pod","openshift/origin-service-catalog","openshift/origin-template-service-broker","openshift/origin-web-console","openshift/prometheus","openshift/prometheus-alertmanager","openshift/prometheus-node-exporter"]}
+  
+  curl -k https://localhost/v2/openshift/origin-metrics-hawkular-metrics/tags/list
+  {"name":"openshift/origin-metrics-hawkular-metrics","tags":["v3.11","v3.11.0"]}
+```
