@@ -2,15 +2,13 @@
 properties([
         parameters([
                 string(name: 'BUILD_NODE', defaultValue: 'omar-build', description: 'Label to use for node selections'),
-                string(name: 'GIT_PRIVATE_SERVER_URL', defaultValue: 'git@github.com:Maxar-Corp', description: 'Git url for config-repo'),
-                string(name: 'CREDENTIALS_ID', defaultValue: 'cicdGithub', description: 'Credentials ID for github'),
                 string(name: 'CONFIG_REPO_NAME', defaultValue: 'config-repo', description: 'The config-repo repository name that will be checked out'),
                 string(name: 'CONFIG_REPO_BRANCH', defaultValue: 'dev', description: 'The config-repo branch that will be checked out'),
-                string(name: 'OPENSHIFT_URL', defaultValue: 'https://openshift.ossim.io:8443', description: 'The url of the openshift instance to deploy to'),
                 string(name: 'APP_TO_DEPLOY', defaultValue: 'all', description: 'The single app to deploy to the cluster, defaults to all apps'),
-                string(name: 'PACKAGE_NAME', defaultValue:'omar-dev.tgz', description: 'Desired name for the O2 deliverable'),
-                string(name: 'BUCKET_NAME', defaultValue:'o2-private', description: 'Desired S3 bucket to archive the O2 deliverable'),
                 text(name: 'ADHOC_CONFIG_YML', defaultValue: '', description: 'Use this as the config file instead of pulling one from a repo'),
+                string(name: 'PACKAGE_NAME', defaultValue:'omar-dev.tgz', description: 'Desired name for the O2 deliverable'),
+                booleanParam(name: 'PUSH_TO_BUCKET', defaultValue: false, description: 'Push the built package to an s3 bucket'),
+                string(name: 'BUCKET_NAME', defaultValue:'o2-private', description: 'Desired S3 bucket to archive the O2 deliverable'),
                 booleanParam(name: 'PUSH_TO_REPO', defaultValue: false, description: 'Push the built package to a git repo'),
                 string(name: 'DEPLOY_PACKAGE_REPO_NAME', defaultValue: 'omar-deploy-package', description: 'The repo name that will be deployed to'),
                 string(name: 'DEPLOY_PACKAGE_REPO_BRANCH', defaultValue: 'dev', description: 'The repo branch that will be pushed to'),
@@ -21,10 +19,22 @@ properties([
 ])
 
 node ("${BUILD_NODE}"){
-    stage("Load Variables"){
+    stage("Checkout O2-Pushbutton"){
         dir("o2-pushbutton"){
             checkout(scm)
         }
+    }
+
+    stage("Load Variables")
+    {
+        withCredentials([string(credentialsId: 'o2-artifact-project', variable: 'o2ArtifactProject')]) {
+            step ([$class: "CopyArtifact",
+                projectName: o2ArtifactProject,
+                filter: "common-variables.groovy",
+                flatten: true])
+        }
+
+        load "common-variables.groovy"
     }
 
     try {
@@ -86,9 +96,16 @@ node ("${BUILD_NODE}"){
         stage("Archive Build Package"){
             sh """
                 ./o2-pushbutton/omar/openshift/build-omar-deploy-package.sh ${CONFIG_REPO_NAME} ${PACKAGE_NAME}
-                aws s3 cp ${PACKAGE_NAME} s3://${BUCKET_NAME}/o2-builder-packages/${PACKAGE_NAME} --no-progress
             """
             archiveArtifacts(PACKAGE_NAME)
+        }
+
+        stage("Push deploy package to s3"){
+            if (Boolean.parseBoolean(PUSH_TO_BUCKET)) {
+                sh """
+                    aws s3 cp ${PACKAGE_NAME} s3://${BUCKET_NAME}/o2-builder-packages/${PACKAGE_NAME} --no-progress
+                """
+            }
         }
 
         stage("Push deploy package to repo"){
