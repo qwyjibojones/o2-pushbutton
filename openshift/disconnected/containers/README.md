@@ -7,6 +7,7 @@
 *Notes:* Although the registry Dockerfile is no more than a pointer to the docker hub registry:2 location, we supplied the docker file for completeness.
 
 **Step 02** Bundle the docker containers: `./bundle-images.sh /data/disconnected/`
+
 *Notes:* The output must have a trailing slash. If this is left off then it will output to the current directory.
 
 
