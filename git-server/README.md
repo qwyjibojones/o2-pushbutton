@@ -20,4 +20,4 @@ $ docker start gogs
 ### Creating a Gogs Service using Docker-Compose
 
 We have also included a docker-compose file to capture the above configuration (port and volume mappings).
-Create the service with `docker-compose up -f <filename>`.
+Create the service with `docker-compose -f gogs.yml up`.
