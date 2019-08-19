@@ -18,5 +18,5 @@ Proxied assets are stored elsewhere and accessed through Nexus, and are subseque
 
 # How to Use
 
-`all-repos` is a group that encapsulates _all_ maven repositories, including `ossimlabs`.
 `ossimlabs` is a Hosted repository where we publish our maven packages.
+`all-repos` is a group that encapsulates _all_ maven repositories, including `ossimlabs`.
