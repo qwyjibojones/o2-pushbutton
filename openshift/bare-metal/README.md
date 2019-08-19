@@ -216,9 +216,14 @@ set the variables:
 allowPrivilegeEscalation: true
 allowPrivilegedContainer: true
 
+defaultAddCapabilities:
+- SYS_ADMIN
+
 runAsUser:
   type: RunAsAny
 ```
+
+**Note:** The defaultAddCapabilities might be set to NULL initially.  This is needed for some of the pods that wish to have s3 mounting via goofys.
 
 then exit with the command sequence Escape key, then hit colin key ":" then "wq" key this will save the modifications.  We are now ready to install a sample ElasticCluster using our dynamic provisioning.
 
@@ -383,3 +388,279 @@ For the OpenShift pod to write out the network settings the ip forwarding must b
 
 * check the file /etc/sysctl.d/99-sysctl.conf file for the variable net.ipv4.ip_forward and make sure it is enabled with the value of 1.
 * sudo systctl --load /etc/sysctl.d/99-sysctl.con
+
+### IPSEC
+
+* https://roll.urown.net/ca/ca_root_setup.html
+* https://gist.github.com/fntlnz/cf14feb5a46b2eda428e000157447309
+* https://docs.openshift.com/container-platform/3.11/admin_guide/ipsec.html
+
+We can use the Openshift cluster certificates generated during installation but for now we will do our own CA and self signed certificates.
+
+First let's create a root directory for our CA and all derived CERTS.  We can for now use the installer node to also be our Root CA for signing new certs for nodes in the cluster.
+
+```bash
+mkdir -p example.net.ca/root-ca/{certreqs,certs,crl,newcerts,private}
+cd example.net.ca/root-ca
+chmod 700 private
+touch root-ca.index
+echo 00 > root-ca.crlnum
+openssl rand -hex 16 > root-ca.serial
+```
+
+This is a sample root-ca.cnf file.   You can replace any **example.net** entries with your own entries.  For us I just made up a domain like **private.ossim.io** and generated CERTS for each node in that DNS lookup.  Example:  **node1.private.ossim.io**
+
+Note:  If you already have a way to sign RSA Keys with a root CA then you can ignore creating you r own CA and skip to the Certificate Signing Request section.
+
+```text
+#
+# OpenSSL configuration for the Root Certification Authority.
+#
+
+#
+# This definition doesn't work if HOME isn't defined.
+CA_HOME                 = .
+RANDFILE                = $ENV::CA_HOME/private/.rnd
+
+#
+# Default Certification Authority
+[ ca ]
+default_ca              = root_ca
+
+#
+# Root Certification Authority
+[ root_ca ]
+dir                     = $ENV::CA_HOME
+certs                   = $dir/certs
+serial                  = $dir/root-ca.serial
+database                = $dir/root-ca.index
+new_certs_dir           = $dir/newcerts
+certificate             = $dir/root-ca.cert.pem
+private_key             = $dir/private/root-ca.key.pem
+default_days            = 1826 # Five years
+crl                     = $dir/root-ca.crl
+crl_dir                 = $dir/crl
+crlnumber               = $dir/root-ca.crlnum
+name_opt                = multiline, align
+cert_opt                = no_pubkey
+copy_extensions         = copy
+crl_extensions          = crl_ext
+default_crl_days        = 180
+default_md              = sha256
+preserve                = no
+email_in_dn             = no
+policy                  = policy
+unique_subject          = no
+
+#
+# Distinguished Name Policy for CAs
+[ policy ]
+countryName             = optional
+stateOrProvinceName     = optional
+localityName            = optional
+organizationName        = supplied
+organizationalUnitName  = optional
+commonName              = supplied
+
+#
+# Root CA Request Options
+[ req ]
+default_bits            = 4096
+default_keyfile         = private/root-ca.key.pem
+encrypt_key             = yes
+default_md              = sha256
+string_mask             = utf8only
+utf8                    = yes
+prompt                  = no
+req_extensions          = root-ca_req_ext
+distinguished_name      = distinguished_name
+subjectAltName          = @subject_alt_name
+
+#
+# Root CA Request Extensions
+[ root-ca_req_ext ]
+subjectKeyIdentifier    = hash
+subjectAltName          = @subject_alt_name
+
+#
+# Distinguished Name (DN)
+[ distinguished_name ]
+organizationName        = example.net
+commonName              = example.net Root Certification Authority
+
+#
+# Root CA Certificate Extensions
+[ root-ca_ext ]
+basicConstraints        = critical, CA:true
+keyUsage                = critical, keyCertSign, cRLSign
+nameConstraints         = critical, @name_constraints
+subjectKeyIdentifier    = hash
+subjectAltName          = @subject_alt_name
+authorityKeyIdentifier  = keyid:always
+issuerAltName           = issuer:copy
+authorityInfoAccess     = @auth_info_access
+crlDistributionPoints   = crl_dist
+
+#
+# Intermediate CA Certificate Extensions
+[ intermed-ca_ext ]
+basicConstraints        = critical, CA:true, pathlen:0
+keyUsage                = critical, keyCertSign, cRLSign
+subjectKeyIdentifier    = hash
+subjectAltName          = @subject_alt_name
+authorityKeyIdentifier  = keyid:always
+issuerAltName           = issuer:copy
+authorityInfoAccess     = @auth_info_access
+crlDistributionPoints   = crl_dist
+
+#
+# CRL Certificate Extensions
+[ crl_ext ]
+authorityKeyIdentifier  = keyid:always
+issuerAltName           = issuer:copy
+
+#
+# Certificate Authorities Alternative Names
+[ subject_alt_name ]
+URI                     = http://ca.example.net/
+email                   = certmaster@example.net
+
+#
+# Name Constraints
+[ name_constraints ]
+permitted;DNS.1         = example.net
+permitted;DNS.2         = example.org
+permitted;DNS.3         = lan
+permitted;DNS.4         = onion
+permitted;email.1       = example.net
+permitted;email.2       = example.org
+
+#
+# Certificate download addresses for the root CA
+[ auth_info_access ]
+caIssuers;URI           = http://ca.example.net/certs/example.net_Root_Certification_Authority.cert.pem
+
+#
+# CRL Download address for the root CA
+[ crl_dist ]
+fullname                = URI:http://ca.example.net/crl/example.net_Root_Certification_Authority.crl
+
+# EOF
+```
+
+We will set the OPENSSL_CONF to the root directory where our root-ca.cnf and run our cert generation process in that directory:
+
+```bash
+export OPENSSL_CONF=./root-ca.cnf
+```
+
+**Generate CSR and new Key**
+
+```bash
+openssl req -new -out root-ca.req.pem
+```
+
+You will find the key in **private/root-ca.key** and the CSR in **root-ca.csr**.
+
+protect the private key:
+
+```bash
+chmod 400 private/root-ca.key.pem
+```
+
+```bash
+openssl req -new -key private/root-ca.key.pem -out root-ca.req.pem
+```
+
+**Generate CSR from existing Key**
+
+```bash
+openssl req -new -key private/root-ca.key.pem -out root-ca.req.pem
+```
+
+**Show the CSR**
+
+You can peek in to the CSR:
+
+```bash
+openssl req -verify -in root-ca.req.pem -noout -text -reqopt no_version,no_pubkey,no_sigdump -nameopt multiline
+```
+
+**Self-Signing the Root Certificate**
+
+If everything looks ok, self-sign your own request:
+
+```bash
+openssl rand -hex 16 > root-ca.serial
+openssl ca -selfsign -in root-ca.req.pem -out root-ca.cert.pem -extensions root-ca_ext \
+    -startdate `date +%y%m%d000000Z -u -d -1day` \
+    -enddate `date +%y%m%d000000Z -u -d +10years+1day`
+```
+
+The signature will be valid for the next ten years.
+
+View it with the following command:
+
+```bash
+openssl x509 -in ./root-ca.cert.pem \
+    -noout -text \
+    -certopt no_version,no_pubkey,no_sigdump \
+    -nameopt multiline
+```
+
+You can verify if it will be recognized as valid:
+
+```bash
+openssl verify -verbose -CAfile root-ca.cert.pem \
+    root-ca.cert.pem
+```
+
+output:
+  root-ca.cert.pem: OK
+
+**Create Each Server Certificate**
+
+First create a file called san.cnf.
+
+```Text
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+req_extensions = req_ext
+distinguished_name = dn
+[dn]
+C = US
+ST = FL
+[req_ext]
+subjectAltName = @alt_names
+```
+
+For this example I will use names ipsec1.private.ossim.io.  Please change accordingly for your distribution.
+
+```bash
+## Unset the Config file
+unset OPENSSL_CONF
+export SERVERS="ipsec1.private.ossim.io ipsec2.private.ossim.io"
+# Now generate your certs for each server
+
+echo "[req]" > san.cnf
+echo "default_bits = 2048" >> san.cnf
+echo "prompt = no" >> san.cnf
+echo "default_md = sha256" >> san.cnf
+echo "req_extensions = req_ext" >> san.cnf
+echo "distinguished_name = dn" >> san.cnf
+echo "[dn]" >> san.cnf
+echo "C = US" >> san.cnf
+echo "ST = FL" >> san.cnf
+echo "O = Maxar, Inc." >> san.cnf
+
+for server in $SERVERS ; do
+  openssl genrsa -out newcerts/$server.key 2048;
+  openssl req -new -sha256 -key newcerts/$server.key -reqexts alt_names -config <(cat san.cnf <(printf "CN = ${server}\n[alt_names]\nsubjectAltName = DNS:$server")) -out $server.csr;
+  openssl x509 -req -in $server.csr -CA root-ca.cert.pem -CAkey private/root-ca.key.pem -CAcreateserial -out newcerts/$server.crt -days 500 -sha256;
+  openssl x509 -in newcerts/$server.crt -text -noout;
+  rm -f $server.csr;
+  openssl pkcs12 -export -in newcerts/$server.crt -name $server -inkey newcerts/$server.key  -certfile root-ca.cert.pem -passout pass: -out newcerts/$server.p12
+done
+```
