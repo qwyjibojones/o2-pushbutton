@@ -1,5 +1,7 @@
 # O2 Pushbutton OpenShift Deployment
 
+See the [Quickstart](#Quickstart) section for a full scale example installation of the entire O2 baseline.
+
 ## Welcome to the One-Stop Shop for all your O2 Deployment needs
 
 ### Purpose
@@ -70,3 +72,119 @@ For these applications, we suggest each app have its own .json template and appe
 Within this repository also exists a script called `build-omar-deploy-package.sh` which bundles all configuration files used for an O2 deployment and a `run.sh` which can then be run from any machine to deploy that version of the deployment configured in the same way to any OpenShift cluster. To use the `run.sh` simply untar the deployment package, cd into the new `omar-deployment-package` dir, and run `./run.sh <OpenShift-Cluster-Endpoint>`. This will deploy O2 with whatever configuration files were last used to the endpoint specified at runtime.
 
 **NOTE:** The `build-omar-deploy-package.sh` bundles the files based off pathnames that exists when the Jenkins Pipeline file is run. So you will either need to edit the script slightly or make sure the pathnames for your own set of configuration files match that of the script. Also, using the `omar-build.tgz` has the same requirements as running the deployment scripts directly.
+
+## Quickstart
+
+This is a quick start guide on installing the O2 distribution.  Before we do a full deploy we need to have two services start before all other services.  We will create two install deployments that will do the first two services and then a full install for all the other services.  For this guide we will assume the following:
+
+- Openshift project name will be **omar-test**
+- NFS name will be o2-nfs.private.ossim.io
+- Domain will be ossim.io
+
+For you distribution please modify any values in this Quickstart guide that pertains to your environment.  For example, you will probably have a different NFS endpoint than what these files will assume.
+
+### Step 1
+
+Please make sure the target project is created.
+
+```bash
+oc new-project omar-test
+```
+
+### Step 2
+
+Pull down the initial scripts found in the o2-pushbutton repository.  We don't need everything in the repo but for now we will grab the entire repository.
+
+```bash
+mkdir o2-install
+cd o2-install
+git clone https://github.com/ossimlabs/o2-pushbutton
+git clone git@github.com:Maxar-Corp/config-repo.git
+mkdir pre-install
+mkdir full-install
+```
+
+### Step 3
+
+Create a file pre-install/deployConfig.yml and edit the contents to enable the **config** and **eureka** services for deployment.
+
+For an example you can look at the template file called [TEMPLATE-deploymentConfig.yml](TEMPLATE-deploymentConfig.yml).
+
+For convenience we have supplied a [preInstallDeploy.yml](quickstart/preInstallDeploy.yml) for an example of an O2 install of these services.
+
+```bash
+cp o2-pushbutton/omar/openshift/quickstart/preInstallDeploy.yml pre-install/deployConfig.yml
+```
+
+In whatever text editor you are familiar with edit **pre-install/deployConfig.yml** and modify the values for your environment
+
+### Step 4
+
+Execute the installation process for the two services.
+
+```
+python o2-pushbutton/omar/openshift/python/deploy-app.py -t o2-pushbutton/omar/openshift/templates -c quickstart/preInstallDeploy.yml -m config-repo/configmaps -o https://localhost:8443 --loglevel debug --all
+```
+
+### Step 5
+
+Create a file pre-install/deployConfig.yml and edit the contents to enable the config and eureka services for deployment.
+
+For an example you can look at the template file called [TEMPLATE-deploymentConfig.yml](TEMPLATE-deploymentConfig.yml).
+
+For convenience we have supplied a [fullInstallDeploy.yml](quickstart/fullInstallDeploy.yml) for a complete example of an O2 install under the project omar-test.
+
+```bash
+cp o2-pushbutton/omar/openshift/quickstart/fullInstallDeploy.yml full-install/deployConfig.yml
+```
+
+In whatever text editor you are familiar with edit **full-install/deployConfig.yml** and modify the values for your environment
+
+### Step 6
+
+Execute the installation process for the rest of the services.
+
+```
+python o2-pushbutton/omar/openshift/python/deploy-app.py -t o2-pushbutton/omar/openshift/templates -c quickstart/fullInstallDeploy.yml -m config-repo/configmaps -o https://localhost:8443 --loglevel debug --all
+```
+
+### Step 7
+
+Browse to the OpenShift cluster and watch the services come up under the omar-test project.
+
+### Step 8
+
+Browse to the https://<O2 URL ENDPOINT>/omar-ui
+
+## Tips
+
+In this section you will find some tips with some useful commands.
+
+### Deleting PVs
+
+When Deleting the project the PV's are not deleted for they are defined outside the project.  The PVC's are deleted but not the PVs.  To get a list of all the PVs in you can execute the command:
+
+```bash
+oc get pv
+```
+
+if your PVs were all postfixed with **test** then you can do something like this to modify the listing:
+
+```bash
+oc get pv | grep "\-test"
+```
+
+and will give you an output that might look something like this:
+
+```text
+basemap-test             75Gi       ROX            Retain           Bound      omar-test/basemap-test-pvc
+ossim-data-test          1500Gi     RWX            Retain           Bound      omar-test/ossim-data-test-pvc
+ossim-video-data-test    1500Gi     RWX            Retain           Bound      omar-test/ossim-video-data-test-pvc
+web-proxy-crl-test       1Gi        RWX            Retain           Bound      omar-test/web-proxy-crl-test-pvc
+```
+
+After the project is deleted and the PVCs are gone then you can delete the PV:
+
+```bash
+   oc delete pv $(oc get pv | grep "\-test" | awk '{print $1}')
+```

@@ -1,0 +1,75 @@
+defaults:
+  type: template
+  DEPLOYMENT_TARGET: omar-test
+  NFS_SERVER_URL:
+  OPENSHIFT_DOCKER_REGISTRY_URL: docker-registry.default.svc:5000
+  INSECURE_REPOSITORY: false
+  DOCKER_IMAGE_REPO: quay.io/radiantsolutions
+  TAG: dev
+  REPLICAS: 1
+  IMAGE_PULL_SECRET: registry-creds
+  RELEASE_NAME: Miami
+  RELEASE_NUMBER: 2.9.0
+  JAVA_OPTS: "-server -Xms256m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XX:+CMSClassUnloadingEnabled -XX:+UseGCOverheadLimit -Djava.awt.headless=true -XshowSettings:vm -Djava.security.egd=file:/dev/./urandom"
+
+  # This is the default memory limit for all applications, you can further override any special apps (oms, geoscript, etc.) by adding this variable below in the service config
+  MEMORY_MAX: 1500Mi
+  OSSIM_DATA_PV_NAME: ossim-data-test
+  OSSIM_DATA_PV_SIZE: 1500Gi
+  OSSIM_DATA_MOUNT_PT: /mnt/ossim-data-test
+
+  OSSIM_VIDEO_DATA_PV_NAME: ossim-video-data-test
+  OSSIM_VIDEO_DATA_PV_SIZE: 1500Gi
+  OSSIM_VIDEO_DATA_MOUNT_PT: /mnt/ossim-data-test
+
+  BASEMAP_PV_NAME: basemap-test
+  BASEMAP_PV_SIZE: 75Gi
+  BASEMAP_MOUNT_PT: /mnt/basemap-test
+
+  MAPPROXY_PV_NAME: basemap-cache-test
+  MAPPROXY_PV_SIZE: 100Gi
+  MAPPROXY_MOUNT_PT: /mnt/basemap-cache-test
+
+  WEB_PROXY_CRL_PV_NAME: web-proxy-crl-test
+  WEB_PROXY_CRL_PV_SIZE: 1Gi
+  WEB_PROXY_CRL_MOUNT_PT: /mnt/web_proxy_crl
+
+  # These are the prefixes of the route before the domain name is appended
+  WEB_PROXY_ROUTE_PREFIX: omar-test
+  PKI_PROXY_ROUTE_PREFIX: pki-omar-test
+
+# This is a list of dictionaries, defining "phases" of deployment
+phases:
+  - project:
+      template_file: infra/project.json
+  - persistent-volumes:
+      template_file: infra/persistent-volumes.json
+    registry-creds:
+      template_file: secrets/registry-creds.json
+    spring-config:
+      type: configmap
+      from-file: spring-config
+    web-proxy-certs:
+      type: configmap
+      from-file: web-proxy-certs
+    web-proxy-conf:
+      type: configmap
+      from-file: web-proxy-conf
+    web-proxy-htpasswd:
+      type: configmap
+      from-file: web-proxy-htpasswd
+    pki-proxy-certs:
+      type: configmap
+      from-file: pki-proxy-certs
+    pki-proxy-conf:
+      type: configmap
+      from-file: pki-proxy-conf
+    pki-proxy-crl:
+      type: configmap
+      from-file: pki-proxy-crl
+  - omar-config-server:
+      IMAGE_NAME: omar-config-server
+      template_file: apps/omar-config-server.json
+    omar-eureka-server:
+      IMAGE_NAME: omar-eureka-server
+      template_file: apps/omar-eureka-server.json
