@@ -16,7 +16,13 @@ Hosted assets are stored directly on the Nexus server.
 Proxied assets are stored elsewhere and accessed through Nexus, and are subsequently cached on Nexus.
 
 
-# How to Use
+# The Shared Nexus
 
 `ossimlabs` is a Hosted repository where we publish our maven packages.
 `all-repos` is a group that encapsulates _all_ maven repositories, including `ossimlabs`.
+
+# Creating a Nexus Instance
+
+Single command: `docker run -d -p 8081:8081 --name nexus sonatype/nexus3`
+
+Or you can run `docker-compose` on the yaml file in this directory.
