@@ -8,7 +8,7 @@ properties([
                 string(name: 'APP_TO_DEPLOY', defaultValue: 'all', description: 'The single app to deploy to the cluster, defaults to all apps'),
                 text(name: 'ADHOC_CONFIG_YML', defaultValue: '', description: 'Use this as the config file instead of pulling one from a repo'),
                 string(name: 'PACKAGE_NAME', defaultValue:'omar-dev.tgz', description: 'Desired name for the O2 deliverable'),
-                booleanParam(name: 'PUSH_TO_BUCKET', defaultValue: false, description: 'Push the built package to an s3 bucket'),
+                booleanParam(name: 'PUSH_TO_BUCKET', defaultValue: true, description: 'Push the built package to an s3 bucket'),
                 string(name: 'BUCKET_NAME', defaultValue:'o2-private', description: 'Desired S3 bucket to archive the O2 deliverable'),
                 booleanParam(name: 'PUSH_TO_REPO', defaultValue: false, description: 'Push the built package to a git repo'),
                 string(name: 'DEPLOY_PACKAGE_REPO_NAME', defaultValue: 'omar-deploy-package', description: 'The repo name that will be deployed to'),
