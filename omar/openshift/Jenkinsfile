@@ -2,7 +2,6 @@
 properties([
         parameters([
                 string(name: 'BUILD_NODE', defaultValue: 'omar-build', description: 'Label to use for node selections'),
-                string(name: 'CONFIG_REPO_NAME', defaultValue: 'config-repo', description: 'The config-repo repository name that will be checked out'),
                 string(name: 'CONFIG_REPO_BRANCH', defaultValue: 'dev', description: 'The config-repo branch that will be checked out'),
                 booleanParam(name: 'DEPLOY', defaultValue: true, description: 'Whether to actually deploy OMAR or not'),
                 string(name: 'APP_TO_DEPLOY', defaultValue: 'all', description: 'The single app to deploy to the cluster, defaults to all apps'),
@@ -40,9 +39,9 @@ node ("${BUILD_NODE}"){
 
     try {
         stage("Checkout"){
-            dir( "${CONFIG_REPO_NAME}" ){
+            dir( "${CONFIG_REPO}" ){
 
-                println "Using ${CONFIG_REPO_NAME} branch: ${CONFIG_REPO_BRANCH}"
+                println "Using ${CONFIG_REPO} branch: ${CONFIG_REPO_BRANCH}"
 
                 final String refSpec = "+refs/heads/*:refs/remotes/origin/*"
                 checkout([
@@ -50,7 +49,7 @@ node ("${BUILD_NODE}"){
                         branches: [[ name: CONFIG_REPO_BRANCH ]],
                         userRemoteConfigs: [[
                                                     refspec: refSpec,
-                                                    url: "${GIT_PRIVATE_SERVER_URL}/${CONFIG_REPO_NAME}.git"]]
+                                                    url: "${GIT_PRIVATE_SERVER_URL}/${CONFIG_REPO}.git"]]
                 ])
             }
         }
@@ -71,7 +70,7 @@ node ("${BUILD_NODE}"){
                                 config_file = "adhocDeployConfig.yml"
                                 sh "echo '${ADHOC_CONFIG_YML}' > adhocDeployConfig.yml"
                             } else {
-                                config_file = "./${CONFIG_REPO_NAME}/deployConfig.yml"
+                                config_file = "./${CONFIG_REPO}/deployConfig.yml"
                             }
 
                             if (APP_TO_DEPLOY == 'all' || APP_TO_DEPLOY == ''){
@@ -85,7 +84,7 @@ node ("${BUILD_NODE}"){
                                  o2-pushbutton/omar/openshift/python/deploy-app.py \
                                   -t o2-pushbutton/omar/openshift/templates \
                                   -c ./${config_file} \
-                                  -m ${CONFIG_REPO_NAME}/configmaps \
+                                  -m ${CONFIG_REPO}/configmaps \
                                   -o ${OPENSHIFT_URL} \
                                   --remove \
                                   --loglevel debug \
@@ -98,7 +97,7 @@ node ("${BUILD_NODE}"){
 
         stage("Archive Build Package"){
             sh """
-                ./o2-pushbutton/omar/openshift/build-omar-deploy-package.sh ${CONFIG_REPO_NAME} ${PACKAGE_NAME}
+                ./o2-pushbutton/omar/openshift/build-omar-deploy-package.sh ${CONFIG_REPO} ${PACKAGE_NAME}
             """
             archiveArtifacts(PACKAGE_NAME)
         }
