@@ -75,20 +75,19 @@ Within this repository also exists a script called `build-omar-deploy-package.sh
 
 ## Quickstart
 
-This is a quick start guide on installing the O2 distribution.  Before we do a full deploy we need to have two services start before all other services.  We will create two install deployments that will do the first two services and then a full install for all the other services.  For this guide we will assume the following:
+This is a quick start guide on installing the O2 distribution.  We will assume that all O2 Docker images have been built and are available from a docker registry.
 
-- Openshift project name will be **omar-test**
-- NFS name will be o2-nfs.private.ossim.io
-- Domain will be ossim.io
+Before we do a full deploy we need to have two services, **omar-config-server** and **omar-eureka-server**, start before all other services.  We will also go ahead and create all configmaps and Persistent volumes.  To execute this, we will create two install deployments that will do the first two services mentioned and then a full install for all the other services.
 
-For you distribution please modify any values in this Quickstart guide that pertains to your environment.  For example, you will probably have a different NFS endpoint than what these files will assume.
+It is important to note that some things in the full service install example cannot be placed in the documentation and will need to be filled in by the installer before installing the distribution. This may include docker registry credentials if you are using a private/protected repo or database credentials or any other private or site specific values that will need to be replaced.  We will annotate the files used in the installation and will place an **ADD_VALUE_HERE** to indicate where you must modify the contents.  Although,  you will need to verify all fields to make sure no other values need modified for your environment.
 
 ### Step 1
 
-Please make sure the target project is created.
+Please make sure the target project is created and that the target project is the active target for any future oc commands.
 
 ```bash
 oc new-project omar-test
+oc project omar-test
 ```
 
 ### Step 2
@@ -106,9 +105,7 @@ mkdir full-install
 
 ### Step 3
 
-Create a file pre-install/deployConfig.yml and edit the contents to enable the **config** and **eureka** services for deployment.
-
-For an example you can look at the template file called [TEMPLATE-deploymentConfig.yml](TEMPLATE-deploymentConfig.yml).
+Create a file pre-install/deployConfig.yml and edit the contents and verify all values.  Make sure you at least replace all occurrences of **ADD_VALUE_HERE**.
 
 For convenience we have supplied a [preInstallDeploy.yml](quickstart/preInstallDeploy.yml) for an example of an O2 install of these services.
 
@@ -122,7 +119,7 @@ In whatever text editor you are familiar with edit **pre-install/deployConfig.ym
 
 Execute the installation process for the two services.
 
-```
+```bash
 python o2-pushbutton/omar/openshift/python/deploy-app.py -t o2-pushbutton/omar/openshift/templates -c quickstart/preInstallDeploy.yml -m config-repo/configmaps -o https://localhost:8443 --loglevel debug --all
 ```
 
@@ -162,7 +159,7 @@ In this section you will find some tips with some useful commands.
 
 ### Deleting PVs
 
-When Deleting the project the PV's are not deleted for they are defined outside the project.  The PVC's are deleted but not the PVs.  To get a list of all the PVs in you can execute the command:
+When Deleting the project the Persistent Volumes (PV's) are not deleted for they are defined outside the project.  The Persistent Volume Claims (PVC's) are part of the project and are deleted, but not the PVs.  To get a list of all the PVs in Openshift you can execute the command:
 
 ```bash
 oc get pv

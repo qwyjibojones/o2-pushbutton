@@ -1,19 +1,33 @@
+# You will see a number of memory limits and sizes in the configuration 
+# file.  Each size is postfixed with the size indicator:
+#        Megabytes (Mi) Gigabytes (Gi) and Terrabytes (Ti)
 defaults:
   type: template
-  DEPLOYMENT_TARGET: omar-test
-  NFS_SERVER_URL:
+  DEPLOYMENT_TARGET: ADD_VALUE_HERE
+  DOMAIN_NAME: ADD_VALUE_HERE
+  NFS_SERVER_URL: ADD_VALUE_HERE
   OPENSHIFT_DOCKER_REGISTRY_URL: docker-registry.default.svc:5000
   INSECURE_REPOSITORY: false
   DOCKER_IMAGE_REPO: quay.io/radiantsolutions
+  # This is the image tag that we will be deploying. For this example we will pull our images
+  # that are tagged as dev
   TAG: dev
   REPLICAS: 1
   IMAGE_PULL_SECRET: registry-creds
+
   RELEASE_NAME: Miami
   RELEASE_NUMBER: 2.9.0
   JAVA_OPTS: "-server -Xms256m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XX:+CMSClassUnloadingEnabled -XX:+UseGCOverheadLimit -Djava.awt.headless=true -XshowSettings:vm -Djava.security.egd=file:/dev/./urandom"
 
-  # This is the default memory limit for all applications, you can further override any special apps (oms, geoscript, etc.) by adding this variable below in the service config
+  # This is the default memory limit for all applications, you can further override 
+  # any special apps (oms, geoscript, etc.) by adding this variable below in the 
+  # service config
   MEMORY_MAX: 1500Mi
+
+  # All your PV mounts should be from the NFS server defined above.
+  # We need several exported mount locations exported by your NFS server
+  # Please modify the size and mount points for each PV for your environment
+  #
   OSSIM_DATA_PV_NAME: ossim-data-test
   OSSIM_DATA_PV_SIZE: 1500Gi
   OSSIM_DATA_MOUNT_PT: /mnt/ossim-data-test
@@ -30,13 +44,19 @@ defaults:
   MAPPROXY_PV_SIZE: 100Gi
   MAPPROXY_MOUNT_PT: /mnt/basemap-cache-test
 
+  # The web proxy uses pre downloaded Certificate Revocation lists for PKI
+  # revocation checks
+  #
   WEB_PROXY_CRL_PV_NAME: web-proxy-crl-test
   WEB_PROXY_CRL_PV_SIZE: 1Gi
   WEB_PROXY_CRL_MOUNT_PT: /mnt/web_proxy_crl
 
   # These are the prefixes of the route before the domain name is appended
+  #
+  # This is typically pre-pended to your domain value.  So if you have a domain
+  # indicated by ossim.io then the web proxy route will be omar-test.ossim.io
+  #
   WEB_PROXY_ROUTE_PREFIX: omar-test
-  PKI_PROXY_ROUTE_PREFIX: pki-omar-test
 
 # This is a list of dictionaries, defining "phases" of deployment
 phases:
@@ -46,6 +66,13 @@ phases:
       template_file: infra/persistent-volumes.json
     registry-creds:
       template_file: secrets/registry-creds.json
+      # If you do not have an open registry please add your credential overrides
+      # here.  Specify the servicer name, username and password
+      #
+      # DOCKER_REGISTRY_SERVER: ADD_VALUE_HERE
+      # DOCKER_REGISTRY_USERNAME: ADD_VALUE_HERE
+      # DOCKER_REGISTRY_PASSWORD: ADD_VALUE_HERE
+      # DOCKER_REGISTRY_EMAIL: example@gmail.com
     spring-config:
       type: configmap
       from-file: spring-config
