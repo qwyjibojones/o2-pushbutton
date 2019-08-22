@@ -5,6 +5,7 @@ See the [Quickstart](#Quickstart) section for a full scale example installation 
 ## Welcome to the One-Stop Shop for all your O2 Deployment needs
 
 ### Purpose
+
 This part of the o2-pushbutton repository houses an easy-to-use set of python scripts for quickly deploying or redeploying an O2 instance.
 
 ### File Breakdown
@@ -18,7 +19,7 @@ This part of the o2-pushbutton repository houses an easy-to-use set of python sc
 
 -   For any Deployment
     -   An OpenShift cluster must already be set up and functioning properly
-    -   The following Environment Variables must be set on whatever machine is running the `deploy-app.py` script
+    -   The following Environment Variables must be set on whatever machine is running the [deploy-app.py](python/deploy-app.py) script
         -   OPENSHIFT_USERNAME - Username for logging into the OpenShift cluster
         -   OPENSHIFT_PASSWORD - Password for logging into the OpenShift cluster
         -   DOCKER_REGISTRY_PASSWORD - Password for the docker registry specified in your deployConfig.yml
@@ -32,6 +33,7 @@ This part of the o2-pushbutton repository houses an easy-to-use set of python sc
     -   The project the service is to be deployed in (specified in deployConfig.yml) must already exist unless the service being deployed is the project itself
 
 ### Usage
+
 After cloning the pushbutton repo, navigate to the `python` directory. Below are a list of the different commands you can run.
 
 -   Whole Suite Deployment
@@ -56,17 +58,17 @@ All objects under the `phases` section must have at least one of the following s
 
 As far as OpenShift object creation is concerned, we suggest grouping/creating objects with the following guidelines.
 - **Project:**
-For the overall project, we ***strongly suggest*** creating it on its own through a separate .json template and it ***must*** be the first object created (appearing first under `phases` in the `deployConfig.yml`). An example can be seen in `templates/infra/project.json`. Otherwise, the project must be created manually before any other apps are deployed.
+For the overall project, we ***strongly suggest*** creating it on its own through a separate .json template and it ***must*** be the first object created (appearing first under `phases` in the `deployConfig.yml`). An example can be seen in [templates/infra/project.json](templates/infra/project.json). Otherwise, the project must be created manually before any other apps are deployed.
 - **PVs and PVCs:**
-For PVs and PVCs we suggest creating them using the same .json template where the PVCs are listed before any PVs are listed. Examples of this can be seen in `templates/infra/persistent-volumes.json`
+For PVs and PVCs we suggest creating them using the same .json template where the PVCs are listed before any PVs are listed. Examples of this can be seen in [templates/infra/persistent-volumes.json](templates/infra/persistent-volumes.json)
 - **Registry Creds:**
-We suggest defining any credentials used for your docker registry to be defined in the 	`deployConfig.yml` after the project and any PV/PVCs are defined. An example of the .json template can be found under `templates/secrets/registry-creds.json`
+We suggest defining any credentials used for your docker registry to be defined in the 	`deployConfig.yml` after the project and any PV/PVCs are defined. An example of the .json template can be found under [templates/secrets/registry-creds.json](templates/secrets/registry-creds.json)
 - **Routes:**
-For routes, we suggest creating them as an object separate from everything else so that they can be updated, deployed, and removed separately. Examples of this can be seen in `templates/infra/routes.json`
+For routes, we suggest creating them as an object separate from everything else so that they can be updated, deployed, and removed separately. Examples of this can be seen in [templates/infra/routes.json](templates/infra/routes.json)
 - **ConfigMaps:**
 For ConfigMaps, we suggest each ConfigMap having its own entry in the `deployConfig.yml` before any of the individual applications are listed
 - **Services/deployments/pods:**
-For these applications, we suggest each app have its own .json template and appear in the deployConfig.yml ***after*** the above objects. Examples can be seen in `templates/apps/*` and a sample template can be found in `templates/A-SAMPLE-TEMPLATE.json`
+For these applications, we suggest each app have its own .json template and appear in the deployConfig.yml ***after*** the above objects. Examples can be seen in `templates/apps/*` and a sample template can be found in [templates/A-SAMPLE-TEMPLATE.json](templates/A-SAMPLE-TEMPLATE.json)
 
 ### omar-builder.tgz
 Within this repository also exists a script called `build-omar-deploy-package.sh` which bundles all configuration files used for an O2 deployment and a `run.sh` which can then be run from any machine to deploy that version of the deployment configured in the same way to any OpenShift cluster. To use the `run.sh` simply untar the deployment package, cd into the new `omar-deployment-package` dir, and run `./run.sh <OpenShift-Cluster-Endpoint>`. This will deploy O2 with whatever configuration files were last used to the endpoint specified at runtime.
