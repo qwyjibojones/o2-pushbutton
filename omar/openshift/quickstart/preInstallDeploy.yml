@@ -3,12 +3,19 @@
 #        Megabytes (Mi) Gigabytes (Gi) and Terrabytes (Ti)
 defaults:
   type: template
+  # This is your OpenShift target Project to deploy in
   DEPLOYMENT_TARGET: ADD_VALUE_HERE
+
+  # This is your subdomain name.  For example or subdomain for our unclass ossim.io.
   DOMAIN_NAME: ADD_VALUE_HERE
   NFS_SERVER_URL: ADD_VALUE_HERE
   OPENSHIFT_DOCKER_REGISTRY_URL: docker-registry.default.svc:5000
   INSECURE_REPOSITORY: false
-  DOCKER_IMAGE_REPO: quay.io/radiantsolutions
+
+  # This is your Docker registry repo path where all O2 images are located that will be deployed
+  # with this script.  For our unclass location we use the path quay.io/radiantsolutions
+  DOCKER_IMAGE_REPO: ADD_VALUE_HERE
+  
   # This is the image tag that we will be deploying. For this example we will pull our images
   # that are tagged as dev
   TAG: dev
@@ -22,7 +29,7 @@ defaults:
   # This is the default memory limit for all applications, you can further override 
   # any special apps (oms, geoscript, etc.) by adding this variable below in the 
   # service config
-  MEMORY_MAX: 1500Mi
+  MEMORY_MAX: 1Gi
 
   # All your PV mounts should be from the NFS server defined above.
   # We need several exported mount locations exported by your NFS server

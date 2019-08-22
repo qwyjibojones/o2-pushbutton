@@ -77,7 +77,7 @@ Within this repository also exists a script called `build-omar-deploy-package.sh
 
 This is a quick start guide on installing the O2 distribution.  We will assume that all O2 Docker images have been built and are available from a docker registry.
 
-Before we do a full deploy we need to have two services, **omar-config-server** and **omar-eureka-server**, start before all other services.  We will also go ahead and create all configmaps and Persistent volumes.  To execute this, we will create two install deployments that will do the first two services mentioned and then a full install for all the other services.
+Before we do a full deploy we need to have two services, **omar-config-server** and **omar-eureka-server**, start before all other services.  All other services will pull their configuration from the omar-config-server and register themselves with eureka.  We will also go ahead and create all configmaps and Persistent volumes.  To execute this, we will create two install deployments that will do the first two services mentioned and then a full install for all the other services.
 
 It is important to note that some things in the full service install example cannot be placed in the documentation and will need to be filled in by the installer before installing the distribution. This may include docker registry credentials if you are using a private/protected repo or database credentials or any other private or site specific values that will need to be replaced.  We will annotate the files used in the installation and will place an **ADD_VALUE_HERE** to indicate where you must modify the contents.  Although,  you will need to verify all fields to make sure no other values need modified for your environment.
 
@@ -123,11 +123,23 @@ Execute the installation process for the two services.
 python o2-pushbutton/omar/openshift/python/deploy-app.py -t o2-pushbutton/omar/openshift/templates -c quickstart/preInstallDeploy.yml -m config-repo/configmaps -o https://localhost:8443 --loglevel debug --all
 ```
 
+Keep checking for running status:
+
+```bash
+oc get pods
+```
+
+When your services are fully up and running the command should output something that looks like:
+
+```text
+NAME                                READY     STATUS    RESTARTS   AGE
+omar-config-server-1-ldtjb          1/1       Running   0          1m
+omar-eureka-server-1-vtrvl          1/1       Running   0          1m
+```
+
 ### Step 5
 
-Create a file pre-install/deployConfig.yml and edit the contents to enable the config and eureka services for deployment.
-
-For an example you can look at the template file called [TEMPLATE-deploymentConfig.yml](TEMPLATE-deploymentConfig.yml).
+Create a file full-install/deployConfig.yml and edit the contents to enable the deployment of all other services.
 
 For convenience we have supplied a [fullInstallDeploy.yml](quickstart/fullInstallDeploy.yml) for a complete example of an O2 install under the project omar-test.
 
@@ -135,29 +147,35 @@ For convenience we have supplied a [fullInstallDeploy.yml](quickstart/fullInstal
 cp o2-pushbutton/omar/openshift/quickstart/fullInstallDeploy.yml full-install/deployConfig.yml
 ```
 
-In whatever text editor you are familiar with edit **full-install/deployConfig.yml** and modify the values for your environment
+In whatever text editor you are familiar with edit **full-install/deployConfig.yml** and modify the values for your environment. In most cases you will just modify the **ADD_VALUE_HERE** found throughout the file.
 
 ### Step 6
 
 Execute the installation process for the rest of the services.
 
-```
+```bash
 python o2-pushbutton/omar/openshift/python/deploy-app.py -t o2-pushbutton/omar/openshift/templates -c quickstart/fullInstallDeploy.yml -m config-repo/configmaps -o https://localhost:8443 --loglevel debug --all
 ```
 
 ### Step 7
 
-Browse to the OpenShift cluster and watch the services come up under the omar-test project.
+Browse to the OpenShift cluster and watch the services come up under the omar-test project.  If you prefer coimmand line you can see how many are in a RUNNING state by using the command:
+
+```bash
+oc get pods
+```
 
 ### Step 8
 
-Browse to the https://<O2 URL ENDPOINT>/omar-ui
+Once all pods are running please brows to the URL endpoint for the O2 UI: https://**O2_URL_ENDPOINT**/omar-ui
 
 ## Tips
 
 In this section you will find some tips with some useful commands.
 
 ### Deleting PVs
+
+If you ever want to just delete the project `os delete omar-test` most items will be removed but the PVs still will remain.
 
 When Deleting the project the Persistent Volumes (PV's) are not deleted for they are defined outside the project.  The Persistent Volume Claims (PVC's) are part of the project and are deleted, but not the PVs.  To get a list of all the PVs in Openshift you can execute the command:
 
@@ -180,7 +198,7 @@ ossim-video-data-test    1500Gi     RWX            Retain           Bound      o
 web-proxy-crl-test       1Gi        RWX            Retain           Bound      omar-test/web-proxy-crl-test-pvc
 ```
 
-After the project is deleted and the PVCs are gone then you can delete the PV:
+After the project is deleted and the PVCs are gone then you can delete the PVs:
 
 ```bash
    oc delete pv $(oc get pv | grep "\-test" | awk '{print $1}')
