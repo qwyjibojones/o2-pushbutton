@@ -35,6 +35,13 @@
       "value": "docker-registry.default.svc:5000"
     },
     {
+      "name": "OSSIM_DATA_PV_NAME",
+      "displayName": "OSSIM_DATA_PV_NAME",
+      "description": "Persistent volume storage base name",
+      "required": true,
+      "value": "ossim-data"
+    },
+    {
       "name": "TAG",
       "displayName": "TAG",
       "description": "Docker Container Image Version Tag",
@@ -171,7 +178,7 @@
                 "volumeMounts": [
                   {
                     "mountPath": "/data",
-                    "name": "${OSSIM_DATA_PV_NAME}"
+                    "name": "volume-tlv"
                   }
                 ]
               }
@@ -179,7 +186,15 @@
             "dnsPolicy": "ClusterFirst",
             "restartPolicy": "Always",
             "securityContext": {},
-            "terminationGracePeriodSeconds": 30
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "volume-tlv",
+                "persistentVolumeClaim": {
+                  "claimName": "${OSSIM_DATA_PV_NAME}-pvc"
+                }
+              }
+            ]
           }
         },
         "test": false,

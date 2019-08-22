@@ -22,7 +22,6 @@ This part of the o2-pushbutton repository houses an easy-to-use set of python sc
     -   The following Environment Variables must be set on whatever machine is running the [deploy-app.py](python/deploy-app.py) script
         -   OPENSHIFT_USERNAME - Username for logging into the OpenShift cluster
         -   OPENSHIFT_PASSWORD - Password for logging into the OpenShift cluster
-        -   DOCKER_REGISTRY_PASSWORD - Password for the docker registry specified in your deployConfig.yml
     -   The machine running the script must have direct access to the following things
         -   deployConfig.yml - This is the main deployment configuration file that holds all deployment variables and the listing of all services desired to be deployed (a templated example can be found in the repo linked above)
         -   Template Directory - This directory holds all .json templates for any apps/objects that are desired to be deployed to OpenShift
