@@ -1,9 +1,9 @@
 version: "3.0"
 services:
-  git-server:
+  gogs:
     image: gogs/gogs
     volumes:
-      - /private/var/gogs:/data
+      - ./gogs/data:/data
     ports:
       - "10022:22"
       - "10080:3000"
