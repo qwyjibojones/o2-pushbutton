@@ -21,7 +21,6 @@ This O2 builder package serves as a static copy of the state/configuration of an
     -   The following Environment Variables must be set on whatever machine is running the `deploy-app.py` script
         -   OPENSHIFT_USERNAME - Username for logging into the OpenShift cluster
         -   OPENSHIFT_PASSWORD - Password for logging into the OpenShift cluster
-        -   DOCKER_REGISTRY_PASSWORD - Password for the docker registry specified in your deployConfig.yml
 
 ### Usage
 

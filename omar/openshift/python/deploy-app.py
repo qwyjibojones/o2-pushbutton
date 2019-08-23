@@ -22,21 +22,31 @@ argument_parser.add_argument('--remove', required=False, action='store_true', he
 argument_parser.add_argument('--nodeploy', required=False, action='store_true', help='Avoid deploying apps, just remove them')
 argument_parser.add_argument('--loglevel', default='INFO', type=str.upper, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'FATAL'], help='The log level to use')
 argument_parser.add_argument('--abort-on-failure', action='store_true', help='Abort the process when there is an error')
-argument_parser.add_argument('--start-phase', type=int, default=1, help='The phase to start with, the first phase (1) by default')
+argument_parser.add_argument('--phases', type=int, nargs='*', help='The phases to run')
 argument_parser.add_argument('--oc-location', default=None, help='The location of the oc executable, if it must be manually specified')
-argument_parser.add_argument('overrides', nargs='*', help='A set of key-value pairs to override settings in the config file')
+argument_parser.add_argument('--wait-for-pods', type=bool, default=False, help='Wait for all pods to be ready before moving onto the next phase')
+argument_parser.add_argument('--overrides', nargs='*', default=[], help='A set of key-value pairs to override settings in the config file')
 
 final_return_code = 0
 
 
 # Process all apps defined in the deployConfig.yml file in order of phases
-def process_all(config_file, template_dir, configmap_dir, overrides, remove_app, deploy_app, abort_on_failure, start_phase):
+def process_all(config_file, template_dir, configmap_dir, overrides, remove_app, deploy_app, abort_on_failure, phases):
     global final_return_code
-    phases = parse_deploy_sequence.get_deployment_phases(config_file)
-    phase_counter = start_phase-1
-    for phase in phases[start_phase-1:]:
-        phase_counter += 1
-        logging.info('\n####### Running phase %s #######' % phase_counter)
+    all_phases = parse_deploy_sequence.get_deployment_phases(config_file)
+
+    if phases is None:
+        run_phases = all_phases
+    else:
+        run_phases = []
+        for phase_num in phases:
+            if phase_num > len(all_phases):
+                logging.warn('Phase %i does not exist, skipping' % phase_num)
+                continue
+            run_phases.append(all_phases[phase_num-1])
+
+    for phase in run_phases:
+        logging.info('\n####### Running phase #######')
         phase_processes = {}
         for app_name in phase:
             new_app_process = process_app(config_file=config_file,
@@ -174,7 +184,7 @@ def main(args):
                     remove_app=parsed_args.remove,
                     deploy_app=not parsed_args.nodeploy,
                     abort_on_failure=parsed_args.abort_on_failure,
-                    start_phase=parsed_args.start_phase)
+                    phases=parsed_args.phases)
     else:
         deploy_process = process_app(config_file=parsed_args.config_file,
                                      template_dir=parsed_args.template_dir,
@@ -182,7 +192,7 @@ def main(args):
                                      overrides=parsed_args.overrides,
                                      app_name=parsed_args.service,
                                      remove_app=parsed_args.remove,
-                                     deploy_app= not parsed_args.nodeploy,
+                                     deploy_app=not parsed_args.nodeploy,
                                      wait=True)
         if deploy_process is not None:
             final_return_code = helpers.report_status(process=deploy_process, name=parsed_args.service)
