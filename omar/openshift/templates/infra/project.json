@@ -14,6 +14,12 @@
          "description": "Deployment target (dev|stage|blue|green)",
          "required": true,
          "value": "dev"
+      },
+      {
+         "name": "NODE_SELECTOR",
+         "displayName": "NODE_SELECTOR",
+         "description": "The node selector to use for the project",
+         "value": ""
       }
    ],
    "objects": [
@@ -25,7 +31,8 @@
             "labels": {
             },
             "annotations": {
-               "openshift.io/display-name": "${DEPLOYMENT_TARGET}"
+               "openshift.io/display-name": "${DEPLOYMENT_TARGET}",
+               "openshift.io/node-selector": "${NODE_SELECTOR}"
             }
          },
          "spec": {
