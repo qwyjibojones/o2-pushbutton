@@ -50,6 +50,8 @@ def get_params_for_service(config_file, service_name, overrides=[]):
 
 def get_deployment_phases(config_file):
     loaded_config = load_deployment_config(config_file)
+    print(loaded_config['phases'])
+    print([phase.keys() for phase in loaded_config['phases']])
     phases = [phase.keys() for phase in loaded_config['phases']]
     return phases
 
