@@ -164,7 +164,7 @@
          "displayName": "NFS_SERVER_URL",
          "description": "Persistent volume storage server URL",
          "required": true,
-         "value": "ip-172-31-11-42.ec2.internal"
+         "value": ""
       }
    ],
    "objects": [
