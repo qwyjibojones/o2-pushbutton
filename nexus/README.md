@@ -26,7 +26,30 @@ Proxied assets are stored elsewhere and accessed through Nexus, and are subseque
 
 `ossimlabs` is a Hosted repository where we publish our maven packages.
 `all-repos` is a group of all maven repositories, including `ossimlabs`.
-`all-yum-repos` is a group of centos mirrors, and ossim mirrors. 
+`all-yum-repos` is a group of centos mirrors, and ossim mirrors.
+
+## All-Repos
+
+- maven-snapshots
+- maven-releases
+- maven-public
+- maven-central
+- ossimlabs
+- jcenter.bintray.com
+- dl.bintray.com_ajay-kumar_plugins
+- download.osgeo.org_webdav_geotools
+- electronic-chart-centre
+- repo.boundlessgeo.com_main
+- repo.grails.org_grails_core
+
+## All-Yum-Repos
+
+- ossimlabs-yum
+- o2-rpms.dev
+- mirror.centos.org_os
+- mirrors.fedoraproject.org
+- mirror.centos.org_extras
+- mirror.centos.org_updates
 
 # Creating a Nexus Instance
 
