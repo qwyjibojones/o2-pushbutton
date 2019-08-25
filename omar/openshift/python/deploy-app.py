@@ -42,6 +42,7 @@ def add_new_deployments_from_namespace(namespace, old_deployments, new_deploymen
         if deployment not in old_deployments:
             deployments_to_add.append(deployment)
 
+    print(deployments_to_add)
     for deployment in deployments_to_add:
         namespace_deployment_pairs.append([namespace, deployment])
 
@@ -136,7 +137,7 @@ def process_app(config_file, template_dir, configmap_dir, overrides, app_name, r
                                 deploy_app=deploy_app)
 
         if wait_for_pods:
-            if 'ignore_errors' not in app_params or app_params['ignore_errors'].lower() != 'true':
+            if 'ignore_errors' not in app_params or not app_params['ignore_errors']:
                 new_deployments = openshift.get_deployment_configs(namespace=namespace)
                 add_new_deployments_from_namespace(namespace=namespace,
                                                    old_deployments=old_deployments,
@@ -242,13 +243,27 @@ def main(args):
                                      overrides=parsed_args.overrides,
                                      app_name=parsed_args.service,
                                      remove_app=parsed_args.remove,
-                                     deploy_app=not parsed_args.nodeploy)
+                                     deploy_app=not parsed_args.nodeploy,
+                                     wait_for_pods=parsed_args.wait_for_pods)
 
         if deploy_process is not None:
             final_return_code = helpers.report_status(process=deploy_process, name=parsed_args.service)
 
-        if wait_for_pods:
-            pass  # TODO: implement
+        if parsed_args.wait_for_pods:
+            print('Waiting for pods')
+            print(namespace_deployment_pairs)
+            if len(namespace_deployment_pairs) > 0:
+                [namespace, deployment] = namespace_deployment_pairs[0]
+                wait_counter = 30
+                while int(openshift.get_available_replicas_for_deployment(namespace=namespace,
+                                                                          deployment=deployment)) == 0:
+                    logging.info('Waiting for deployment %s in namespace %s' % (deployment, namespace))
+                    time.sleep(5)
+                    wait_counter -= 1
+                    if wait_counter <= 0:
+                        logging.warn(
+                            'Timed out waiting for deployment %s in namespace %s, continuing' % (deployment, namespace))
+                        break
 
     exit(final_return_code)
 
