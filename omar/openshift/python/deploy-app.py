@@ -136,7 +136,7 @@ def process_app(config_file, template_dir, configmap_dir, overrides, app_name, r
                                 deploy_app=deploy_app)
 
         if wait_for_pods:
-            if 'ignore_errors' not in app_params or not app_params['ignore_errors']:
+            if 'ignore_errors' not in app_params or app_params['ignore_errors'].lower() != 'true':
                 new_deployments = openshift.get_deployment_configs(namespace=namespace)
                 add_new_deployments_from_namespace(namespace=namespace,
                                                    old_deployments=old_deployments,
