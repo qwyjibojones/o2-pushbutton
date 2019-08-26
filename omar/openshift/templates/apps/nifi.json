@@ -134,7 +134,7 @@
                 "livenessProbe": {
                   "failureThreshold": 5,
                   "initialDelaySeconds": 600,
-                  "periodSeconds": 15,
+                  "periodSeconds": 30,
                   "successThreshold": 1,
                   "tcpSocket": {
                     "port": 8080
@@ -153,9 +153,9 @@
                   }
                 ],
                 "readinessProbe": {
-                  "failureThreshold": 30,
-                  "initialDelaySeconds": 300,
-                  "periodSeconds": 15,
+                  "failureThreshold": 60,
+                  "initialDelaySeconds": 5,
+                  "periodSeconds": 10,
                   "successThreshold": 1,
                   "tcpSocket": {
                     "port": 8080
