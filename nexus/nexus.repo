@@ -1,0 +1,5 @@
+[ossim-dev]
+name=OSSIM Dev Repo
+baseurl=https://nexus.ossim.io/repository/all-yum-repos/
+enabled=1
+gpgcheck=0
