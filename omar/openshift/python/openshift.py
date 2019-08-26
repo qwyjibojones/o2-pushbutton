@@ -76,3 +76,18 @@ def new_app(template_file, params, wait=False):
     temp_params_file = write_temporary_file(yaml.dump(params, default_flow_style=False, width=float("inf")))
     command_args = [oc, 'new-app', '-f', template_file, '--param-file', temp_params_file, '--ignore-unknown-parameters']
     return run_command(command_args, wait)
+
+
+def get_available_replicas_for_deployment(deployment, namespace):
+    command_args = [oc, 'get', 'dc', deployment, '--namespace', namespace, '-o', 'jsonpath={.status.availableReplicas}']
+    process = run_command(command_args, wait=True)
+    output, error = process.communicate()
+    return output
+
+
+def get_deployment_configs(namespace):
+    command_args = [oc, 'get', 'dc', '--namespace', namespace, '-o',
+                    'jsonpath={range .items[*]}{.metadata.name}\n']
+    process = run_command(command_args, wait=True)
+    output, error = process.communicate()
+    return output.split('\n')

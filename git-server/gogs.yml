@@ -1,0 +1,9 @@
+version: "3.0"
+services:
+  gogs:
+    image: gogs/gogs
+    volumes:
+      - ./gogs/data:/data
+    ports:
+      - "10022:22"
+      - "10080:3000"

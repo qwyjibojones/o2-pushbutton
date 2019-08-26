@@ -48,6 +48,12 @@ def get_params_for_service(config_file, service_name, overrides=[]):
     raise Exception('No service named \'%s\' found in %s' % (service_name, config_file))
 
 
+def get_namespace(config_file):
+    loaded_config = load_deployment_config(config_file)
+    if 'meta' in loaded_config:
+        return loaded_config['meta'].get('namespace')
+
+
 def get_deployment_phases(config_file):
     loaded_config = load_deployment_config(config_file)
     phases = [phase.keys() for phase in loaded_config['phases']]
