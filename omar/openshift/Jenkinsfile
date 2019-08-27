@@ -88,6 +88,7 @@ node ("${BUILD_NODE}"){
                                   -o ${OPENSHIFT_URL} \
                                   --remove \
                                   --loglevel debug \
+                                  --wait-for-pods \
                                   --overrides DOCKER_REGISTRY_PASSWORD=${DOCKER_REGISTRY_PASSWORD} \
                                   ${app_arg}
                             """
