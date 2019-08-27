@@ -2,10 +2,10 @@
   "apiVersion": "v1",
   "kind": "Template",
   "metadata": {
-    "name": "omar-openshift-template"
+    "name": "gogs-openshift-template"
   },
   "labels": {
-    "template": "omar-openshift-template"
+    "template": "gogs-openshift-template"
   },
   "parameters": [
     {
@@ -18,35 +18,28 @@
       "description": "",
       "displayName": "",
       "name": "APP_NAME",
-      "value": "nifi-app"
+      "value": "gogs"
     },
     {
       "name": "DEPLOYMENT_TARGET",
       "displayName": "DEPLOYMENT_TARGET",
-      "description": "Deployment target (dev|stage|blue|green)",
+      "description": "",
       "required": true,
-      "value": "dev"
+      "value": "devops"
     },
     {
       "name": "OPENSHIFT_DOCKER_REGISTRY_URL",
       "displayName": "OPENSHIFT_DOCKER_REGISTRY_URL",
       "description": "Openshift Docker Registry URL",
       "required": true,
-      "value": "docker-registry.default.svc:5000"
+      "value": "gogs.default.svc:5000"
     },
     {
       "name": "TAG",
       "displayName": "TAG",
       "description": "Docker Container Image Version Tag",
       "required": true,
-      "value": "latest"
-    },
-    {
-      "name": "OSSIM_DATA_PV_NAME",
-      "displayName": "OSSIM_DATA_PV_NAME",
-      "description": "Persistent volume storage base name",
-      "required": true,
-      "value": "ossim-data"
+      "value": "2"
     },
     {
       "name": "REPLICAS",
@@ -60,7 +53,7 @@
       "displayName": "IMAGE_NAME",
       "description": "The name of the docker image to pull",
       "required": true,
-      "value": ""
+      "value": "registry"
     },
     {
       "name": "INSECURE_REPOSITORY",
@@ -90,21 +83,27 @@
           "openshift.io/generated-by": "OpenShiftNewApp"
         },
         "creationTimestamp": null,
-        "generation": 320,
+        "generation": 325,
         "labels": {
-          "type": "tool"
         },
-        "name": "nifi",
+        "name": "gogs",
         "namespace": "${DEPLOYMENT_TARGET}"
       },
       "spec": {
         "replicas": "${REPLICAS}",
         "selector": {
-          "deploymentconfig": "nifi"
+          "deploymentconfig": "${APP_NAME}"
         },
         "strategy": {
           "resources": {},
-          "type": "Recreate"
+          "rollingParams": {
+            "intervalSeconds": 1,
+            "maxSurge": "25%",
+            "maxUnavailable": "25%",
+            "timeoutSeconds": 600,
+            "updatePeriodSeconds": 1
+          },
+          "type": "Rolling"
         },
         "template": {
           "metadata": {
@@ -113,7 +112,7 @@
             },
             "creationTimestamp": null,
             "labels": {
-              "deploymentconfig": "nifi"
+              "deploymentconfig": "${APP_NAME}"
             }
           },
           "spec": {
@@ -121,45 +120,47 @@
               {
                 "env": [
                   {
-                    "name": "NIFI_WEB_HTTP_HOST",
-                    "value": "0.0.0.0"
+                    "name": "SPRING_CLOUD_CONFIG_LABEL",
+                    "value": "master"
                   },
                   {
                     "name": "JAVA_OPTS",
                     "value": "${JAVA_OPTS}"
                   }
                 ],
-                "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/nifi:${TAG}",
+                "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/gogs:${TAG}",
                 "imagePullPolicy": "Always",
                 "livenessProbe": {
                   "failureThreshold": 5,
-                  "initialDelaySeconds": 600,
-                  "periodSeconds": 30,
+                  "initialDelaySeconds": 30,
+                  "periodSeconds": 15,
                   "successThreshold": 1,
                   "tcpSocket": {
-                    "port": 8080
+                    "port": 3000
                   },
                   "timeoutSeconds": 3
                 },
-                "name": "nifi",
+                "name": "${APP_NAME}",
                 "ports": [
                   {
-                    "containerPort": 8080,
-                    "protocol": "TCP"
+                    "containerPort": 3000,
+                    "protocol": "HTTP"
                   },
                   {
-                    "containerPort": 8081,
+                    "containerPort": 22,
                     "protocol": "TCP"
                   }
                 ],
                 "readinessProbe": {
-                  "failureThreshold": 60,
-                  "initialDelaySeconds": 5,
-                  "periodSeconds": 10,
-                  "successThreshold": 1,
-                  "tcpSocket": {
-                    "port": 8080
+                  "failureThreshold": 15,
+                  "httpGet": {
+                    "path": "/",
+                    "port": 3000,
+                    "scheme": "HTTP"
                   },
+                  "initialDelaySeconds": 30,
+                  "periodSeconds": 15,
+                  "successThreshold": 1,
                   "timeoutSeconds": 3
                 },
                 "resources": {
@@ -170,62 +171,13 @@
                     "memory": "${MEMORY_MAX}"
                   }
                 },
-                "terminationMessagePath": "/dev/termination-log",
-                "volumeMounts": [
-                  {
-                    "mountPath": "/data",
-                    "name": "volume-nifi"
-                  },
-                  {
-                    "mountPath": "/opt/nifi/nifi-current/conf",
-                    "name": "volume-nifi",
-                    "subPath": "nifi-conf/conf"
-                  },
-                  {
-                    "mountPath": "/opt/nifi/nifi-current/logs",
-                    "name": "volume-nifi",
-                    "subPath": "nifi-conf/logs"
-                  },
-                  {
-                    "mountPath": "/opt/nifi/nifi-current/state",
-                    "name": "volume-nifi",
-                    "subPath": "nifi-conf/state"
-                  },
-                  {
-                    "mountPath": "/opt/nifi/nifi-current/content_repository",
-                    "name": "volume-nifi",
-                    "subPath": "nifi-conf/content_repository"
-                  },
-                  {
-                    "mountPath": "/opt/nifi/nifi-current/database_repository",
-                    "name": "volume-nifi",
-                    "subPath": "nifi-conf/database_repository"
-                  },
-                  {
-                    "mountPath": "/opt/nifi/nifi-current/flowfile_repository",
-                    "name": "volume-nifi",
-                    "subPath": "nifi-conf/flowfile_repository"
-                  },
-                  {
-                    "mountPath": "/opt/nifi/nifi-current/provenance_repository",
-                    "name": "volume-nifi",
-                    "subPath": "nifi-conf/provenance_repository"
-                  }
-                ]
+                "terminationMessagePath": "/dev/termination-log"
               }
             ],
             "dnsPolicy": "ClusterFirst",
             "restartPolicy": "Always",
             "securityContext": {},
-            "terminationGracePeriodSeconds": 30,
-            "volumes": [
-              {
-                "name": "volume-nifi",
-                "persistentVolumeClaim": {
-                  "claimName": "${OSSIM_DATA_PV_NAME}-pvc"
-                }
-              }
-            ]
+            "terminationGracePeriodSeconds": 30
           }
         },
         "test": false,
@@ -234,11 +186,11 @@
             "imageChangeParams": {
               "automatic": true,
               "containerNames": [
-                "nifi"
+                "${APP_NAME}"
               ],
               "from": {
                 "kind": "ImageStreamTag",
-                "name": "nifi:${TAG}",
+                "name": "gogs:${TAG}",
                 "namespace": "${DEPLOYMENT_TARGET}"
               }
             },
@@ -260,26 +212,26 @@
         "creationTimestamp": null,
         "labels": {
         },
-        "name": "nifi",
+        "name": "${APP_NAME}",
         "namespace": "${DEPLOYMENT_TARGET}"
       },
       "spec": {
         "ports": [
           {
-            "name": "8080-tcp",
-            "port": 8080,
+            "name": "3000-tcp",
+            "port": 3000,
             "protocol": "TCP",
-            "targetPort": 8080
+            "targetPort": 3000
           },
           {
-            "name": "8081-tcp",
-            "port": 8081,
+            "name": "22-ssh",
+            "port": 22,
             "protocol": "TCP",
-            "targetPort": 8081
+            "targetPort": 22
           }
         ],
         "selector": {
-          "deploymentconfig": "nifi"
+          "deploymentconfig": "gogs"
         },
         "sessionAffinity": "None",
         "type": "ClusterIP"
@@ -289,7 +241,7 @@
       "apiVersion": "v1",
       "kind": "ImageStream",
       "metadata": {
-        "name": "nifi",
+        "name": "${APP_NAME}",
         "namespace": "${DEPLOYMENT_TARGET}",
         "labels": {
           "application": "test"
