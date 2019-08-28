@@ -13,7 +13,7 @@ Via Docker Compose: `docker-compose -f registry.yml up`
 In this example, the user pulls some image, in this case 'ubuntu,' from the global registry and pushes it to a new local registry.
 
 ```bash
-$ docker pull ubuntu
-$ docker tag ubuntu localhost:5000/ubuntu
-$ docker push localhost:5000/ubuntu
+docker pull ubuntu
+docker tag ubuntu localhost:5000/ubuntu
+docker push localhost:5000/ubuntu
 ```
