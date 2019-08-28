@@ -25,7 +25,7 @@
       "displayName": "DEPLOYMENT_TARGET",
       "description": "Deployment target (omar-dev, etc.)",
       "required": true,
-      "value": "devops"
+      "value": "omar-dev"
     },
     {
       "name": "OPENSHIFT_DOCKER_REGISTRY_URL",
@@ -35,18 +35,25 @@
       "value": "docker-registry.default.svc:5000"
     },
     {
-      "name": "TAG",
-      "displayName": "TAG",
+      "name": "NIFI_TAG",
+      "displayName": "NIFI_TAG",
       "description": "Docker Container Image Version Tag",
       "required": true,
-      "value": "latest"
+      "value": "1.9.2"
+    },
+    {
+      "name": "ZOOKEEPER_TAG",
+      "displayName": "ZOOKEEPER_TAG",
+      "description": "Docker Container Image Version Tag",
+      "required": true,
+      "value": "3.5.5"
     },
     {
       "name": "OSSIM_DATA_PV_NAME",
       "displayName": "OSSIM_DATA_PV_NAME",
       "description": "Persistent volume storage base name",
       "required": true,
-      "value": "ossim-data"
+      "value": "ossim-data-dev"
     },
     {
       "name": "REPLICAS",
@@ -154,7 +161,7 @@
                     "value": "${JAVA_OPTS}"
                   }
                 ],
-                "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/nifi:${TAG}",
+                "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/nifi:${NIFI_TAG}",
                 "imagePullPolicy": "Always",
                 "livenessProbe": {
                   "failureThreshold": 5,
@@ -199,41 +206,41 @@
                 "volumeMounts": [
                   {
                     "mountPath": "/data",
-                    "name": "volume-nifi"
+                    "name": "volume-nifi-cluster"
                   },
                   {
                     "mountPath": "/opt/nifi/nifi-current/conf",
-                    "name": "volume-nifi",
+                    "name": "volume-nifi-cluster",
                     "subPath": "nifi-conf/conf"
                   },
                   {
                     "mountPath": "/opt/nifi/nifi-current/logs",
-                    "name": "volume-nifi",
+                    "name": "volume-nifi-cluster",
                     "subPath": "nifi-conf/logs"
                   },
                   {
                     "mountPath": "/opt/nifi/nifi-current/state",
-                    "name": "volume-nifi",
+                    "name": "volume-nifi-cluster",
                     "subPath": "nifi-conf/state"
                   },
                   {
                     "mountPath": "/opt/nifi/nifi-current/content_repository",
-                    "name": "volume-nifi",
+                    "name": "volume-nifi-cluster",
                     "subPath": "nifi-conf/content_repository"
                   },
                   {
                     "mountPath": "/opt/nifi/nifi-current/database_repository",
-                    "name": "volume-nifi",
+                    "name": "volume-nifi-cluster",
                     "subPath": "nifi-conf/database_repository"
                   },
                   {
                     "mountPath": "/opt/nifi/nifi-current/flowfile_repository",
-                    "name": "volume-nifi",
+                    "name": "volume-nifi-cluster",
                     "subPath": "nifi-conf/flowfile_repository"
                   },
                   {
                     "mountPath": "/opt/nifi/nifi-current/provenance_repository",
-                    "name": "volume-nifi",
+                    "name": "volume-nifi-cluster",
                     "subPath": "nifi-conf/provenance_repository"
                   }
                 ]
@@ -245,7 +252,7 @@
             "terminationGracePeriodSeconds": 30,
             "volumes": [
               {
-                "name": "volume-nifi",
+                "name": "volume-nifi-cluster",
                 "persistentVolumeClaim": {
                   "claimName": "${OSSIM_DATA_PV_NAME}-pvc"
                 }
@@ -263,7 +270,7 @@
               ],
               "from": {
                 "kind": "ImageStreamTag",
-                "name": "nifi:${TAG}",
+                "name": "nifi:${NIFI_TAG}",
                 "namespace": "${DEPLOYMENT_TARGET}"
               }
             },
@@ -361,14 +368,7 @@
             "restartPolicy": "Always",
             "securityContext": {},
             "terminationGracePeriodSeconds": 30,
-            "volumes": [
-              {
-                "name": "volume-nifi",
-                "persistentVolumeClaim": {
-                  "claimName": "${OSSIM_DATA_PV_NAME}-pvc"
-                }
-              }
-            ]
+            "volumes": []
           }
         },
         "test": false,
@@ -381,7 +381,7 @@
               ],
               "from": {
                 "kind": "ImageStreamTag",
-                "name": "zookeeper:${TAG}",
+                "name": "zookeeper:${ZOOKEEPER_TAG}",
                 "namespace": "${DEPLOYMENT_TARGET}"
               }
             },
@@ -403,7 +403,7 @@
         "creationTimestamp": null,
         "labels": {
         },
-        "name": "nifi",
+        "name": "nifi-cluster",
         "namespace": "${DEPLOYMENT_TARGET}"
       },
       "spec": {
@@ -428,7 +428,7 @@
           }
         ],
         "selector": {
-          "deploymentconfig": "nifi"
+          "deploymentconfig": "nifi-cluster"
         },
         "sessionAffinity": "None",
         "type": "ClusterIP"
@@ -485,6 +485,42 @@
       "apiVersion": "v1",
       "kind": "ImageStream",
       "metadata": {
+        "name": "nifi-cluster",
+        "namespace": "${DEPLOYMENT_TARGET}",
+        "labels": {
+          "application": "test"
+        },
+        "annotations": {
+          "openshift.io/image.insecureRepository": "${INSECURE_REPOSITORY}"
+        }
+      },
+      "spec": {
+        "lookupPolicy": {
+          "local": false
+        },
+        "tags": [
+          {
+            "annotations": null,
+            "from": {
+              "kind": "DockerImage",
+              "name": "${DOCKER_IMAGE_REPO}/${NIFI_IMAGE_NAME}:${NIFI_TAG}"
+            },
+            "importPolicy": {
+              "scheduled": true,
+              "insecure": "${{INSECURE_REPOSITORY}}"
+            },
+            "name": "${NIFI_TAG}",
+            "referencePolicy": {
+              "type": "Source"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ImageStream",
+      "metadata": {
         "name": "zookeeper",
         "namespace": "${DEPLOYMENT_TARGET}",
         "labels": {
@@ -503,43 +539,7 @@
             "annotations": null,
             "from": {
               "kind": "DockerImage",
-              "name": "${ZOOKEEPER_IMAGE_NAME}:${TAG}"
-            },
-            "importPolicy": {
-              "scheduled": true,
-              "insecure": "${{INSECURE_REPOSITORY}}"
-            },
-            "name": "${TAG}",
-            "referencePolicy": {
-              "type": "Source"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "v1",
-      "kind": "ImageStream",
-      "metadata": {
-        "name": "nifi",
-        "namespace": "${DEPLOYMENT_TARGET}",
-        "labels": {
-          "application": "test"
-        },
-        "annotations": {
-          "openshift.io/image.insecureRepository": "${INSECURE_REPOSITORY}"
-        }
-      },
-      "spec": {
-        "lookupPolicy": {
-          "local": false
-        },
-        "tags": [
-          {
-            "annotations": null,
-            "from": {
-              "kind": "DockerImage",
-              "name": "${DOCKER_IMAGE_REPO}/${NIFI_IMAGE_NAME}:${TAG}"
+              "name": "${ZOOKEEPER_IMAGE_NAME}:${ZOOKEEPER_TAG}"
             },
             "importPolicy": {
               "scheduled": true,
