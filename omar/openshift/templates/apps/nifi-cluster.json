@@ -266,7 +266,7 @@
             "imageChangeParams": {
               "automatic": true,
               "containerNames": [
-                "nifi"
+                "nifi-cluster"
               ],
               "from": {
                 "kind": "ImageStreamTag",
@@ -485,42 +485,6 @@
       "apiVersion": "v1",
       "kind": "ImageStream",
       "metadata": {
-        "name": "nifi-cluster",
-        "namespace": "${DEPLOYMENT_TARGET}",
-        "labels": {
-          "application": "test"
-        },
-        "annotations": {
-          "openshift.io/image.insecureRepository": "${INSECURE_REPOSITORY}"
-        }
-      },
-      "spec": {
-        "lookupPolicy": {
-          "local": false
-        },
-        "tags": [
-          {
-            "annotations": null,
-            "from": {
-              "kind": "DockerImage",
-              "name": "${DOCKER_IMAGE_REPO}/${NIFI_IMAGE_NAME}:${NIFI_TAG}"
-            },
-            "importPolicy": {
-              "scheduled": true,
-              "insecure": "${{INSECURE_REPOSITORY}}"
-            },
-            "name": "${NIFI_TAG}",
-            "referencePolicy": {
-              "type": "Source"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "v1",
-      "kind": "ImageStream",
-      "metadata": {
         "name": "zookeeper",
         "namespace": "${DEPLOYMENT_TARGET}",
         "labels": {
@@ -545,7 +509,7 @@
               "scheduled": true,
               "insecure": "${{INSECURE_REPOSITORY}}"
             },
-            "name": "${TAG}",
+            "name": "${ZOOKEEPER_TAG}",
             "referencePolicy": {
               "type": "Source"
             }
