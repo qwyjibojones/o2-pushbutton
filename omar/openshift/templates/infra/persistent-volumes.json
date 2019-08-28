@@ -9,50 +9,11 @@
    },
    "parameters": [
       {
-      "description": "",
-      "displayName": "",
-      "name": "DOCKER_IMAGE_REPO",
-      "value": "quay.io/radiantsolutions"
-       },
-       {
-         "description": "",
-         "displayName": "",
-         "name": "APP_NAME",
-         "value": "icarus-app"
-       },
-       {
-         "description": "",
-         "displayName": "",
-         "name": "TARGET_NAMESPACE",
-         "value": "omar-dev"
-       },
-      {
          "name": "DEPLOYMENT_TARGET",
          "displayName": "DEPLOYMENT_TARGET",
          "description": "Deployment target (dev|stage|blue|green)",
          "required": true,
          "value": "dev"
-      },
-      {
-         "name": "DOMAIN_NAME",
-         "displayName": "DOMAIN_NAME",
-         "description": "Host Domain Name",
-         "required": true,
-         "value": "ossim.io"
-      },
-      {
-         "name": "DOCKER_REGISTRY_URL",
-         "displayName": "DOCKER_REGISTRY_URL",
-         "description": "Openshift Docker Registry URL",
-         "required": true,
-         "value": "docker-registry.default.svc:5000"
-      },
-      {
-         "name": "TAG",
-         "displayName": "TAG",
-         "description": "Docker Container Image Version Tag",
-         "required": true,
-         "value": "latest"
       },
       {
          "name": "OSSIM_DATA_PV_NAME",

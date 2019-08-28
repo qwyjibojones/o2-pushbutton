@@ -1,0 +1,557 @@
+{
+  "apiVersion": "v1",
+  "kind": "Template",
+  "metadata": {
+    "name": "nifi-cluster"
+  },
+  "labels": {
+    "template": "nifi-cluster"
+  },
+  "parameters": [
+    {
+      "description": "",
+      "displayName": "",
+      "name": "DOCKER_IMAGE_REPO",
+      "value": "quay.io/radiantsolutions"
+    },
+    {
+      "description": "",
+      "displayName": "",
+      "name": "APP_NAME",
+      "value": "nifi-cluster"
+    },
+    {
+      "name": "DEPLOYMENT_TARGET",
+      "displayName": "DEPLOYMENT_TARGET",
+      "description": "Deployment target (omar-dev, etc.)",
+      "required": true,
+      "value": "devops"
+    },
+    {
+      "name": "OPENSHIFT_DOCKER_REGISTRY_URL",
+      "displayName": "OPENSHIFT_DOCKER_REGISTRY_URL",
+      "description": "Openshift Docker Registry URL",
+      "required": true,
+      "value": "docker-registry.default.svc:5000"
+    },
+    {
+      "name": "TAG",
+      "displayName": "TAG",
+      "description": "Docker Container Image Version Tag",
+      "required": true,
+      "value": "latest"
+    },
+    {
+      "name": "OSSIM_DATA_PV_NAME",
+      "displayName": "OSSIM_DATA_PV_NAME",
+      "description": "Persistent volume storage base name",
+      "required": true,
+      "value": "ossim-data"
+    },
+    {
+      "name": "REPLICAS",
+      "displayName": "REPLICAS",
+      "description": "Number of replicas to deploy for a given service",
+      "required": true,
+      "value": "1"
+    },
+    {
+      "name": "NIFI_IMAGE_NAME",
+      "displayName": "NIFI_IMAGE_NAME",
+      "description": "The name of the docker image to pull",
+      "value": "nifi"
+    },
+    {
+      "name": "ZOOKEEPER_IMAGE_NAME",
+      "displayName": "ZOOKEEPER_IMAGE_NAME",
+      "description": "The name of the docker image to pull",
+      "value": "zookeeper"
+    },
+    {
+      "name": "INSECURE_REPOSITORY",
+      "displayName": "INSECURE_REPOSITORY",
+      "description": "Mark the image stream as an insecure repository",
+      "value": "false"
+    },
+    {
+      "name": "MEMORY_MAX",
+      "displayName": "MEMORY_MAX",
+      "description": "Maximum memory for this app to have",
+      "value": "1000Mi"
+    },
+    {
+      "name": "JAVA_OPTS",
+      "displayName": "JAVA_OPTS",
+      "description": "Desired value for the JAVA_OPTS environment variable",
+      "value": ""
+    }
+  ],
+  "objects": [
+    {
+      "apiVersion": "v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "creationTimestamp": null,
+        "generation": 320,
+        "labels": {
+          "type": "tool"
+        },
+        "name": "nifi-cluster",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "replicas": "${REPLICAS}",
+        "selector": {
+          "deploymentconfig": "nifi-cluster"
+        },
+        "strategy": {
+          "resources": {},
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "annotations": {
+              "openshift.io/generated-by": "OpenShiftNewApp"
+            },
+            "creationTimestamp": null,
+            "labels": {
+              "deploymentconfig": "nifi-cluster"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "NIFI_WEB_HTTP_HOST",
+                    "value": "0.0.0.0"
+                  },
+                  {
+                    "name": "NIFI_WEB_PORT",
+                    "value": "8080"
+                  },
+                  {
+                    "name": "NIFI_CLUSTER_IS_NODE",
+                    "value": "true"
+                  },
+                  {
+                    "name": "NIFI_CLUSTER_NODE_PROTOCOL_PORT",
+                    "value": "8082"
+                  },
+                  {
+                    "name": "NIFI_ZK_CONNECT_STRING",
+                    "value": "zookeeper:2181"
+                  },
+                  {
+                    "name": "NIFI_ELECTION_MAX_WAIT",
+                    "value": "30 secs"
+                  },
+                  {
+                    "name": "JAVA_OPTS",
+                    "value": "${JAVA_OPTS}"
+                  }
+                ],
+                "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/nifi:${TAG}",
+                "imagePullPolicy": "Always",
+                "livenessProbe": {
+                  "failureThreshold": 5,
+                  "initialDelaySeconds": 600,
+                  "periodSeconds": 30,
+                  "successThreshold": 1,
+                  "tcpSocket": {
+                    "port": 8080
+                  },
+                  "timeoutSeconds": 3
+                },
+                "name": "nifi-cluster",
+                "ports": [
+                  {
+                    "containerPort": 8080,
+                    "protocol": "TCP"
+                  },
+                  {
+                    "containerPort": 8081,
+                    "protocol": "TCP"
+                  }
+                ],
+                "readinessProbe": {
+                  "failureThreshold": 60,
+                  "initialDelaySeconds": 5,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "tcpSocket": {
+                    "port": 8080
+                  },
+                  "timeoutSeconds": 3
+                },
+                "resources": {
+                  "requests": {
+                    "memory": "${MEMORY_MAX}"
+                  },
+                  "limits": {
+                    "memory": "${MEMORY_MAX}"
+                  }
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/data",
+                    "name": "volume-nifi"
+                  },
+                  {
+                    "mountPath": "/opt/nifi/nifi-current/conf",
+                    "name": "volume-nifi",
+                    "subPath": "nifi-conf/conf"
+                  },
+                  {
+                    "mountPath": "/opt/nifi/nifi-current/logs",
+                    "name": "volume-nifi",
+                    "subPath": "nifi-conf/logs"
+                  },
+                  {
+                    "mountPath": "/opt/nifi/nifi-current/state",
+                    "name": "volume-nifi",
+                    "subPath": "nifi-conf/state"
+                  },
+                  {
+                    "mountPath": "/opt/nifi/nifi-current/content_repository",
+                    "name": "volume-nifi",
+                    "subPath": "nifi-conf/content_repository"
+                  },
+                  {
+                    "mountPath": "/opt/nifi/nifi-current/database_repository",
+                    "name": "volume-nifi",
+                    "subPath": "nifi-conf/database_repository"
+                  },
+                  {
+                    "mountPath": "/opt/nifi/nifi-current/flowfile_repository",
+                    "name": "volume-nifi",
+                    "subPath": "nifi-conf/flowfile_repository"
+                  },
+                  {
+                    "mountPath": "/opt/nifi/nifi-current/provenance_repository",
+                    "name": "volume-nifi",
+                    "subPath": "nifi-conf/provenance_repository"
+                  }
+                ]
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "restartPolicy": "Always",
+            "securityContext": {},
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "volume-nifi",
+                "persistentVolumeClaim": {
+                  "claimName": "${OSSIM_DATA_PV_NAME}-pvc"
+                }
+              }
+            ]
+          }
+        },
+        "test": false,
+        "triggers": [
+          {
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "nifi"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "nifi:${TAG}",
+                "namespace": "${DEPLOYMENT_TARGET}"
+              }
+            },
+            "type": "ImageChange"
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "creationTimestamp": null,
+        "generation": 320,
+        "labels": {
+          "type": "tool"
+        },
+        "name": "zookeeper",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "replicas": "1",
+        "selector": {
+          "deploymentconfig": "nifi-cluster"
+        },
+        "strategy": {
+          "resources": {},
+          "type": "Recreate"
+        },
+        "template": {
+          "metadata": {
+            "annotations": {
+              "openshift.io/generated-by": "OpenShiftNewApp"
+            },
+            "creationTimestamp": null,
+            "labels": {
+              "deploymentconfig": "nifi-cluster"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "ALLOW_ANONYMOUS_LOGIN",
+                    "value": "yes"
+                  }
+                ],
+                "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/zookeeper:${TAG}",
+                "imagePullPolicy": "Always",
+                "livenessProbe": {
+                  "failureThreshold": 5,
+                  "initialDelaySeconds": 600,
+                  "periodSeconds": 30,
+                  "successThreshold": 1,
+                  "tcpSocket": {
+                    "port": 2181
+                  },
+                  "timeoutSeconds": 3
+                },
+                "name": "zookeeper",
+                "ports": [],
+                "readinessProbe": {
+                  "failureThreshold": 60,
+                  "initialDelaySeconds": 5,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "tcpSocket": {
+                    "port": 2181
+                  },
+                  "timeoutSeconds": 3
+                },
+                "resources": {
+                  "requests": {
+                    "memory": "${MEMORY_MAX}"
+                  },
+                  "limits": {
+                    "memory": "${MEMORY_MAX}"
+                  }
+                },
+                "securityContext": {
+                  "runAsUser": 1000
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "volumeMounts": []
+              }
+            ],
+            "dnsPolicy": "ClusterFirst",
+            "restartPolicy": "Always",
+            "securityContext": {},
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "name": "volume-nifi",
+                "persistentVolumeClaim": {
+                  "claimName": "${OSSIM_DATA_PV_NAME}-pvc"
+                }
+              }
+            ]
+          }
+        },
+        "test": false,
+        "triggers": [
+          {
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "zookeeper"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "zookeeper:${TAG}",
+                "namespace": "${DEPLOYMENT_TARGET}"
+              }
+            },
+            "type": "ImageChange"
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "creationTimestamp": null,
+        "labels": {
+        },
+        "name": "nifi",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "8443-tcp",
+            "port": 8443,
+            "protocol": "TCP",
+            "targetPort": 8443
+          },
+          {
+            "name": "10000-tcp",
+            "port": 10000,
+            "protocol": "TCP",
+            "targetPort": 10000
+          },
+          {
+            "name": "8080-tcp",
+            "port": 8080,
+            "protocol": "TCP",
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "deploymentconfig": "nifi"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "creationTimestamp": null,
+        "labels": {
+        },
+        "name": "zookeeper",
+        "namespace": "${DEPLOYMENT_TARGET}"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "2181-tcp",
+            "port": 2181,
+            "protocol": "TCP",
+            "targetPort": 2181
+          },
+          {
+            "name": "2888-tcp",
+            "port": 2888,
+            "protocol": "TCP",
+            "targetPort": 2888
+          },
+          {
+            "name": "3888-tcp",
+            "port": 3888,
+            "protocol": "TCP",
+            "targetPort": 3888
+          },
+          {
+            "name": "8080-tcp",
+            "port": 8080,
+            "protocol": "TCP",
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "deploymentconfig": "zookeeper"
+        },
+        "sessionAffinity": "None",
+        "type": "ClusterIP"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ImageStream",
+      "metadata": {
+        "name": "zookeeper",
+        "namespace": "${DEPLOYMENT_TARGET}",
+        "labels": {
+          "application": "test"
+        },
+        "annotations": {
+          "openshift.io/image.insecureRepository": "${INSECURE_REPOSITORY}"
+        }
+      },
+      "spec": {
+        "lookupPolicy": {
+          "local": false
+        },
+        "tags": [
+          {
+            "annotations": null,
+            "from": {
+              "kind": "DockerImage",
+              "name": "${ZOOKEEPER_IMAGE_NAME}:${TAG}"
+            },
+            "importPolicy": {
+              "scheduled": true,
+              "insecure": "${{INSECURE_REPOSITORY}}"
+            },
+            "name": "${TAG}",
+            "referencePolicy": {
+              "type": "Source"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "ImageStream",
+      "metadata": {
+        "name": "nifi",
+        "namespace": "${DEPLOYMENT_TARGET}",
+        "labels": {
+          "application": "test"
+        },
+        "annotations": {
+          "openshift.io/image.insecureRepository": "${INSECURE_REPOSITORY}"
+        }
+      },
+      "spec": {
+        "lookupPolicy": {
+          "local": false
+        },
+        "tags": [
+          {
+            "annotations": null,
+            "from": {
+              "kind": "DockerImage",
+              "name": "${DOCKER_IMAGE_REPO}/${NIFI_IMAGE_NAME}:${TAG}"
+            },
+            "importPolicy": {
+              "scheduled": true,
+              "insecure": "${{INSECURE_REPOSITORY}}"
+            },
+            "name": "${TAG}",
+            "referencePolicy": {
+              "type": "Source"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
