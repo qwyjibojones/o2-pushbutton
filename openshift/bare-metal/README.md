@@ -54,8 +54,8 @@ We will need a machine running ansible that will be used to configure and setup 
 
 We have supplied a mechanism that uses docker to serve up openshift related RPM and container dependencies.  For disconnected networks we will assume that the /etc/yum.repo.d/ directory has files that are pointing to a yum repo that holds all the base RPMS for a CentOS distribution including any updates and extras.  If you do not have these then these could be added to our RPM tree as described in this [README](../disconnected/README.md)
 
-For connected environments:
-**Step XX: ** 
+
+**Step XX.** Install The necessary dependencies:
 ```bash
 sudo yum install -y ansible
 sudo yum install -y centos-release-ansible26
@@ -87,7 +87,9 @@ ssh-keygen -f ~/.ssh/os-config-key-rsa -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/os-config-key-rsa user@host
 ```
 
-*Notes:* SSH is used by ansible to configure nodes in the cluster.  Each node must be reachable from the ansible configuration node.  Setup an ssh key for a common user so one can configure all nodes in the inventory. The preferred way is to create an ssh key without a password.  If you add a password to your ssh key you must use an ssh-agent on the ansible machine.  The ssh-agent will cache the password and encrypt it.  We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node, for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
+*Notes:* The preferred way is to create an ssh key without a password.  If you add a password to your ssh key you must use an ssh-agent on the ansible machine. 
+
+We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node, for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
 
 If the **keys are password protected** then make sure the ssh-agent is running on the ansible machine and then add the key.
 
@@ -96,24 +98,26 @@ ssh-agent
 ssh-add ~/.ssh/os-config-key-rsa
 ```
 
-`create ~/.ssh/config` on your ansible machine with contents listing all nodes in your cluster
-
+**Step XX.** Create `~/.ssh/config` on your ansible machine, listing all the nodes in the cluster: 
 ```config
-Host openshift-test-master-node-1.private.ossim.io
+Host openshift-master-node-1.private.ossim.io
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
-Host openshift-test-infra-node-1.private.ossim.io
+Host openshift-infra-node-1.private.ossim.io
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
-Host openshift-test-compute-node-1.private.ossim.io
+Host openshift-compute-node-1.private.ossim.io
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
-Host openshift-test-lb-node.private.ossim.io
+Host openshift-lb-node.private.ossim.io
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
 ```
 
-change the permissions to be 600: `chmod 600 ~/.ssh/config`
+**Step XX.** Change the permissions on the config file:
+```bash
+chmod 600 ~/.ssh/config
+```
 
 Setup NetworkManager and python ssl on all nodes.  If you have your nodes in the config named with numbers 1-n then it's a simple bash script and can be done for each dns prefix.  In this example all of our nodes are prefixed with openshift-test-node-.  When metrics are enabled we must add to the install java headless and python-passlib.  Please modify these bash commands to match the number of nodes and dns values:
 
