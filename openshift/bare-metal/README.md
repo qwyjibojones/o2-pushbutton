@@ -55,47 +55,39 @@ We will need a machine running ansible that will be used to configure and setup 
 We have supplied a mechanism that uses docker to serve up openshift related RPM and container dependencies.  For disconnected networks we will assume that the /etc/yum.repo.d/ directory has files that are pointing to a yum repo that holds all the base RPMS for a CentOS distribution including any updates and extras.  If you do not have these then these could be added to our RPM tree as described in this [README](../disconnected/README.md)
 
 For connected environments:
-
+**Step XX: ** 
 ```bash
-sudo yum install -y git centos-release-ansible26
-sudo yum install -y ansible python-passlib git pyOpenSSL httpd-tools java-1.8.0-openjdk-headless
+sudo yum install -y ansible
+sudo yum install -y centos-release-ansible26
+sudo yum install -y git 
+sudo yum install -y httpd-tools 
+sudo yum install -y java-1.8.0-openjdk-headless
+sudo yum install -y pyOpenSSL 
+sudo yum install -y python-passlib 
 ```
 
-For disconnected environments, assume all dependency RPMs are in a common repo and have a repo file under /etc/yum.repo.d/ directory pointing to your common yum repository.
+*Notes:* For disconnected environments, we assume all dependency RPMs are in a common repo and have a repo file under /etc/yum.repo.d/ directory pointing to your common yum repository. Obviously, git can be ignored in this case. At the time of writing this document we are using ansible version **2.7.10**.  
 
-```bash
-sudo yum install -y ansible python-passlib git pyOpenSSL httpd-tools java-1.8.0-openjdk-headless
-```
-
-At the time of writing this document we are using ansible version **2.7.10**.  
-
-If you have internet connectivity you can checkout openshift-ansible playbooks from the openshift project on github.
-
+**Step XX:** On an internet connected machine, checkout out the the openshift-ansible playbooks.
 ```bash
 cd ~
 git clone https://github.com/openshift/openshift-ansible.git
 cd ~/openshift-ansible
 git checkout release-3.11
-# for disconnected create a tarball
-cd ~
-tar cvfz openshift-ansible.tgz openshift-ansible
 ```
 
-If you are disconnected then the openshift-ansible repo will need to be tarballed up and then extracted to the home/working directory of an install user on the ansible machine. We will assume that the version is the same mentioned in this Documentation, release-3.11.
+*Notes:* For disconnected environments, make this repository available. 
 
-`tar xvfz openshift-ansible.tgz`
+### SSH Keys and Config
 
-We have made no modifications to the installation playbooks and can be used as is.  Most of the playbooks have variables we can set in the inventory file to customize the installation process.
-
-### Setup SSH Keys and Config
-
-SSH is used by ansible to configure nodes in the cluster.  Each node must be reachable from the ansible configuration node.  Setup an ssh key for a common user so one can configure all nodes in the inventory. The preferred way is to create an ssh key without a password.  If you add a password to your ssh key you must use an ssh-agent on the ansible machine.  The ssh-agent will cache the password and encrypt it.  We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node, for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
-
+**STEP XX:** Create an SSH key to allow the ansible machine to communicate with the rest of the cluster:
 ```bash
 mkdir ~/.ssh;chmod 700 ~/.ssh
 ssh-keygen -f ~/.ssh/os-config-key-rsa -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/os-config-key-rsa user@host
 ```
+
+*Notes:* SSH is used by ansible to configure nodes in the cluster.  Each node must be reachable from the ansible configuration node.  Setup an ssh key for a common user so one can configure all nodes in the inventory. The preferred way is to create an ssh key without a password.  If you add a password to your ssh key you must use an ssh-agent on the ansible machine.  The ssh-agent will cache the password and encrypt it.  We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node, for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
 
 If the **keys are password protected** then make sure the ssh-agent is running on the ansible machine and then add the key.
 
