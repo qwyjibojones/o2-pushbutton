@@ -119,23 +119,20 @@ Host openshift-lb-node.private.ossim.io
 chmod 600 ~/.ssh/config
 ```
 
-Setup NetworkManager and python ssl on all nodes.  If you have your nodes in the config named with numbers 1-n then it's a simple bash script and can be done for each dns prefix.  In this example all of our nodes are prefixed with openshift-test-node-.  When metrics are enabled we must add to the install java headless and python-passlib.  Please modify these bash commands to match the number of nodes and dns values:
+**Step XX.** Setup NetworkManager and python ssl on all nodes:
 
 ```bash
-for x in {1..3}; do ssh openshift-test-master-node-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
-for x in {1..1}; do ssh openshift-test-infra-node-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
-for x in {1..8}; do ssh openshift-test-compute-node-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
+ssh <node-dns-or-ip> "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"
 ```
 
-**Note**: when you start the installation and you see messages of the form  `RETRYING: Wait for the ServiceMonitor CRD to be created` you will need to make sure you enable ip forwarding on all nodes see [Ip Forwarding Must Be Enable](#ip-forwarding-must-be-enable) section on how to set the value.
+*Note*: when you start the installation and you see messages of the form  `RETRYING: Wait for the ServiceMonitor CRD to be created` you will need to make sure you enable ip forwarding on all nodes see [Ip Forwarding Must Be Enable](#ip-forwarding-must-be-enable) section on how to set the value.
 
-If you have a gluster cluster that would need to be configured for openshift dynamic provisioning support then we will assume similar private dns names and you can run the following script
+**Step XX.** If a gluster cluster needs to be configured for openshift dynamic provisioning support then run the following script:
 
 ```bash
-for x in {1..3}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
+ssh <gluster-dns-or-ip> "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL; sudo systemctl enable NetworkManager; sudo systemctl start NetworkManager"
 ```
-
-Note, the gluster cluster here should have un-allocated disks and OpenShift installs heketi to add a restful interface for dynamically provisioning space from the gluster cluster.
+*Note:* The gluster cluster should have un-allocated disks and OpenShift installs heketi to add a restful interface for dynamically provisioning space from the gluster cluster.
 
 ### Dynamic Provisioning with Gluster
 
@@ -163,24 +160,21 @@ We can override the variable without editing the scripts but the original list c
 
 ### Configure the Nodes in the Cluster
 
-We now assume that you have a ~/.ssh/config file that describes how to reach each node in the cluster.  We will now place those nodes into the proper sections described in the annotated sample inventory file found in the directory **[openshift/openshift-inventory-sample](openshift/openshift-inventory-sample)**.  Use this file to create an inventory file for your cluster in the ansible home ~/openshift-inventory.  The file has annotations explaining each section and must be tailored for your environment and resource limits.  If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  Please see the inventory example for further definitions.  
-
-Copy  and edit the inventory file
-
+**Step XX.** Edit the openshift inventory file:  
 ```bash
-cp openshift/openshift-inventory-sample ~/openshift-inventory
+cp o2-pushbutton/openshift/bare-metal/openshift-inventory-sample ~/openshift-inventory
 vi ~/openshift-inventory
 ```
 
- Put your node name into each section the node corresponds to.  SSH to each node in the config.  This will verify that the ansible machine can reach all nodes and are part of the known_hosts.
+*Note:* If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  
 
-If all the nodes are reachable and ready to be configured then run:
-
+**Step XX.** Let ansible configure the cluster: 
 ```bash
 cd ~/openshift-ansible
 ansible-playbook -i ~/openshift-inventory playbooks/prerequisites.yml
 ansible-playbook -i ~/openshift-inventory playbooks/deploy_cluster.yml
 ```
+*Note:* Use the `playbooks/adhoc/uninstall.yml` playbook liberally as it may take a few times to properly configure the cluster. 
 
 Once the cluster has been deployed we must setup the Security Context for the cluster to allow us to run as any user.  The OMAR services run as user 1000 and the ElasticSearch Opendistro cluster runs as user 1001.  The easiest thing to do is:
 
