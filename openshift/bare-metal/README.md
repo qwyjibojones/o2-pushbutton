@@ -68,23 +68,18 @@ git checkout release-3.11
 
 ### SSH Keys and Config
 
-**STEP XX:** Create an SSH key to allow the ansible machine to communicate with the rest of the cluster:
+**Step XX.** Create an SSH key to allow the ansible machine to communicate with the rest of the cluster:
 ```bash
 mkdir ~/.ssh;chmod 700 ~/.ssh
 ssh-keygen -f ~/.ssh/os-config-key-rsa -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/os-config-key-rsa user@host
 ```
 
-*Notes:* The preferred way is to create an ssh key without a password.  If you add a password to your ssh key you must use an ssh-agent on the ansible machine. 
+*Notes:* The preferred way is to create an ssh key without a password.  If a password is added to the ssh key, use an ssh-agent on the ansible machine. 
 
-We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node, for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
+**Step XX.** Copy the ssh keys to all nodes in the cluster. 
 
-If the **keys are password protected** then make sure the ssh-agent is running on the ansible machine and then add the key.
-
-```bash
-ssh-agent
-ssh-add ~/.ssh/os-config-key-rsa
-```
+*Notes:* It is important to note that the **ssh user must have sudo rights** on each node, for the ansible scripts will install items that require sudo privileges.  If the **keys are password protected** then make sure the ssh-agent is running on the ansible machine and then add the key.
 
 **Step XX.** Create `~/.ssh/config` on your ansible machine, listing all the nodes in the cluster: 
 ```config
