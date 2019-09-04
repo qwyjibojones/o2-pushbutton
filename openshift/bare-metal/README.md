@@ -2,7 +2,7 @@
 
 ## Requirements
 
-For completeness we will repeat from the Origin Documentation for 3.11 the Hardware Requirements but tailored to our CentOS7 environment.
+**Step 01.** Ensure your cluster hardware meets the following requirements. For completeness we will repeat from the Origin Documentation for 3.11 the Hardware Requirements but tailored to our CentOS7 environment.
 
 * **Master Hardware**
   - Physical or virtual system or an instance running on a public or private IaaS.
@@ -27,33 +27,21 @@ For completeness we will repeat from the Origin Documentation for 3.11 the Hardw
   - Minimum 20 GB hard disk space for etcd data.
   - See the Hardware Recommendations section of the CoreOS etcd documentation for information how to properly size your etcd nodes.
   - Currently, OKD stores image, build, and deployment metadata in etcd. You must periodically prune old resources. If you are planning to leverage a large number of these resources, place etcd on machines with large amounts of memory and fast SSD drives.
-* **System Admin Knowledge** One will need to have some level of training in System Administration and bash scripting.
-* **Repos**
-  - openshift-ansible This will be a checkout or tar ball of release-3.11.  Repo can be found here [https://github.com/openshift/openshift-ansible](https://github.com/openshift/openshift-ansible)
-  - o2-pushbutton repo can be found here [https://github.com/ossimlabs/o2-pushbutton](https://github.com/ossimlabs/o2-pushbutton)
   
-* **NPE Certificate** We prefer that you have a valid wildcard NPE certificate that we can use.  If this is in the format of a .p12 we will need to convert into a pem and key without a password and have the CA available.  If you do not have the ability to use a wildcard NPE CERT that is fine. You will at the minimum need an NPE CERT for the okd hawkular metrics and OKD master web console endpoints.  Additional NPE CERTS will be needed for any web applications installed on the cluster that needs to serve via https.
+*Notes:* It is recommended the cluster contain at least 2 masters and 2 infra nodes that route service traffic within the cluster. If resources are limited the infra support may be placed on the master nodes.  The compute nodes typically handle all the main processing pods.  The number of compute nodes will allow horizontal scaling by increasing the pod count and if the pod resources exceeds the resources of the cluster then another compute node can be added to the cluster. 
+  
+**Step 02.** 
+  
+* **NPE Certificate** It is preferable to have a valid wildcard NPE certificate that can be used.  If this is in the format of a .p12 it needs to be converted into a pem and key without a password and have the CA available.  If the ability to use a wildcard NPE CERT that is fine. You will at the minimum need an NPE CERT for the okd hawkular metrics and OKD master web console endpoints.  Additional NPE CERTS will be needed for any web applications installed on the cluster that needs to serve via https.
 
-If we do not have the luxury of being able to host or install OpenShift within a cloud environment and be able to use one of their cloud installation scripts we will need to configure and deploy OpenShift "manually".  When we say "manually" we have to configure each bare-metal machine with some initial settings before the openshift-ansible scripts can be ran to setup the cluster as an OpenShift environment.
-
-For this example installation process we will use one node for master, infra and compute and will have DNS names:
-
-* `openshift-test-master-node-1.foo.io`
-* `openshift-test-infra-node-1.foo.io`
-* `openshift-test-compute-node-1.foo.io`
-
-Please rename accordingly for your installation.  For a production install you probably would want at least 2 or 3 masters and 2 infra nodes that route service traffic within the cluster. If you are limited on resources you can double up the infra and put the infra support on the master nodes.  The compute or "worker nodes" typically handle all the main processing pods.  The number of compute nodes will allow one to horizontally scale compute power by increasing the pod count and if the pod resources exceeds the resources of your cluster then you can add another compute node to the cluster and keep horizontally scaling.
 
 Before we begin, please have your NPE Certificate(s) for each endpoint hosted via https which at a minimum will be hawkular, and the web console.
 
 ## Ansible
 
-We will need a machine running ansible that will be used to configure and setup the OpenShift cluster.  The ansible machine does not need to be very powerful, for it is only used for cluster configuration.  We will also use the ansible host as a disconnected machine that will serve up the OpenShift origin containers and the RPMS used during the installation process.  The machine uses ansible to configure your OpenShift cluster using the openshift-ansible playbooks.  If you are limited on resources, you can use the node that will be dedicated to the OpenShift master as your ansible machine.  It is best to have a separate ansible machine dedicated to the configuration of the cluster, so if you need to destroy the cluster and re-install, you still have your configuration machine in tact.
+**Step XX.** Locate or provision a machine that will serve to install and configure the cluster. 
 
-### Install Ansible
-
-We have supplied a mechanism that uses docker to serve up openshift related RPM and container dependencies.  For disconnected networks we will assume that the /etc/yum.repo.d/ directory has files that are pointing to a yum repo that holds all the base RPMS for a CentOS distribution including any updates and extras.  If you do not have these then these could be added to our RPM tree as described in this [README](../disconnected/README.md)
-
+*Notes:* This machine does not need to be very powerful, for it is only used for cluster configuration.  The machine will also serve up the OpenShift origin containers and the RPMS used during the installation process.  The machine uses ansible to configure the OpenShift cluster using the openshift-ansible playbooks.  If resources are limited, use the node that will be dedicated to the OpenShift master as the ansible machine.  It is best to have a separate ansible machine dedicated to the configuration of the cluster, so if the cluster needs to be destroyed and re-installed, you still have your configuration machine in tact.
 
 **Step XX.** Install The necessary dependencies:
 ```bash
