@@ -30,12 +30,9 @@
   
 *Notes:* It is recommended the cluster contain at least 2 masters and 2 infra nodes that route service traffic within the cluster. If resources are limited the infra support may be placed on the master nodes.  The compute nodes typically handle all the main processing pods.  The number of compute nodes will allow horizontal scaling by increasing the pod count and if the pod resources exceeds the resources of the cluster then another compute node can be added to the cluster. 
   
-**Step 02.** 
-  
-* **NPE Certificate** It is preferable to have a valid wildcard NPE certificate that can be used.  If this is in the format of a .p12 it needs to be converted into a pem and key without a password and have the CA available.  If the ability to use a wildcard NPE CERT that is fine. You will at the minimum need an NPE CERT for the okd hawkular metrics and OKD master web console endpoints.  Additional NPE CERTS will be needed for any web applications installed on the cluster that needs to serve via https.
+**Step 02.** Prepare the NPE Certificate(s) for each endpoint hosted via https. 
 
-
-Before we begin, please have your NPE Certificate(s) for each endpoint hosted via https which at a minimum will be hawkular, and the web console.
+*Notes:* This will at a minimum be used for hawkular, and the web console. It is preferable to have a valid wildcard NPE certificate that can be used.  If this is in the format of a .p12 it needs to be converted into a pem and key without a password and have the CA available.  If the ability to use a wildcard NPE CERT that is fine.
 
 ## Ansible
 
@@ -157,7 +154,7 @@ cd ~/openshift-ansible
 ansible-playbook -i ~/openshift-inventory playbooks/prerequisites.yml
 ansible-playbook -i ~/openshift-inventory playbooks/deploy_cluster.yml
 ```
-*Note:* Use the `playbooks/adhoc/uninstall.yml` playbook liberally as it may take a few times to properly configure the cluster. 
+*Notes:* Use the `playbooks/adhoc/uninstall.yml` playbook liberally as it may take a few times to properly configure the cluster. 
 
 **Step XX.** Setup the Security Context for the cluster to allow things to run as any user:
 
