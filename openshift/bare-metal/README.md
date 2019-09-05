@@ -36,11 +36,11 @@
 
 ## Ansible
 
-**Step XX.** Locate or provision a machine that will serve to install and configure the cluster. 
+**Step 03.** Locate or provision a machine that will serve to install and configure the cluster. 
 
 *Notes:* This machine does not need to be very powerful, for it is only used for cluster configuration.  The machine will also serve up the OpenShift origin containers and the RPMS used during the installation process.  The machine uses ansible to configure the OpenShift cluster using the openshift-ansible playbooks.  If resources are limited, use the node that will be dedicated to the OpenShift master as the ansible machine.  It is best to have a separate ansible machine dedicated to the configuration of the cluster, so if the cluster needs to be destroyed and re-installed, you still have your configuration machine in tact.
 
-**Step XX.** Install The necessary dependencies:
+**Step 04.** Install the necessary dependencies:
 ```bash
 sudo yum install -y ansible
 sudo yum install -y centos-release-ansible26
@@ -51,9 +51,9 @@ sudo yum install -y pyOpenSSL
 sudo yum install -y python-passlib 
 ```
 
-*Notes:* For disconnected environments, we assume all dependency RPMs are in a common repo and have a repo file under /etc/yum.repo.d/ directory pointing to your common yum repository. Obviously, git can be ignored in this case. At the time of writing this document we are using ansible version **2.7.10**.  
+*Notes:* For disconnected environments, all dependency RPMs need to be in a common repo and have a repo file under `/etc/yum.repo.d/` directory pointing to the common yum repository. Obviously, git can be ignored in this case. At the time of writing this document we are using ansible version **2.7.10**.  
 
-**Step XX:** On an internet connected machine, checkout out the the openshift-ansible playbooks.
+**Step 05.** On an internet connected machine, checkout out the the openshift-ansible playbooks.
 ```bash
 cd ~
 git clone https://github.com/openshift/openshift-ansible.git
@@ -65,7 +65,7 @@ git checkout release-3.11
 
 ### SSH Keys and Config
 
-**Step XX.** Create an SSH key to allow the ansible machine to communicate with the rest of the cluster:
+**Step 06.** Create an SSH key to allow the ansible machine to communicate with the rest of the cluster:
 ```bash
 mkdir ~/.ssh;chmod 700 ~/.ssh
 ssh-keygen -f ~/.ssh/os-config-key-rsa -t rsa -b 4096
@@ -74,49 +74,49 @@ ssh-copy-id -i ~/.ssh/os-config-key-rsa user@host
 
 *Notes:* The preferred way is to create an ssh key without a password.  If a password is added to the ssh key, use an ssh-agent on the ansible machine. 
 
-**Step XX.** Copy the ssh keys to all nodes in the cluster. 
+**Step 07.** Copy the ssh keys to all nodes in the cluster. 
 
 *Notes:* It is important to note that the **ssh user must have sudo rights** on each node, for the ansible scripts will install items that require sudo privileges.  If the **keys are password protected** then make sure the ssh-agent is running on the ansible machine and then add the key.
 
-**Step XX.** Create `~/.ssh/config` on your ansible machine, listing all the nodes in the cluster: 
+**Step 08.** Create `~/.ssh/config` on the ansible machine, listing all the nodes in the cluster: 
 ```config
-Host openshift-master-node-1.private.ossim.io
+Host <master nodes(s)>
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
-Host openshift-infra-node-1.private.ossim.io
+Host <infra node(s)>
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
-Host openshift-compute-node-1.private.ossim.io
+Host <compute node(s)>
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
-Host openshift-lb-node.private.ossim.io
+Host <load balancer(s)>
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
 ```
 
-**Step XX.** Change the permissions on the config file:
+**Step 09.** Change the permissions on the config file:
 ```bash
 chmod 600 ~/.ssh/config
 ```
 
-**Step XX.** Setup NetworkManager and python ssl on all nodes:
+**Step 10.** Setup NetworkManager and python ssl on all nodes:
 
 ```bash
 ssh <node-dns-or-ip> "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"
 ```
 
-*Note*: when you start the installation and you see messages of the form  `RETRYING: Wait for the ServiceMonitor CRD to be created` you will need to make sure you enable ip forwarding on all nodes see [Ip Forwarding Must Be Enable](#ip-forwarding-must-be-enable) section on how to set the value.
+*Note*: When the installation is started and messages appear in the form  `RETRYING: Wait for the ServiceMonitor CRD to be created` make sure ip forwarding is enabled on all nodes see [Ip Forwarding Must Be Enabled](#ip-forwarding-must-be-enabled) section on how to set the value.
 
-**Step XX.** If a gluster cluster needs to be configured for openshift dynamic provisioning support then run the following script:
+**Step 11.** If a gluster cluster needs to be configured for openshift dynamic provisioning support then run the following script:
 
 ```bash
 ssh <gluster-dns-or-ip> "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL; sudo systemctl enable NetworkManager; sudo systemctl start NetworkManager"
 ```
-*Note:* The gluster cluster should have un-allocated disks and OpenShift installs heketi to add a restful interface for dynamically provisioning space from the gluster cluster.
+*Notes:* The gluster cluster should have un-allocated disks and OpenShift installs heketi to add a restful interface for dynamically provisioning space from the gluster cluster.
 
 ### Dynamic Provisioning with Gluster
 
-**Step XX.** If provisioning with Gluster, modify the inventory file appropriately: 
+**Step 12.** If provisioning with Gluster, modify the inventory file appropriately: 
 
 ```config
 openshift_storage_glusterfs_is_native=true
@@ -140,7 +140,7 @@ We can override the variable without editing the scripts but the original list c
 
 ### Configure the Nodes in the Cluster
 
-**Step XX.** Edit the openshift inventory file:  
+**Step 12.** Edit the openshift inventory file:  
 ```bash
 cp o2-pushbutton/openshift/bare-metal/openshift-inventory-sample ~/openshift-inventory
 vi ~/openshift-inventory
@@ -344,7 +344,7 @@ The node should no longer be scheduling and have any pods running on it.  We can
 oc delete node <node>
 ```
 
-### Ip Forwarding Must Be Enable
+### Ip Forwarding Must Be Enabled
 
 For the OpenShift pod to write out the network settings the ip forwarding must be enabled on all the nodes.
 
