@@ -148,7 +148,7 @@ vi ~/openshift-inventory
 
 *Note:* If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  
 
-**Step XX.** Let ansible configure the cluster: 
+**Step 13.** Let ansible configure the cluster: 
 ```bash
 cd ~/openshift-ansible
 ansible-playbook -i ~/openshift-inventory playbooks/prerequisites.yml
@@ -156,7 +156,7 @@ ansible-playbook -i ~/openshift-inventory playbooks/deploy_cluster.yml
 ```
 *Notes:* Use the `playbooks/adhoc/uninstall.yml` playbook liberally as it may take a few times to properly configure the cluster. 
 
-**Step XX.** Setup the Security Context for the cluster to allow things to run as any user:
+**Step 14.** Setup the Security Context for the cluster to allow things to run as any user:
 
 ```bash
 oc login -u system:admin
@@ -170,7 +170,7 @@ runAsUser:
   type: RunAsAny
 ```
 
-**Step XX.** Edit the restricted scc:
+**Step 15.** Edit the restricted scc:
 
 ```bash
 oc login -u system:admin
