@@ -119,15 +119,15 @@ ssh <gluster-dns-or-ip> "sudo yum install -y python-passlib java-1.8.0-openjdk-h
 
 ### Dynamic Provisioning with Gluster
 
-For the gluster ansible scripts to work, please make sure you have the latest CentOS7 and updates installed on your gluster nodes.  We will show the dynamic provisioning via heketi.  The dynamic provisioning is facilitated through heketi and will carve out volumes from the gluster cluster on demand.  At the time of writing this document the version of CentOS that we know worked with the configuration setup is **CentOS Linux release 7.6.1810 (Core)**.  Note, when the openshift installation gets to heketi and it loads the topology it seems to take a while, so please be patient.
-
-The gluster interface allows one to dynamically provision volumes using heketi.  The current installation allows the gluster server to be installed as a daemonset into OpenShift.  This is indicated by the variables in the inventory file:
+**Step XX.** If provisioning with Gluster, modify the inventory file appropriately: 
 
 ```config
 openshift_storage_glusterfs_is_native=true
 openshift_storage_glusterfs_heketi_is_native=true
 openshift_storage_glusterfs_name="dynamic"
 ```
+
+*Notes:* For the gluster ansible scripts to work, please make sure you have the latest CentOS7 and updates installed on your gluster nodes.  We will show the dynamic provisioning via heketi.  The dynamic provisioning is facilitated through heketi and will carve out volumes from the gluster cluster on demand.  At the time of writing this document the version of CentOS that we know worked with the configuration setup is **CentOS Linux release 7.6.1810 (Core)**.  Note, when the openshift installation gets to heketi and it loads the topology it seems to take a while, so please be patient.
 
 A gluster server is installed on every node listed in the **[glusterfs]** section.
 
@@ -159,15 +159,12 @@ ansible-playbook -i ~/openshift-inventory playbooks/deploy_cluster.yml
 ```
 *Note:* Use the `playbooks/adhoc/uninstall.yml` playbook liberally as it may take a few times to properly configure the cluster. 
 
-Once the cluster has been deployed we must setup the Security Context for the cluster to allow us to run as any user.  The OMAR services run as user 1000 and the ElasticSearch Opendistro cluster runs as user 1001.  The easiest thing to do is:
+**Step XX.** Setup the Security Context for the cluster to allow things to run as any user:
 
 ```bash
 oc login -u system:admin
 oc edit scc privileged
 ```
-
-set the variables:
-
 ```yaml
 allowPrivilegeEscalation: true
 allowPrivilegedContainer: true
@@ -176,15 +173,12 @@ runAsUser:
   type: RunAsAny
 ```
 
-Also edit the restricted scc:
+**Step XX.** Edit the restricted scc:
 
 ```bash
 oc login -u system:admin
 oc edit scc restricted
 ```
-
-set the variables:
-
 ```yaml
 allowPrivilegeEscalation: true
 allowPrivilegedContainer: true
@@ -196,9 +190,7 @@ runAsUser:
   type: RunAsAny
 ```
 
-**Note:** The defaultAddCapabilities might be set to NULL initially.  This is needed for some of the pods that wish to have s3 mounting via goofys.
-
-then exit with the command sequence Escape key, then hit colin key ":" then "wq" key this will save the modifications.  We are now ready to install a sample ElasticCluster using our dynamic provisioning.
+*Notes:* The defaultAddCapabilities might be set to NULL initially.  This is needed for some of the pods that wish to have s3 mounting via goofys.
 
 ### Gluster Volume Types
 
