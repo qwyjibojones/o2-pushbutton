@@ -2,7 +2,7 @@
 
 ## Requirements
 
-For completeness we will repeat from the Origin Documentation for 3.11 the Hardware Requirements but tailored to our CentOS7 environment.
+**Step 01.** Ensure your cluster hardware meets the following requirements. For completeness we will repeat from the Origin Documentation for 3.11 the Hardware Requirements but tailored to our CentOS7 environment.
 
 * **Master Hardware**
   - Physical or virtual system or an instance running on a public or private IaaS.
@@ -27,131 +27,104 @@ For completeness we will repeat from the Origin Documentation for 3.11 the Hardw
   - Minimum 20 GB hard disk space for etcd data.
   - See the Hardware Recommendations section of the CoreOS etcd documentation for information how to properly size your etcd nodes.
   - Currently, OKD stores image, build, and deployment metadata in etcd. You must periodically prune old resources. If you are planning to leverage a large number of these resources, place etcd on machines with large amounts of memory and fast SSD drives.
-* **System Admin Knowledge** One will need to have some level of training in System Administration and bash scripting.
-* **Repos**
-  - openshift-ansible This will be a checkout or tar ball of release-3.11.  Repo can be found here [https://github.com/openshift/openshift-ansible](https://github.com/openshift/openshift-ansible)
-  - o2-pushbutton repo can be found here [https://github.com/ossimlabs/o2-pushbutton](https://github.com/ossimlabs/o2-pushbutton)
   
-* **NPE Certificate** We prefer that you have a valid wildcard NPE certificate that we can use.  If this is in the format of a .p12 we will need to convert into a pem and key without a password and have the CA available.  If you do not have the ability to use a wildcard NPE CERT that is fine. You will at the minimum need an NPE CERT for the okd hawkular metrics and OKD master web console endpoints.  Additional NPE CERTS will be needed for any web applications installed on the cluster that needs to serve via https.
+*Notes:* It is recommended the cluster contain at least 2 masters and 2 infra nodes that route service traffic within the cluster. If resources are limited the infra support may be placed on the master nodes.  The compute nodes typically handle all the main processing pods.  The number of compute nodes will allow horizontal scaling by increasing the pod count and if the pod resources exceeds the resources of the cluster then another compute node can be added to the cluster. 
+  
+**Step 02.** Prepare the NPE Certificate(s) for each endpoint hosted via https. 
 
-If we do not have the luxury of being able to host or install OpenShift within a cloud environment and be able to use one of their cloud installation scripts we will need to configure and deploy OpenShift "manually".  When we say "manually" we have to configure each bare-metal machine with some initial settings before the openshift-ansible scripts can be ran to setup the cluster as an OpenShift environment.
-
-For this example installation process we will use one node for master, infra and compute and will have DNS names:
-
-* `openshift-test-master-node-1.foo.io`
-* `openshift-test-infra-node-1.foo.io`
-* `openshift-test-compute-node-1.foo.io`
-
-Please rename accordingly for your installation.  For a production install you probably would want at least 2 or 3 masters and 2 infra nodes that route service traffic within the cluster. If you are limited on resources you can double up the infra and put the infra support on the master nodes.  The compute or "worker nodes" typically handle all the main processing pods.  The number of compute nodes will allow one to horizontally scale compute power by increasing the pod count and if the pod resources exceeds the resources of your cluster then you can add another compute node to the cluster and keep horizontally scaling.
-
-Before we begin, please have your NPE Certificate(s) for each endpoint hosted via https which at a minimum will be hawkular, and the web console.
+*Notes:* This will at a minimum be used for hawkular, and the web console. It is preferable to have a valid wildcard NPE certificate that can be used.  If this is in the format of a .p12 it needs to be converted into a pem and key without a password and have the CA available.  If the ability to use a wildcard NPE CERT that is fine.
 
 ## Ansible
 
-We will need a machine running ansible that will be used to configure and setup the OpenShift cluster.  The ansible machine does not need to be very powerful, for it is only used for cluster configuration.  We will also use the ansible host as a disconnected machine that will serve up the OpenShift origin containers and the RPMS used during the installation process.  The machine uses ansible to configure your OpenShift cluster using the openshift-ansible playbooks.  If you are limited on resources, you can use the node that will be dedicated to the OpenShift master as your ansible machine.  It is best to have a separate ansible machine dedicated to the configuration of the cluster, so if you need to destroy the cluster and re-install, you still have your configuration machine in tact.
+**Step 03.** Locate or provision a machine that will serve to install and configure the cluster. 
 
-### Install Ansible
+*Notes:* This machine does not need to be very powerful, for it is only used for cluster configuration.  The machine will also serve up the OpenShift origin containers and the RPMS used during the installation process.  The machine uses ansible to configure the OpenShift cluster using the openshift-ansible playbooks.  If resources are limited, use the node that will be dedicated to the OpenShift master as the ansible machine.  It is best to have a separate ansible machine dedicated to the configuration of the cluster, so if the cluster needs to be destroyed and re-installed, you still have your configuration machine in tact.
 
-We have supplied a mechanism that uses docker to serve up openshift related RPM and container dependencies.  For disconnected networks we will assume that the /etc/yum.repo.d/ directory has files that are pointing to a yum repo that holds all the base RPMS for a CentOS distribution including any updates and extras.  If you do not have these then these could be added to our RPM tree as described in this [README](../disconnected/README.md)
-
-For connected environments:
-
+**Step 04.** Install the necessary dependencies:
 ```bash
-sudo yum install -y git centos-release-ansible26
-sudo yum install -y ansible python-passlib git pyOpenSSL httpd-tools java-1.8.0-openjdk-headless
+sudo yum install -y ansible
+sudo yum install -y centos-release-ansible26
+sudo yum install -y git 
+sudo yum install -y httpd-tools 
+sudo yum install -y java-1.8.0-openjdk-headless
+sudo yum install -y pyOpenSSL 
+sudo yum install -y python-passlib 
 ```
 
-For disconnected environments, assume all dependency RPMs are in a common repo and have a repo file under /etc/yum.repo.d/ directory pointing to your common yum repository.
+*Notes:* For disconnected environments, all dependency RPMs need to be in a common repo and have a repo file under `/etc/yum.repo.d/` directory pointing to the common yum repository. Obviously, git can be ignored in this case. At the time of writing this document we are using ansible version **2.7.10**.  
 
-```bash
-sudo yum install -y ansible python-passlib git pyOpenSSL httpd-tools java-1.8.0-openjdk-headless
-```
-
-At the time of writing this document we are using ansible version **2.7.10**.  
-
-If you have internet connectivity you can checkout openshift-ansible playbooks from the openshift project on github.
-
+**Step 05.** On an internet connected machine, checkout out the the openshift-ansible playbooks.
 ```bash
 cd ~
 git clone https://github.com/openshift/openshift-ansible.git
 cd ~/openshift-ansible
 git checkout release-3.11
-# for disconnected create a tarball
-cd ~
-tar cvfz openshift-ansible.tgz openshift-ansible
 ```
 
-If you are disconnected then the openshift-ansible repo will need to be tarballed up and then extracted to the home/working directory of an install user on the ansible machine. We will assume that the version is the same mentioned in this Documentation, release-3.11.
+*Notes:* For disconnected environments, make this repository available. 
 
-`tar xvfz openshift-ansible.tgz`
+### SSH Keys and Config
 
-We have made no modifications to the installation playbooks and can be used as is.  Most of the playbooks have variables we can set in the inventory file to customize the installation process.
-
-### Setup SSH Keys and Config
-
-SSH is used by ansible to configure nodes in the cluster.  Each node must be reachable from the ansible configuration node.  Setup an ssh key for a common user so one can configure all nodes in the inventory. The preferred way is to create an ssh key without a password.  If you add a password to your ssh key you must use an ssh-agent on the ansible machine.  The ssh-agent will cache the password and encrypt it.  We will now copy this ssh id to all nodes in the cluster so the authorized_keys will be configured and setup for ssh on each node.  It is important to note that the **ssh user must have sudo rights** on each node, for the ansible scripts will install items that require sudo privileges.  You can use the ssh-copy-id tool to handle setting up the authorized_keys, ... etc on the target machine.
-
+**Step 06.** Create an SSH key to allow the ansible machine to communicate with the rest of the cluster:
 ```bash
 mkdir ~/.ssh;chmod 700 ~/.ssh
 ssh-keygen -f ~/.ssh/os-config-key-rsa -t rsa -b 4096
 ssh-copy-id -i ~/.ssh/os-config-key-rsa user@host
 ```
 
-If the **keys are password protected** then make sure the ssh-agent is running on the ansible machine and then add the key.
+*Notes:* The preferred way is to create an ssh key without a password.  If a password is added to the ssh key, use an ssh-agent on the ansible machine. 
 
-```bash
-ssh-agent
-ssh-add ~/.ssh/os-config-key-rsa
-```
+**Step 07.** Copy the ssh keys to all nodes in the cluster. 
 
-`create ~/.ssh/config` on your ansible machine with contents listing all nodes in your cluster
+*Notes:* It is important to note that the **ssh user must have sudo rights** on each node, for the ansible scripts will install items that require sudo privileges.  If the **keys are password protected** then make sure the ssh-agent is running on the ansible machine and then add the key.
 
+**Step 08.** Create `~/.ssh/config` on the ansible machine, listing all the nodes in the cluster: 
 ```config
-Host openshift-test-master-node-1.private.ossim.io
+Host <master nodes(s)>
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
-Host openshift-test-infra-node-1.private.ossim.io
+Host <infra node(s)>
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
-Host openshift-test-compute-node-1.private.ossim.io
+Host <compute node(s)>
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
-Host openshift-test-lb-node.private.ossim.io
+Host <load balancer(s)>
   User centos
   IdentityFile ~/.ssh/os-config-key-rsa
 ```
 
-change the permissions to be 600: `chmod 600 ~/.ssh/config`
+**Step 09.** Change the permissions on the config file:
+```bash
+chmod 600 ~/.ssh/config
+```
 
-Setup NetworkManager and python ssl on all nodes.  If you have your nodes in the config named with numbers 1-n then it's a simple bash script and can be done for each dns prefix.  In this example all of our nodes are prefixed with openshift-test-node-.  When metrics are enabled we must add to the install java headless and python-passlib.  Please modify these bash commands to match the number of nodes and dns values:
+**Step 10.** Setup NetworkManager and python ssl on all nodes:
 
 ```bash
-for x in {1..3}; do ssh openshift-test-master-node-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
-for x in {1..1}; do ssh openshift-test-infra-node-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
-for x in {1..8}; do ssh openshift-test-compute-node-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
+ssh <node-dns-or-ip> "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"
 ```
 
-**Note**: when you start the installation and you see messages of the form  `RETRYING: Wait for the ServiceMonitor CRD to be created` you will need to make sure you enable ip forwarding on all nodes see [Ip Forwarding Must Be Enable](#ip-forwarding-must-be-enable) section on how to set the value.
+*Note*: When the installation is started and messages appear in the form  `RETRYING: Wait for the ServiceMonitor CRD to be created` make sure ip forwarding is enabled on all nodes see [Ip Forwarding Must Be Enabled](#ip-forwarding-must-be-enabled) section on how to set the value.
 
-If you have a gluster cluster that would need to be configured for openshift dynamic provisioning support then we will assume similar private dns names and you can run the following script
+**Step 11.** If a gluster cluster needs to be configured for openshift dynamic provisioning support then run the following script:
 
 ```bash
-for x in {1..3}; do ssh openshift-test-glusterfs-$x.private.ossim.io "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL;sudo systemctl enable NetworkManager;sudo systemctl start NetworkManager"; done
+ssh <gluster-dns-or-ip> "sudo yum install -y python-passlib java-1.8.0-openjdk-headless NetworkManager pyOpenSSL; sudo systemctl enable NetworkManager; sudo systemctl start NetworkManager"
 ```
-
-Note, the gluster cluster here should have un-allocated disks and OpenShift installs heketi to add a restful interface for dynamically provisioning space from the gluster cluster.
+*Notes:* The gluster cluster should have un-allocated disks and OpenShift installs heketi to add a restful interface for dynamically provisioning space from the gluster cluster.
 
 ### Dynamic Provisioning with Gluster
 
-For the gluster ansible scripts to work, please make sure you have the latest CentOS7 and updates installed on your gluster nodes.  We will show the dynamic provisioning via heketi.  The dynamic provisioning is facilitated through heketi and will carve out volumes from the gluster cluster on demand.  At the time of writing this document the version of CentOS that we know worked with the configuration setup is **CentOS Linux release 7.6.1810 (Core)**.  Note, when the openshift installation gets to heketi and it loads the topology it seems to take a while, so please be patient.
-
-The gluster interface allows one to dynamically provision volumes using heketi.  The current installation allows the gluster server to be installed as a daemonset into OpenShift.  This is indicated by the variables in the inventory file:
+**Step 12.** If provisioning with Gluster, modify the inventory file appropriately: 
 
 ```config
 openshift_storage_glusterfs_is_native=true
 openshift_storage_glusterfs_heketi_is_native=true
 openshift_storage_glusterfs_name="dynamic"
 ```
+
+*Notes:* For the gluster ansible scripts to work, please make sure you have the latest CentOS7 and updates installed on your gluster nodes.  We will show the dynamic provisioning via heketi.  The dynamic provisioning is facilitated through heketi and will carve out volumes from the gluster cluster on demand.  At the time of writing this document the version of CentOS that we know worked with the configuration setup is **CentOS Linux release 7.6.1810 (Core)**.  Note, when the openshift installation gets to heketi and it loads the topology it seems to take a while, so please be patient.
 
 A gluster server is installed on every node listed in the **[glusterfs]** section.
 
@@ -167,34 +140,28 @@ We can override the variable without editing the scripts but the original list c
 
 ### Configure the Nodes in the Cluster
 
-We now assume that you have a ~/.ssh/config file that describes how to reach each node in the cluster.  We will now place those nodes into the proper sections described in the annotated sample inventory file found in the directory **[openshift/openshift-inventory-sample](openshift/openshift-inventory-sample)**.  Use this file to create an inventory file for your cluster in the ansible home ~/openshift-inventory.  The file has annotations explaining each section and must be tailored for your environment and resource limits.  If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  Please see the inventory example for further definitions.  
-
-Copy  and edit the inventory file
-
+**Step 12.** Edit the openshift inventory file:  
 ```bash
-cp openshift/openshift-inventory-sample ~/openshift-inventory
+cp o2-pushbutton/openshift/bare-metal/openshift-inventory-sample ~/openshift-inventory
 vi ~/openshift-inventory
 ```
 
- Put your node name into each section the node corresponds to.  SSH to each node in the config.  This will verify that the ansible machine can reach all nodes and are part of the known_hosts.
+*Note:* If you only have a couple of machines to use for an OpenShift cluster then you can merge the definitions so they share machines.  For example,  you can have your master node, infra, and etcd all on one node and use the other node for compute only.  
 
-If all the nodes are reachable and ready to be configured then run:
-
+**Step 13.** Let ansible configure the cluster: 
 ```bash
 cd ~/openshift-ansible
 ansible-playbook -i ~/openshift-inventory playbooks/prerequisites.yml
 ansible-playbook -i ~/openshift-inventory playbooks/deploy_cluster.yml
 ```
+*Notes:* Use the `playbooks/adhoc/uninstall.yml` playbook liberally as it may take a few times to properly configure the cluster. 
 
-Once the cluster has been deployed we must setup the Security Context for the cluster to allow us to run as any user.  The OMAR services run as user 1000 and the ElasticSearch Opendistro cluster runs as user 1001.  The easiest thing to do is:
+**Step 14.** Setup the Security Context for the cluster to allow things to run as any user:
 
 ```bash
 oc login -u system:admin
 oc edit scc privileged
 ```
-
-set the variables:
-
 ```yaml
 allowPrivilegeEscalation: true
 allowPrivilegedContainer: true
@@ -203,15 +170,12 @@ runAsUser:
   type: RunAsAny
 ```
 
-Also edit the restricted scc:
+**Step 15.** Edit the restricted scc:
 
 ```bash
 oc login -u system:admin
 oc edit scc restricted
 ```
-
-set the variables:
-
 ```yaml
 allowPrivilegeEscalation: true
 allowPrivilegedContainer: true
@@ -223,9 +187,7 @@ runAsUser:
   type: RunAsAny
 ```
 
-**Note:** The defaultAddCapabilities might be set to NULL initially.  This is needed for some of the pods that wish to have s3 mounting via goofys.
-
-then exit with the command sequence Escape key, then hit colin key ":" then "wq" key this will save the modifications.  We are now ready to install a sample ElasticCluster using our dynamic provisioning.
+*Notes:* The defaultAddCapabilities might be set to NULL initially.  This is needed for some of the pods that wish to have s3 mounting via goofys.
 
 ### Gluster Volume Types
 
@@ -382,7 +344,7 @@ The node should no longer be scheduling and have any pods running on it.  We can
 oc delete node <node>
 ```
 
-### Ip Forwarding Must Be Enable
+### Ip Forwarding Must Be Enabled
 
 For the OpenShift pod to write out the network settings the ip forwarding must be enabled on all the nodes.
 
