@@ -134,18 +134,6 @@
                     "value": "master"
                   },
                   {
-                    "name": "OSSIM_PREFS_FILE",
-                    "value": "/usr/share/ossim/ossim-site-preferences"
-                  },
-                  {
-                    "name": "OSSIM_INSTALL_PREFIX",
-                    "value": "/usr"
-                  },
-                  {
-                    "name": "OSSIM_DATA",
-                    "value": "/data"
-                  },
-                  {
                     "name": "BUCKETS",
                     "value": "o2-test-data"
                   },

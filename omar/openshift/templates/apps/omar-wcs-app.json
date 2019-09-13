@@ -135,18 +135,6 @@
                     "value": "o2-test-data"
                   },
                   {
-                    "name": "OSSIM_PREFS_FILE",
-                    "value": "/usr/share/ossim/ossim-site-preferences"
-                  },
-                  {
-                    "name": "OSSIM_DATA",
-                    "value": "/data"
-                  },
-                  {
-                    "name": "OSSIM_INSTALL_PREFIX",
-                    "value": "/usr"
-                  },
-                  {
                     "name": "JAVA_OPTS",
                     "value": "${JAVA_OPTS}"
                   }
