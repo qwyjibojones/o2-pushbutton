@@ -35,6 +35,39 @@ def convert_overrides_to_dict(overrides):
     return overrides_dict
 
 
+def get_defaults_from_config(loaded_config):
+    return loaded_config['defaults']
+
+
+def get_phases_from_config(loaded_config):
+    return loaded_config['phases']
+
+
+def get_simplified_phases_from_config(loaded_config):
+    phases = [phase.keys() for phase in get_phases_from_config(loaded_config)]
+    return phases
+
+
+def generate_app_configs(loaded_config, overrides=[]):
+    all_app_configs = {}
+    for phase in get_phases_from_config(loaded_config):
+        for app_name, app_params in phase.iteritems():
+            params = generate_params_for_app(get_defaults_from_config(loaded_config),
+                                             app_params,
+                                             convert_overrides_to_dict(overrides))
+            all_app_configs[app_name] = params
+
+    return all_app_configs
+
+
+def generate_params_for_app(default_params, app_params, overrides):
+    params = {}
+    params.update(default_params)
+    params.update(app_params)
+    params.update(overrides)
+    return params
+
+
 # Get the final parameters for a service after taking defaults, app-specific configs, and overrides into account
 def get_params_for_service(config_file, service_name, overrides=[]):
     overrides_dict = convert_overrides_to_dict(overrides)
