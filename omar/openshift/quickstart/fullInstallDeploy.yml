@@ -110,6 +110,10 @@ phases:
     #   IMAGE_NAME: omar-blink
     #   template_file: apps/omar-blink.json
 
+    omar-cucumber-ingest-test:
+      IMAGE_NAME: omar-cucumber-ingest-test
+      template_file: apps/omar-cucumber-ingest-test.json
+
   - omar-docs-app:
       IMAGE_NAME: omar-docs-app
       template_file: apps/omar-docs-app.json
