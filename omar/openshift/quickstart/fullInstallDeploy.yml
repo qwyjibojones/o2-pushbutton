@@ -122,7 +122,7 @@ phases:
       IMAGE_NAME: omar-cucumber-ingest-test
       template_file: apps/omar-cucumber-ingest-test.json
 
-    omar-docs-app:
+  - omar-docs-app:
       IMAGE_NAME: omar-docs-app
       template_file: apps/omar-docs-app.json
 
