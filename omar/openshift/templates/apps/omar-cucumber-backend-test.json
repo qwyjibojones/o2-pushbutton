@@ -82,8 +82,6 @@
         "annotations": {
           "openshift.io/generated-by": "OpenShiftNewApp"
         },
-        "creationTimestamp": null,
-        "generation": 325,
         "labels": {
         },
         "name": "${APP_NAME}",
@@ -126,6 +124,17 @@
                 ],
                 "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/${APP_NAME}:${TAG}",
                 "imagePullPolicy": "Always",
+                "livenessProbe": {
+                  "failureThreshold": 5,
+                  "initialDelaySeconds": 20,
+                  "periodSeconds": 15,
+                  "successThreshold": 1,
+                  "httpGet": {
+                    "path": "/health",
+                    "port": 8080
+                  },
+                  "timeoutSeconds": 3
+                },
                 "name": "${APP_NAME}",
                 "ports": [
                   {
