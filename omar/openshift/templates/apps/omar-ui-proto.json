@@ -139,7 +139,7 @@
                 "imagePullPolicy": "Always",
                 "livenessProbe": {
                   "failureThreshold": 5,
-                  "initialDelaySeconds": 30,
+                  "initialDelaySeconds": 5,
                   "periodSeconds": 15,
                   "successThreshold": 1,
                   "tcpSocket": {
@@ -157,11 +157,11 @@
                 "readinessProbe": {
                   "failureThreshold": 15,
                   "httpGet": {
-                    "path": "/omar-ui-proto/health",
+                    "path": "/omar-ui-proto",
                     "port": 8080,
                     "scheme": "HTTP"
                   },
-                  "initialDelaySeconds": 30,
+                  "initialDelaySeconds": 5,
                   "periodSeconds": 15,
                   "successThreshold": 1,
                   "timeoutSeconds": 3
