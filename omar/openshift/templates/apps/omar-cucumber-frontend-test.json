@@ -130,7 +130,7 @@
                   "periodSeconds": 15,
                   "successThreshold": 1,
                   "httpGet": {
-                    "path": "/health",
+                    "path": "/backend-test/",
                     "port": 8080
                   },
                   "timeoutSeconds": 3
