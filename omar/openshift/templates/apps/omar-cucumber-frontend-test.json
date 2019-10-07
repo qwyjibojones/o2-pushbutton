@@ -156,7 +156,15 @@
             "dnsPolicy": "ClusterFirst",
             "restartPolicy": "Always",
             "securityContext": {},
-            "terminationGracePeriodSeconds": 30
+            "terminationGracePeriodSeconds": 30,
+            "volumes": [
+              {
+                "configMap": {
+                  "name": "cucumber-tests"
+                },
+                "name": "cucumber-tests"
+              }
+            ]
           }
         },
         "test": false,
