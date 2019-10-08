@@ -150,7 +150,13 @@
                     "memory": "${MEMORY_MAX}"
                   }
                 },
-                "terminationMessagePath": "/dev/termination-log"
+                "terminationMessagePath": "/dev/termination-log",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/conf",
+                    "name": "cucumber-tests"
+                  }
+                ]
               }
             ],
             "dnsPolicy": "ClusterFirst",
