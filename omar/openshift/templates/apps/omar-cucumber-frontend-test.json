@@ -120,6 +120,10 @@
                   {
                     "name": "JAVA_OPTS",
                     "value": "${JAVA_OPTS}"
+                  },
+                  {
+                    "name": "CUCUMBER_CONFIG_LOCATION",
+                    "value": "/conf/cucumber-config-frontend.groovy"
                   }
                 ],
                 "image": "${OPENSHIFT_DOCKER_REGISTRY_URL}/${DEPLOYMENT_TARGET}/${APP_NAME}:${TAG}",
