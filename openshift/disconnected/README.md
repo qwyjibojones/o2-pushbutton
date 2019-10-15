@@ -2,7 +2,7 @@
 
 ## Syncronizing Repos for Disconnected Installation
 
-**Step 01.** [Syncrhonize the RPMs](../../../repo-sync/README.md)
+**Step 01.** [Syncrhonize the RPMs](../../repo-sync/README.md)
 
 *Notes:* For disconnected installations of OpenShift 3.11 we need to synchronize RPM repos for the containers that will be running in the OpenShift environment.
 
